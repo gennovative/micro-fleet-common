@@ -1,14 +1,25 @@
 # Gennova backend common contracts
 
-Contains common interfaces used by other contract packages.
-
-See more examples and usage guide in unit test.
+Contains interfaces and models which are shared between data services and REST/web services.
 
 ---
 
-##INSTALLATION
+## INSTALLATION
 
+`npm i`: To install dependencies.
+`gulp` to transpile TypeScript.
+
+## DEVELOPMENT
+
+`gulp watch`: To transpile and watch for edit.
+
+## RELEASE
+
+`gulp release`: To transpile and create `app.d.ts` definition file.
 
 ## VERSIONS
 
-### 0.1.0
+### 1.0.0
+
+* `PagedArray<T>`: A derived Array class that supports pagination.
+* `IRepository`: Provides common methods for repositories.
