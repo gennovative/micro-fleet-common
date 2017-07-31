@@ -56,8 +56,22 @@ declare module 'back-lib-common-contracts/interfaces' {
 	}
 
 }
+declare module 'back-lib-common-contracts/models' {
+	import * as joi from 'joi';
+	export class GetSettingRequestValidator {
+	    static readonly schema: joi.ObjectSchema;
+	    static validate(target: GetSettingRequest): joi.ValidationResult<GetSettingRequest>;
+	}
+	export class GetSettingRequest {
+	    slug: string;
+	    ipAddress: string;
+	    constructor(from?: any);
+	}
+
+}
 declare module 'back-lib-common-contracts' {
 	export * from 'back-lib-common-contracts/interfaces';
+	export * from 'back-lib-common-contracts/models';
 	export * from 'back-lib-common-contracts/PagedArray';
 
 }
