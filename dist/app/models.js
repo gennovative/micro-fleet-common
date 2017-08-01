@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
+class ModelIdValidator {
+    static validate(id) {
+        return ModelIdValidator.schema.validate(id);
+    }
+}
+ModelIdValidator.schema = joi.string().regex(/^\d+$/).optional();
+exports.ModelIdValidator = ModelIdValidator;
 class GetSettingRequestValidator {
     static validate(target) {
         return GetSettingRequestValidator.schema.validate(target);

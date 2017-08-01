@@ -1,5 +1,13 @@
 import * as joi from 'joi';
 
+export class ModelIdValidator {
+	public static readonly schema = joi.string().regex(/^\d+$/).optional();
+
+	public static validate(id): joi.ValidationResult<BigSInt> {
+		return ModelIdValidator.schema.validate(id);
+	}
+}
+
 export class GetSettingRequestValidator {
 	public static readonly schema = joi.object({
 		slug: joi.string().regex(/^[0-9a-zA-z-]+$/).example('SettingSvc').example('setting-svc'),
