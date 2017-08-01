@@ -58,6 +58,10 @@ declare module 'back-lib-common-contracts/interfaces' {
 }
 declare module 'back-lib-common-contracts/models' {
 	import * as joi from 'joi';
+	export class ModelIdValidator {
+	    static readonly schema: joi.StringSchema;
+	    static validate(id: any): joi.ValidationResult<BigSInt>;
+	}
 	export class GetSettingRequestValidator {
 	    static readonly schema: joi.ObjectSchema;
 	    static validate(target: GetSettingRequest): joi.ValidationResult<GetSettingRequest>;
