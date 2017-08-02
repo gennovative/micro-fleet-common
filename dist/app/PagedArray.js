@@ -4,10 +4,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * A wrapper array that contains paged items.
  */
 class PagedArray extends Array {
-    constructor(_total, source) {
+    constructor(_total = 0, ...items) {
         super();
         this._total = _total;
-        Array.prototype.push.apply(this, source);
+        /* istanbul ignore else */
+        if (Array.isArray(items)) {
+            Array.prototype.push.apply(this, items);
+        }
     }
     /**
      * Gets total number of items.
