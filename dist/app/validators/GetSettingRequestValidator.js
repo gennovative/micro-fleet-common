@@ -5,19 +5,20 @@ const back_lib_common_util_1 = require("back-lib-common-util");
 const ModelValidatorBase_1 = require("./ModelValidatorBase");
 class GetSettingRequestValidator extends ModelValidatorBase_1.ModelValidatorBase {
     constructor() {
-        super(...arguments);
-        this._schema = joi.object({
+        super();
+        this._schemaMap = {
             slug: joi.string().regex(/^[0-9a-zA-z-]+$/).required().example('SettingSvc').example('setting-svc'),
             ipAddress: joi.string().ip().required().example('127.0.0.1').example('192.168.10.23')
-        });
+        };
+        this.compile();
     }
     /**
-     * This method is unnecessary. Use `forNew` instead.
+     * This method is unnecessary. Use `whole` instead.
      * @override
      * @throws NotImplementedException
      */
-    forEdit(target, options = {}) {
-        throw new back_lib_common_util_1.NotImplementedException('This method is not supported. Use `forNew` instead.');
+    partial(target, options = {}) {
+        throw new back_lib_common_util_1.NotImplementedException('This method is not supported. Use `whole` instead.');
     }
 }
 exports.GetSettingRequestValidator = GetSettingRequestValidator;

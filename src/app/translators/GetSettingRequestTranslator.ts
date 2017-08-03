@@ -1,5 +1,6 @@
 /// <reference types="automapper-ts" />
 
+/* istanbul ignore else */
 if (!global['automapper']) {
 	// AutoMapper registers itself as a singleton global variable.
 	require('automapper-ts');
@@ -8,6 +9,7 @@ import { NotImplementedException } from 'back-lib-common-util';
 
 import { GetSettingRequest } from '../models/GetSettingRequest';
 import { ModelValidatorBase } from '../validators/ModelValidatorBase';
+import { ValidationError } from '../validators/ValidationError';
 import validator from '../validators/GetSettingRequestValidator';
 import { ModelTranslatorBase } from './ModelTranslatorBase';
 
@@ -24,12 +26,12 @@ export class GetSettingRequestTranslator
 
 
 	/**
-	 * This method is unnecessary. Use `forNew` instead.
+	 * This method is unnecessary. Use `whole` instead.
 	 * @override
 	 * @throws NotImplementedException
 	 */
-	public forEdit(source: any): GetSettingRequest {
-		throw new NotImplementedException('This method is not supported. Use `forNew` instead.');
+	public partial(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<GetSettingRequest> {
+		throw new NotImplementedException('This method is not supported. Use `whole` instead.');
 	}
 
 
@@ -38,7 +40,6 @@ export class GetSettingRequestTranslator
 	 */
 	protected createMap(): void {
 		automapper.createMap('any', GetSettingRequest);
-			// .convertToType(GetSettingRequest);
 	}
 
 	/**

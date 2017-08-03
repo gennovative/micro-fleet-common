@@ -1,11 +1,12 @@
 import { expect } from 'chai';
+import { NotImplementedException } from 'back-lib-common-util';
 
 import { GetSettingRequest } from '../../app';
 import translator from '../../app/translators/GetSettingRequestTranslator';
 
 
 describe('GetSettingRequestTranslator', () => {
-	describe('forNew', () => {
+	describe('whole', () => {
 		it('Should return an object of type GetSettingRequest if success', () => {
 			// Arrange
 			let sourceOne = {
@@ -22,13 +23,13 @@ describe('GetSettingRequestTranslator', () => {
 
 			// Act
 			try {
-				convertedOne = translator.forNew(sourceOne);
+				convertedOne = translator.whole(sourceOne, false);
 			} catch (err) {
 				errorOne = err;
 			}
 			
 			try {
-				convertedTwo = translator.forNew(sourceTwo);
+				convertedTwo = translator.whole(sourceTwo, false);
 			} catch (err) {
 				errorTwo = err;
 			}
@@ -50,5 +51,22 @@ describe('GetSettingRequestTranslator', () => {
 			expect(convertedTwo.ipAddress).to.equal(sourceTwo.ipAddress);
 			expect(convertedTwo.unknown).not.to.exist;
 		});
-	});
+	}); // END describe 'whole'
+	
+	describe('partial', () => {
+		it('Should throw NotImplementedException', () => {
+			// Act
+			let result, exception;
+			try {
+				result = translator.partial({}, false);
+			} catch (err) {
+				exception = err;
+			}
+
+			// Assert
+			expect(result).not.to.exist;
+			expect(exception).to.exist;
+			expect(exception).to.be.instanceOf(NotImplementedException);
+		});
+	}); // END describe 'partial'
 });

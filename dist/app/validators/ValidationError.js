@@ -9,13 +9,17 @@ class ValidationError extends back_lib_common_util_1.Exception {
         super(null, false, ValidationError);
         this.parseDetails(details);
     }
+    get details() {
+        return this._details;
+    }
     parseDetails(joiDetails) {
-        this.details = [];
+        this._details = [];
+        /* istanbul ignore next */
         if (!joiDetails || !joiDetails.length) {
             return;
         }
         joiDetails.forEach(d => {
-            this.details.push({
+            this._details.push({
                 message: d.message,
                 path: d.path,
                 value: d.context.value

@@ -2,12 +2,13 @@
   "name": "back-lib-common-contracts",
   "private": true,
   "version": "1.0.0",
-  "description": "Contains common interfaces used by other contract packages.",
+  "description": "Contains interfaces and models which are shared between data services and REST/web services.",
   "main": "./dist/app/index.js",
   "types": "./typings/app.d.ts",
   "repository": "git@bitbucket.org:firstinteractive/back-lib-common-contracts.git",
   "engines": {
-    "node": "~7.10.1"
+    "node": "~7.10.1",
+    "npm": "^4.6.1"
   },
   "dependencies": {
     "back-lib-common-util": "git+ssh://git@bitbucket.org:firstinteractive/back-lib-common-util.git#1.0.0",

@@ -1,6 +1,7 @@
 "use strict";
 /// <reference types="automapper-ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
+/* istanbul ignore else */
 if (!global['automapper']) {
     // AutoMapper registers itself as a singleton global variable.
     require('automapper-ts');
@@ -17,19 +18,18 @@ class GetSettingRequestTranslator extends ModelTranslatorBase_1.ModelTranslatorB
         return GetSettingRequestValidator_1.default;
     }
     /**
-     * This method is unnecessary. Use `forNew` instead.
+     * This method is unnecessary. Use `whole` instead.
      * @override
      * @throws NotImplementedException
      */
-    forEdit(source) {
-        throw new back_lib_common_util_1.NotImplementedException('This method is not supported. Use `forNew` instead.');
+    partial(source, isEdit, errorCallback) {
+        throw new back_lib_common_util_1.NotImplementedException('This method is not supported. Use `whole` instead.');
     }
     /**
      * @override
      */
     createMap() {
         automapper.createMap('any', GetSettingRequest_1.GetSettingRequest);
-        // .convertToType(GetSettingRequest);
     }
     /**
      * @override

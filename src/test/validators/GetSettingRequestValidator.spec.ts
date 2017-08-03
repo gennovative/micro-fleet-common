@@ -1,11 +1,12 @@
 import { expect } from 'chai';
+import { NotImplementedException } from 'back-lib-common-util';
 
 import validator from '../../app/validators/GetSettingRequestValidator';
 
 
 describe('GetSettingRequestValidator', () => {
-	describe('forNew', () => {
-		it('Should return a valid object if valid', () => {
+	describe('whole', () => {
+		it('Should return the validated object if valid', () => {
 			// Arrange
 			let targetOne = {
 					slug: 'SettingSvc',
@@ -17,8 +18,8 @@ describe('GetSettingRequestValidator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.forNew(targetOne),
-				[errorTwo, validatedTwo] = validator.forNew(targetTwo);
+			let [errorOne, validatedOne] = validator.whole(targetOne),
+				[errorTwo, validatedTwo] = validator.whole(targetTwo);
 
 			// Assert
 			expect(errorOne).not.to.exist;
@@ -31,7 +32,7 @@ describe('GetSettingRequestValidator', () => {
 			expect(validatedTwo.slug).to.equal(targetTwo.slug);
 			expect(validatedTwo.ipAddress).to.equal(targetTwo.ipAddress);
 		});
-		
+
 		it('Should return an err object if invalid', () => {
 			// Arrange
 			let targetOne = {
@@ -46,9 +47,9 @@ describe('GetSettingRequestValidator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.forNew(targetOne),
-				[errorTwo, validatedTwo] = validator.forNew(targetTwo),
-				[errorThree, validatedThree] = validator.forNew(targetThree);
+			let [errorOne, validatedOne] = validator.whole(targetOne),
+				[errorTwo, validatedTwo] = validator.whole(targetTwo),
+				[errorThree, validatedThree] = validator.whole(targetThree);
 
 			// Assert
 			expect(errorOne).to.exist;
@@ -60,5 +61,22 @@ describe('GetSettingRequestValidator', () => {
 			expect(errorThree).to.exist;
 			expect(validatedThree).not.to.exist;
 		});
-	});
+	}); // END describe 'whole'
+
+	describe('partial', () => {
+		it('Should throw NotImplementedException', () => {
+			// Act
+			let result, exception;
+			try {
+				result = validator.partial({});
+			} catch (err) {
+				exception = err;
+			}
+
+			// Assert
+			expect(result).not.to.exist;
+			expect(exception).to.exist;
+			expect(exception).to.be.instanceOf(NotImplementedException);
+		});
+	}); // END describe 'partial'
 });

@@ -29,19 +29,27 @@ export interface IValidationErrorItem {
  */
 export class ValidationError extends Exception {
 	
-	private details: IValidationErrorItem[];
+	private _details: IValidationErrorItem[];
+
 
 	constructor(details: joi.ValidationErrorItem[]) {
 		super(null, false, ValidationError);
 		this.parseDetails(details);
 	}
 
+
+	public get details(): IValidationErrorItem[] {
+		return this._details;
+	}
+
+
 	private parseDetails(joiDetails: joi.ValidationErrorItem[]): void {
-		this.details = [];
+		this._details = [];
+		/* istanbul ignore next */
 		if (!joiDetails || !joiDetails.length) { return; }
 
 		joiDetails.forEach(d => {
-			this.details.push({
+			this._details.push({
 				message: d.message,
 				path: d.path,
 				value: d.context.value
