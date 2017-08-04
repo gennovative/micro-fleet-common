@@ -1,5 +1,5 @@
-export * from './models/GetSettingRequest';
-export * from './translators/ModelTranslatorBase';
-export * from './validators/ModelValidatorBase';
+export { GetSettingRequest } from './models/GetSettingRequest';
+export * from './translators/ModelAutoMapper';
+export * from './validators/JoiModelValidator';
 export * from './interfaces';
 export * from './PagedArray';

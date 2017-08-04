@@ -3,12 +3,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
 const back_lib_common_util_1 = require("back-lib-common-util");
 const ValidationError_1 = require("./ValidationError");
-class ModelValidatorBase {
-    constructor() {
+class JoiModelValidator {
+    /**
+     *
+     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
+     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID. Only the first property rule is used.
+     */
+    constructor(_schemaMap, _schemaMapId) {
+        this._schemaMap = _schemaMap;
+        this._schemaMapId = _schemaMapId;
         // As default, model ID is a string of 64-bit integer.
         // JS cannot handle 64-bit integer, that's why we must use string.
         // The database will convert to BigInt type when inserting.
-        this._schemaMapId = { id: joi.string().regex(/^\d+$/).required() };
+        this._schemaMapId = _schemaMapId || { id: joi.string().regex(/^\d+$/).required() };
+    }
+    /**
+     * Builds a new instance of ModelValidatorBase.
+     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
+     * @param {joi.SchemaMap} schemaMapId Rule to validate model ID. Only the first property rule is used.
+     */
+    static create(schemaMapModel, schemaMapId) {
+        let validator = new JoiModelValidator(schemaMapModel, schemaMapId);
+        validator.compile();
+        return validator;
     }
     /**
      * Validates model ID.
@@ -72,6 +89,6 @@ class ModelValidatorBase {
         return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
     }
 }
-exports.ModelValidatorBase = ModelValidatorBase;
+exports.JoiModelValidator = JoiModelValidator;
 
-//# sourceMappingURL=ModelValidatorBase.js.map
+//# sourceMappingURL=JoiModelValidator.js.map

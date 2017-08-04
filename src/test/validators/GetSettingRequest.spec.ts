@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { NotImplementedException } from 'back-lib-common-util';
 
-import validator from '../../app/validators/GetSettingRequestValidator';
+import { GetSettingRequest, validator } from '../../app/models/GetSettingRequest';
 
 
-describe('GetSettingRequestValidator', () => {
+describe('GetSettingRequest\'s validator', () => {
 	describe('whole', () => {
 		it('Should return the validated object if valid', () => {
 			// Arrange
@@ -12,10 +12,10 @@ describe('GetSettingRequestValidator', () => {
 					slug: 'SettingSvc',
 					ipAddress: '127.0.0.1'
 				},
-				targetTwo = {
-					slug: 'setting-svc',
-					ipAddress: '192.168.10.23'
-				};
+				targetTwo = new GetSettingRequest();
+
+			targetTwo.slug = 'setting-svc';
+			targetTwo.ipAddress = '192.168.10.23';
 
 			// Act
 			let [errorOne, validatedOne] = validator.whole(targetOne),

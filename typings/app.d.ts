@@ -1,21 +1,5 @@
 /// <reference path="./global.d.ts" />
 
-declare module 'back-lib-common-contracts/models/GetSettingRequest' {
-	/**
-	 * Represents the request contract for GetSetting endpoint.
-	 */
-	export class GetSettingRequest {
-	    /**
-	     * Gets or sets program slug.
-	     */
-	    slug: string;
-	    /**
-	     * Gets or sets IP address where the calling program is running.
-	     */
-	    ipAddress: string;
-	}
-
-}
 declare module 'back-lib-common-contracts/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { Exception } from 'back-lib-common-util';
@@ -46,7 +30,7 @@ declare module 'back-lib-common-contracts/validators/ValidationError' {
 	    	}
 
 }
-declare module 'back-lib-common-contracts/validators/ModelValidatorBase' {
+declare module 'back-lib-common-contracts/validators/JoiModelValidator' {
 	import * as joi from 'joi';
 	import { ValidationError } from 'back-lib-common-contracts/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
@@ -56,17 +40,15 @@ declare module 'back-lib-common-contracts/validators/ModelValidatorBase' {
 	     */
 	    isEdit?: boolean;
 	}
-	export abstract class ModelValidatorBase<T> {
-	    /**
-	     * Rules to validate model properties.
-	     * Can be overriden before calling `compile`.
-	     */
-	    protected readonly abstract _schemaMap: joi.SchemaMap;
-	    /**
-	     * Rule to validate model ID. Only the first property rule is used.
-	     * Can be overriden before calling `compile`.
-	     */
+	export class JoiModelValidator<T> {
+	    protected _schemaMap: joi.SchemaMap;
 	    protected _schemaMapId: joi.SchemaMap;
+	    /**
+	     * Builds a new instance of ModelValidatorBase.
+	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
+	     * @param {joi.SchemaMap} schemaMapId Rule to validate model ID. Only the first property rule is used.
+	     */
+	    static create<T>(schemaMapModel: joi.SchemaMap, schemaMapId?: joi.SchemaMap): JoiModelValidator<T>;
 	    /**
 	     * Compiled rules for model ID.
 	     */
@@ -80,7 +62,12 @@ declare module 'back-lib-common-contracts/validators/ModelValidatorBase' {
 	     * Used for patch operation.
 	     */
 	    protected _compiledPartial: joi.ObjectSchema;
-	    constructor();
+	    /**
+	     *
+	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
+	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID. Only the first property rule is used.
+	     */
+	    protected constructor(_schemaMap: joi.SchemaMap, _schemaMapId?: joi.SchemaMap);
 	    /**
 	     * Validates model ID.
 	     */
@@ -98,20 +85,29 @@ declare module 'back-lib-common-contracts/validators/ModelValidatorBase' {
 	}
 
 }
-declare module 'back-lib-common-contracts/translators/ModelTranslatorBase' {
-	import { ModelValidatorBase } from 'back-lib-common-contracts/validators/ModelValidatorBase';
+declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
+	import { JoiModelValidator } from 'back-lib-common-contracts/validators/JoiModelValidator';
 	import { ValidationError } from 'back-lib-common-contracts/validators/ValidationError';
-	export abstract class ModelTranslatorBase<T> {
+	/**
+	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
+	 */
+	export class ModelAutoMapper<T> {
+	    protected ModelClass: new () => any;
+	    protected _validator: JoiModelValidator<T>;
 	    /**
 	     * Turns on or off model validation before translating.
-	     * Default to `true`.
+	     * Is set to `true` if validator is passed to class constructor.
 	     */
 	    enableValidation: boolean;
-	    constructor();
 	    /**
-	     * Gets validator for specific type <T>.
+	     * @param {class} ModelClass The model class
+	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
 	     */
-	    protected readonly abstract validator: ModelValidatorBase<T>;
+	    constructor(ModelClass: new () => any, _validator?: JoiModelValidator<T>);
+	    /**
+	     * Gets validator.
+	     */
+	    readonly validator: JoiModelValidator<T>;
 	    /**
 	     * Validates then converts an object to type <T>.
 	     * but ONLY properties with value are validated and copied.
@@ -135,12 +131,33 @@ declare module 'back-lib-common-contracts/translators/ModelTranslatorBase' {
 	    /**
 	     * Initializes the model mapping engine.
 	     */
-	    protected abstract createMap(): void;
+	    protected createMap(): void;
 	    /**
 	     * Is invoked after source object is validated to map source object to target model.
 	     */
-	    protected abstract map(validatedSource: any): T;
-	    	}
+	    protected map(source: any): T;
+	    protected translate(fn: string, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T;
+	}
+
+}
+declare module 'back-lib-common-contracts/models/GetSettingRequest' {
+	import { ModelAutoMapper } from 'back-lib-common-contracts/translators/ModelAutoMapper';
+	import { JoiModelValidator } from 'back-lib-common-contracts/validators/JoiModelValidator';
+	/**
+	 * Represents the request contract for GetSetting endpoint.
+	 */
+	export class GetSettingRequest {
+	    /**
+	     * Gets or sets program slug.
+	     */
+	    slug: string;
+	    /**
+	     * Gets or sets IP address where the calling program is running.
+	     */
+	    ipAddress: string;
+	}
+	export let validator: JoiModelValidator<GetSettingRequest>;
+	export let translator: ModelAutoMapper<GetSettingRequest>;
 
 }
 declare module 'back-lib-common-contracts/PagedArray' {
@@ -200,59 +217,10 @@ declare module 'back-lib-common-contracts/interfaces' {
 
 }
 declare module 'back-lib-common-contracts' {
-	export * from 'back-lib-common-contracts/models/GetSettingRequest';
-	export * from 'back-lib-common-contracts/translators/ModelTranslatorBase';
-	export * from 'back-lib-common-contracts/validators/ModelValidatorBase';
+	export { GetSettingRequest } from 'back-lib-common-contracts/models/GetSettingRequest';
+	export * from 'back-lib-common-contracts/translators/ModelAutoMapper';
+	export * from 'back-lib-common-contracts/validators/JoiModelValidator';
 	export * from 'back-lib-common-contracts/interfaces';
 	export * from 'back-lib-common-contracts/PagedArray';
-
-}
-declare module 'back-lib-common-contracts/validators/GetSettingRequestValidator' {
-	import * as joi from 'joi';
-	import { GetSettingRequest } from 'back-lib-common-contracts/models/GetSettingRequest';
-	import { ValidationError } from 'back-lib-common-contracts/validators/ValidationError';
-	import { ModelValidatorBase, ValidationOptions } from 'back-lib-common-contracts/validators/ModelValidatorBase';
-	export class GetSettingRequestValidator extends ModelValidatorBase<GetSettingRequest> {
-	    protected readonly _schemaMap: {
-	        slug: joi.StringSchema;
-	        ipAddress: joi.StringSchema;
-	    };
-	    constructor();
-	    /**
-	     * This method is unnecessary. Use `whole` instead.
-	     * @override
-	     * @throws NotImplementedException
-	     */
-	    partial(target: any, options?: ValidationOptions): [ValidationError, GetSettingRequest];
-	} const _default: GetSettingRequestValidator;
-	export default _default;
-
-}
-declare module 'back-lib-common-contracts/translators/GetSettingRequestTranslator' {
-	import { GetSettingRequest } from 'back-lib-common-contracts/models/GetSettingRequest';
-	import { ModelValidatorBase } from 'back-lib-common-contracts/validators/ModelValidatorBase';
-	import { ValidationError } from 'back-lib-common-contracts/validators/ValidationError';
-	import { ModelTranslatorBase } from 'back-lib-common-contracts/translators/ModelTranslatorBase';
-	export class GetSettingRequestTranslator extends ModelTranslatorBase<GetSettingRequest> {
-	    /**
-	     * @override
-	     */
-	    protected readonly validator: ModelValidatorBase<GetSettingRequest>;
-	    /**
-	     * This method is unnecessary. Use `whole` instead.
-	     * @override
-	     * @throws NotImplementedException
-	     */
-	    partial(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<GetSettingRequest>;
-	    /**
-	     * @override
-	     */
-	    protected createMap(): void;
-	    /**
-	     * @override
-	     */
-	    protected map(validatedSource: any): GetSettingRequest;
-	} const _default: GetSettingRequestTranslator;
-	export default _default;
 
 }

@@ -1,50 +1,15 @@
-/// <reference types="automapper-ts" />
-
-if (!global['automapper']) {
-	// AutoMapper registers itself as a singleton global variable.
-	require('automapper-ts');
-}
+import * as joi from 'joi';
 import { expect } from 'chai';
 
-import { ModelTranslatorBase, ModelValidatorBase } from '../../app';
-import { SampleModelValidator, SampleModel } from '../validators/SampleModelValidator';
+import { ModelAutoMapper } from '../../app';
+import { SampleModel, validator } from '../validators/SampleModel';
 
-class SampleModelTranslator extends ModelTranslatorBase<SampleModel> {
 
-	private _validator: SampleModelValidator;
-	constructor() {
-		super();
-		this._validator = new SampleModelValidator();
-	}
-
-	/**
-	 * @override
-	 */
-	protected get validator(): ModelValidatorBase<SampleModel> {
-		return this._validator;
-	}
-
-	/**
-	 * @override
-	 */
-	protected createMap(): void {
-		automapper.createMap('any', SampleModel);
-	}
-
-	/**
-	 * @override
-	 */
-	protected map(validatedSource: any): SampleModel {
-		return automapper.map('any', SampleModel, validatedSource);
-	}
-}
-
-let translator: SampleModelTranslator;
-
+let translator: ModelAutoMapper<SampleModel>;
 
 describe('ModelTranslatorBase', () => {
 	beforeEach(() => {
-		translator = new SampleModelTranslator();
+		translator = new ModelAutoMapper(SampleModel, validator);
 	});
 
 	describe('whole', () => {

@@ -1,15 +1,23 @@
 import { expect } from 'chai';
 import * as joi from 'joi';
 
-import { ModelValidatorBase } from '../../app';
-import { SampleModelValidator, SampleModel } from './SampleModelValidator';
+import { JoiModelValidator } from '../../app';
+import { SampleModel } from './SampleModel';
 
 
-let validator: SampleModelValidator;
+let validator: JoiModelValidator<SampleModel>;
 
 describe('ModelValidatorBase', () => {
 	beforeEach(() => {
-		validator = new SampleModelValidator();
+		validator = JoiModelValidator.create<SampleModel>(
+			{
+				name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
+				address: joi.string().required(),
+				age: joi.number().min(15).max(99).integer().optional(),
+				gender: joi.only('male', 'female').optional()
+			},
+			{ theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required() }
+		);
 	});
 
 	describe('id', () => {

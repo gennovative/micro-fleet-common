@@ -1,26 +1,44 @@
-import { ModelValidatorBase } from '../validators/ModelValidatorBase';
+/* istanbul ignore else */
+if (!global['automapper']) {
+	// AutoMapper registers itself as a singleton global variable.
+	require('automapper-ts');
+}
+
+import { JoiModelValidator } from '../validators/JoiModelValidator';
 import { ValidationError } from '../validators/ValidationError';
 
 
-export abstract class ModelTranslatorBase<T> {
+/**
+ * Provides functions to auto mapping an arbitrary object to model of specific class type.
+ */
+export class ModelAutoMapper<T> {
 
 	/**
 	 * Turns on or off model validation before translating.
-	 * Default to `true`.
+	 * Is set to `true` if validator is passed to class constructor.
 	 */
 	public enableValidation: boolean;
 
 
-	constructor() {
-		this.enableValidation = true;
+	/**
+	 * @param {class} ModelClass The model class
+	 * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
+	 */
+	constructor(
+		protected ModelClass: new() => any,
+		protected _validator?: JoiModelValidator<T>
+	) {
+		this.enableValidation = (_validator != null);
 		this.createMap();
 	}
 
 
 	/**
-	 * Gets validator for specific type <T>.
+	 * Gets validator.
 	 */
-	protected abstract get validator(): ModelValidatorBase<T>;
+	public get validator(): JoiModelValidator<T> {
+		return this._validator;
+	}
 
 	/**
 	 * Validates then converts an object to type <T>. 
@@ -32,7 +50,7 @@ export abstract class ModelTranslatorBase<T> {
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
 	public partial(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<T> {
-		return this.translate(this.validator.partial, source, isEdit, errorCallback);
+		return this.translate('partial', source, isEdit, errorCallback);
 	}
 
 	/**
@@ -45,27 +63,31 @@ export abstract class ModelTranslatorBase<T> {
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
 	public whole(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
-		return this.translate(this.validator.whole, source, isEdit, errorCallback);
+		return this.translate('whole', source, isEdit, errorCallback);
 	}
 
 
 	/**
 	 * Initializes the model mapping engine.
 	 */
-	protected abstract createMap(): void;
+	protected createMap(): void {
+		automapper.createMap('any', this.ModelClass);
+	}
 	
 	/**
 	 * Is invoked after source object is validated to map source object to target model.
 	 */
-	protected abstract map(validatedSource: any): T;
+	protected map(source: any): T {
+		return automapper.map('any', this.ModelClass, source);
+	}
 
 
-	private translate(fn: Function, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
+	protected translate(fn: string, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
 		if (!this.enableValidation) {
 			return this.map(source);
 		}
 
-		let [error, model] = fn.call(this.validator, source, { isEdit });
+		let [error, model] = this.validator[fn](source, { isEdit });
 		if (error) {
 			if (!errorCallback) {
 				throw error;
@@ -75,5 +97,4 @@ export abstract class ModelTranslatorBase<T> {
 
 		return this.map(model);
 	}
-
 }

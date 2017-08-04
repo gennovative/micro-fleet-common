@@ -1,7 +1,7 @@
 import * as joi from 'joi';
 import { Guard } from 'back-lib-common-util';
 
-import { ValidationError, IValidationErrorItem } from './ValidationError';
+import { ValidationError } from './ValidationError';
 
 
 export interface ValidationOptions extends joi.ValidationOptions {
@@ -12,19 +12,19 @@ export interface ValidationOptions extends joi.ValidationOptions {
 	isEdit?: boolean;
 }
 
-export abstract class ModelValidatorBase<T> {
+export class JoiModelValidator<T> {
 
 	/**
-	 * Rules to validate model properties.
-	 * Can be overriden before calling `compile`.
+	 * Builds a new instance of ModelValidatorBase.
+	 * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
+	 * @param {joi.SchemaMap} schemaMapId Rule to validate model ID. Only the first property rule is used.
 	 */
-	protected abstract readonly _schemaMap: joi.SchemaMap;
+	public static create<T>(schemaMapModel: joi.SchemaMap, schemaMapId?: joi.SchemaMap): JoiModelValidator<T> {
+		let validator = new JoiModelValidator<T>(schemaMapModel, schemaMapId);
+		validator.compile();
+		return validator;
+	}
 
-	/**
-	 * Rule to validate model ID. Only the first property rule is used.
-	 * Can be overriden before calling `compile`.
-	 */
-	protected _schemaMapId: joi.SchemaMap;
 
 	/**
 	 * Compiled rules for model ID.
@@ -43,11 +43,19 @@ export abstract class ModelValidatorBase<T> {
 	protected _compiledPartial: joi.ObjectSchema;
 
 
-	constructor() {
+	/**
+	 * 
+	 * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
+	 * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID. Only the first property rule is used.
+	 */
+	protected constructor(
+		protected _schemaMap: joi.SchemaMap,
+		protected _schemaMapId?: joi.SchemaMap
+	) {
 		// As default, model ID is a string of 64-bit integer.
 		// JS cannot handle 64-bit integer, that's why we must use string.
 		// The database will convert to BigInt type when inserting.
-		this._schemaMapId = { id: joi.string().regex(/^\d+$/).required() };
+		this._schemaMapId = _schemaMapId || { id: joi.string().regex(/^\d+$/).required() };
 	}
 
 

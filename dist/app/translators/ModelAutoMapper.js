@@ -1,9 +1,29 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class ModelTranslatorBase {
-    constructor() {
-        this.enableValidation = true;
+/* istanbul ignore else */
+if (!global['automapper']) {
+    // AutoMapper registers itself as a singleton global variable.
+    require('automapper-ts');
+}
+/**
+ * Provides functions to auto mapping an arbitrary object to model of specific class type.
+ */
+class ModelAutoMapper {
+    /**
+     * @param {class} ModelClass The model class
+     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
+     */
+    constructor(ModelClass, _validator) {
+        this.ModelClass = ModelClass;
+        this._validator = _validator;
+        this.enableValidation = (_validator != null);
         this.createMap();
+    }
+    /**
+     * Gets validator.
+     */
+    get validator() {
+        return this._validator;
     }
     /**
      * Validates then converts an object to type <T>.
@@ -15,7 +35,7 @@ class ModelTranslatorBase {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     partial(source, isEdit, errorCallback) {
-        return this.translate(this.validator.partial, source, isEdit, errorCallback);
+        return this.translate('partial', source, isEdit, errorCallback);
     }
     /**
      * Validates then converts an object to type <T>.
@@ -27,13 +47,25 @@ class ModelTranslatorBase {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     whole(source, isEdit, errorCallback) {
-        return this.translate(this.validator.whole, source, isEdit, errorCallback);
+        return this.translate('whole', source, isEdit, errorCallback);
+    }
+    /**
+     * Initializes the model mapping engine.
+     */
+    createMap() {
+        automapper.createMap('any', this.ModelClass);
+    }
+    /**
+     * Is invoked after source object is validated to map source object to target model.
+     */
+    map(source) {
+        return automapper.map('any', this.ModelClass, source);
     }
     translate(fn, source, isEdit, errorCallback) {
         if (!this.enableValidation) {
             return this.map(source);
         }
-        let [error, model] = fn.call(this.validator, source, { isEdit });
+        let [error, model] = this.validator[fn](source, { isEdit });
         if (error) {
             if (!errorCallback) {
                 throw error;
@@ -43,6 +75,6 @@ class ModelTranslatorBase {
         return this.map(model);
     }
 }
-exports.ModelTranslatorBase = ModelTranslatorBase;
+exports.ModelAutoMapper = ModelAutoMapper;
 
-//# sourceMappingURL=ModelTranslatorBase.js.map
+//# sourceMappingURL=ModelAutoMapper.js.map
