@@ -68,6 +68,8 @@ declare module 'back-lib-common-contracts/validators/JoiModelValidator' {
 	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID. Only the first property rule is used.
 	     */
 	    protected constructor(_schemaMap: joi.SchemaMap, _schemaMapId?: joi.SchemaMap);
+	    readonly schemaMap: joi.SchemaMap;
+	    readonly schemaMapId: joi.SchemaMap;
 	    /**
 	     * Validates model ID.
 	     */

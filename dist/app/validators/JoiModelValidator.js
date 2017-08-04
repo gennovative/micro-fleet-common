@@ -27,6 +27,12 @@ class JoiModelValidator {
         validator.compile();
         return validator;
     }
+    get schemaMap() {
+        return this._schemaMap;
+    }
+    get schemaMapId() {
+        return this._schemaMapId;
+    }
     /**
      * Validates model ID.
      */

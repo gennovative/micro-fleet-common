@@ -59,6 +59,15 @@ export class JoiModelValidator<T> {
 	}
 
 
+	public get schemaMap(): joi.SchemaMap {
+		return this._schemaMap;
+	}
+
+	public get schemaMapId(): joi.SchemaMap {
+		return this._schemaMapId;
+	}
+
+
 	/**
 	 * Validates model ID.
 	 */
