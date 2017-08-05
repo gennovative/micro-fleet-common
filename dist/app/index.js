@@ -7,6 +7,7 @@ var GetSettingRequest_1 = require("./models/GetSettingRequest");
 exports.GetSettingRequest = GetSettingRequest_1.GetSettingRequest;
 __export(require("./translators/ModelAutoMapper"));
 __export(require("./validators/JoiModelValidator"));
+__export(require("./validators/ValidationError"));
 __export(require("./PagedArray"));
 
 //# sourceMappingURL=index.js.map

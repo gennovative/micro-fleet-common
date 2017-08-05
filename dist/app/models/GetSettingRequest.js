@@ -20,13 +20,13 @@ class GetSettingRequest {
     }
 }
 exports.GetSettingRequest = GetSettingRequest;
-exports.validator = JoiModelValidator_1.JoiModelValidator.create({
+let validator = GetSettingRequest.validator = JoiModelValidator_1.JoiModelValidator.create({
     slug: joi.string().regex(/^[0-9a-zA-z-]+$/).required().example('SettingSvc').example('setting-svc'),
     ipAddress: joi.string().ip().required().example('127.0.0.1').example('192.168.10.23')
 });
-exports.validator.partial = function () {
+validator.partial = function () {
     throw new back_lib_common_util_1.NotImplementedException('This method is not supported. Use `whole` instead.');
 };
-exports.translator = new ModelAutoMapper_1.ModelAutoMapper(GetSettingRequest, exports.validator);
+GetSettingRequest.translator = new ModelAutoMapper_1.ModelAutoMapper(GetSettingRequest, validator);
 
 //# sourceMappingURL=GetSettingRequest.js.map

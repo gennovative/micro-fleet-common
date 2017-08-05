@@ -20,6 +20,16 @@ describe('ModelValidatorBase', () => {
 		);
 	});
 
+	describe('getters', () => {
+		it('schemaMap', () => {
+			expect(validator.schemaMap).to.equal(validator['_schemaMap']);
+		});
+
+		it('schemaMapId', () => {
+			expect(validator.schemaMapId).to.equal(validator['_schemaMapId']);
+		});
+	}); // END describe 'getters'
+
 	describe('id', () => {
 		it('Should return the validated model ID if valid', () => {
 			// Arrange

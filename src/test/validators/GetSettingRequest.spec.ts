@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { NotImplementedException } from 'back-lib-common-util';
 
-import { GetSettingRequest, validator } from '../../app/models/GetSettingRequest';
+import { GetSettingRequest } from '../../app/models/GetSettingRequest';
 
 
 describe('GetSettingRequest\'s validator', () => {
@@ -18,7 +18,8 @@ describe('GetSettingRequest\'s validator', () => {
 			targetTwo.ipAddress = '192.168.10.23';
 
 			// Act
-			let [errorOne, validatedOne] = validator.whole(targetOne),
+			let validator = GetSettingRequest.validator,
+				[errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo);
 
 			// Assert
@@ -47,7 +48,8 @@ describe('GetSettingRequest\'s validator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.whole(targetOne),
+			let validator = GetSettingRequest.validator,
+				[errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo),
 				[errorThree, validatedThree] = validator.whole(targetThree);
 
@@ -66,7 +68,8 @@ describe('GetSettingRequest\'s validator', () => {
 	describe('partial', () => {
 		it('Should throw NotImplementedException', () => {
 			// Act
-			let result, exception;
+			let validator = GetSettingRequest.validator,
+				result, exception;
 			try {
 				result = validator.partial({});
 			} catch (err) {

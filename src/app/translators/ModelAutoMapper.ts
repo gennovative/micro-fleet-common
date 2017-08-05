@@ -87,14 +87,24 @@ export class ModelAutoMapper<T> {
 			return this.map(source);
 		}
 
-		let [error, model] = this.validator[fn](source, { isEdit });
-		if (error) {
-			if (!errorCallback) {
-				throw error;
-			}
-			errorCallback(error);
-		}
+		let [error, model] = this.validator[fn](source, { isEdit }),
+			handleError = function (err, callback) {
+				if (!err) { return false; }
+				if (!callback) {
+					throw err;
+				}
+				callback(err);
+				return true;
+			};
 
-		return this.map(model);
+		if (handleError(error, errorCallback)) { // Validation error
+			return null;
+		}
+		try {
+			return this.map(model);
+		} catch (ex) {
+			handleError(ex, errorCallback); // Mapping error
+		}
+		return null;
 	}
 }

@@ -91,8 +91,11 @@ export class JoiModelValidator<T> {
 		return this.validate(this._compiledPartial, target, options);
 	}
 
-
-	protected compile(): void {
+	/**
+	 * Must call this method before using `whole` or `partial`,
+	 * or after `schemaMap` or `schemaMapId` is changed.
+	 */
+	public compile(): void {
 		let wholeSchema = this._schemaMap;
 		this._compiledWhole = joi.object(wholeSchema);
 

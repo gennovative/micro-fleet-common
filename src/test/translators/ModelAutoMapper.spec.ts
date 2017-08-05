@@ -1,15 +1,39 @@
 import * as joi from 'joi';
 import { expect } from 'chai';
 
-import { ModelAutoMapper } from '../../app';
-import { SampleModel, validator } from '../validators/SampleModel';
+import { ModelAutoMapper, JoiModelValidator, ValidationError } from '../../app';
+import { SampleModel } from '../validators/SampleModel';
 
+
+const itemValidator = JoiModelValidator.create({ name: joi.string().required() });
+
+class NestingTranslator extends ModelAutoMapper<SampleModel> {
+	/**
+	 * @override
+	 */
+	protected createMap(): void {
+		// Validates and translates item array
+		let transformation = (opts) => {
+			let output = opts.sourceObject.items.map(it => {
+				let [err, val] = itemValidator.whole(it);
+				if (err) { throw err; }
+				return val;
+			});
+			return output;
+		};
+		automapper.createMap('any', this.ModelClass)
+			.forSourceMember('items', (opts: AutoMapperJs.ISourceMemberConfigurationOptions) => {
+				// Work around for bug: https://github.com/loedeman/AutoMapper/issues/33
+				return transformation(opts);
+			});
+	}
+}
 
 let translator: ModelAutoMapper<SampleModel>;
 
 describe('ModelTranslatorBase', () => {
 	beforeEach(() => {
-		translator = new ModelAutoMapper(SampleModel, validator);
+		translator = new ModelAutoMapper(SampleModel, SampleModel.validator);
 	});
 
 	describe('whole', () => {
@@ -124,6 +148,69 @@ describe('ModelTranslatorBase', () => {
 			expect(error).to.exist;
 		});
 
+		it('Should throw an error object if translating fails and no error callback is given', () => {
+			// Arrange
+			let source = {
+					name: 'Gennova123',
+					address: 'Unlimited length street name',
+					items: [
+						{ name: 'Item 1' },
+						{ name: '' } // not allowed to be empty
+					]
+				};
+
+			// Add 'items' key to model schema map, otherwise it will stripped.
+			SampleModel.validator.schemaMap['items'] = joi.array().length(2);
+			SampleModel.validator.compile();
+
+			translator = new NestingTranslator(SampleModel, SampleModel.validator);
+
+			// Act
+			let error: ValidationError, converted;
+
+			try {
+				converted = translator.whole(source, false);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(converted).not.to.exist;
+			expect(error).to.exist;
+			expect(error.details[0].path).to.equal('name');
+			expect(error.details[0].message).to.equal('"name" is not allowed to be empty');
+		});
+
+		it('Should pass an error object to callback if translating fails', () => {
+			// Arrange
+			let source = {
+					name: 'Gennova123',
+					address: 'Unlimited length street name',
+					items: [
+						{ name: 'Item 1' },
+						{ name: '' } // not allowed to be empty
+					]
+				};
+
+			// Add 'items' key to model schema map, otherwise it will stripped.
+			SampleModel.validator.schemaMap['items'] = joi.array().length(2);
+			SampleModel.validator.compile();
+
+			translator = new NestingTranslator(SampleModel, SampleModel.validator);
+
+			// Act
+			let error: ValidationError, converted;
+			converted = translator.whole(source, false, (err) => {
+				error = err;
+			});
+
+			// Assert
+			expect(converted).not.to.exist;
+			expect(error).to.exist;
+			expect(error.details[0].path).to.equal('name');
+			expect(error.details[0].message).to.equal('"name" is not allowed to be empty');
+		});
+	
 		it('Should blindly convert object if validation is disabled', () => {
 			// Arrange
 			let source = {

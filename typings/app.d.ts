@@ -82,7 +82,11 @@ declare module 'back-lib-common-contracts/validators/JoiModelValidator' {
 	     * Validates model for modification operation, which requires `id` property.
 	     */
 	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-	    protected compile(): void;
+	    /**
+	     * Must call this method before using `whole` or `partial`,
+	     * or after `schemaMap` or `schemaMapId` is changed.
+	     */
+	    compile(): void;
 	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
 	}
 
@@ -149,6 +153,8 @@ declare module 'back-lib-common-contracts/models/GetSettingRequest' {
 	 * Represents the request contract for GetSetting endpoint.
 	 */
 	export class GetSettingRequest {
+	    static validator: JoiModelValidator<GetSettingRequest>;
+	    static translator: ModelAutoMapper<GetSettingRequest>;
 	    /**
 	     * Gets or sets program slug.
 	     */
@@ -158,8 +164,6 @@ declare module 'back-lib-common-contracts/models/GetSettingRequest' {
 	     */
 	    ipAddress: string;
 	}
-	export let validator: JoiModelValidator<GetSettingRequest>;
-	export let translator: ModelAutoMapper<GetSettingRequest>;
 
 }
 declare module 'back-lib-common-contracts/PagedArray' {
@@ -222,6 +226,7 @@ declare module 'back-lib-common-contracts' {
 	export { GetSettingRequest } from 'back-lib-common-contracts/models/GetSettingRequest';
 	export * from 'back-lib-common-contracts/translators/ModelAutoMapper';
 	export * from 'back-lib-common-contracts/validators/JoiModelValidator';
+	export * from 'back-lib-common-contracts/validators/ValidationError';
 	export * from 'back-lib-common-contracts/interfaces';
 	export * from 'back-lib-common-contracts/PagedArray';
 

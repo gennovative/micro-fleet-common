@@ -4,6 +4,8 @@ import { JoiModelValidator } from '../../app';
 
 
 export class SampleModel {
+	public static validator: JoiModelValidator<SampleModel>;
+
 	public theID: number = undefined; // It's IMPORTANT to initialize property with a value.
 	public name: string = undefined;
 	public address: string = undefined;
@@ -11,7 +13,7 @@ export class SampleModel {
 	public gender: 'male' | 'female' = undefined;
 }
 
-export let validator = JoiModelValidator.create<SampleModel>(
+SampleModel.validator = JoiModelValidator.create<SampleModel>(
 	{
 		name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
 		address: joi.string().required(),
