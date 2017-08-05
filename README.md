@@ -21,6 +21,10 @@ Contains interfaces and models which are shared between data services and REST/w
 
 ### 1.0.0
 
-* `PagedArray<T>`: A derived Array class that supports pagination.
-* `IRepository`: Provides common methods for repositories.
-* Use `BigSInt` (alias of `string`) as data type of model ID.
+* **PagedArray<T>**: A derived Array class that supports pagination.
+* **IRepository**: Provides common methods for repositories.
+* Use **BigSInt** (alias of `string`) as data type of model ID.
+* **ModelValidatorBase**: Base class that provides methods to validate models.
+* **ModelTranslatorBase**: Base class that provides methods to convert arbitrary objects to models.
+* **GetSettingRequest**, **GetSettingRequestValidator**, **GetSettingRequestTranslator**: Request model to fetch service settings, comes with its validators and translators.
+* Test coverage: **100%**

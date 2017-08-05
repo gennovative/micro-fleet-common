@@ -1,3 +1,5 @@
+import * as joi from 'joi';
+
 import { PagedArray } from './PagedArray';
 
 /**

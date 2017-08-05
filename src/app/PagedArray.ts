@@ -10,8 +10,11 @@ export class PagedArray<T> extends Array<T> {
 		return this._total;
 	}
 
-	constructor(private _total, source: Array<T>) {
+	constructor(private _total: number = 0, ...items: T[]) {
 		super();
-		Array.prototype.push.apply(this, source);
+		/* istanbul ignore else */
+		if (Array.isArray(items)) {
+			Array.prototype.push.apply(this, items);
+		}
 	}
 }
