@@ -31,7 +31,7 @@ class NestingTranslator extends ModelAutoMapper<SampleModel> {
 
 let translator: ModelAutoMapper<SampleModel>;
 
-describe('ModelTranslatorBase', () => {
+describe('ModelAutoMapper', () => {
 	beforeEach(() => {
 		translator = new ModelAutoMapper(SampleModel, SampleModel.validator);
 	});
@@ -46,6 +46,7 @@ describe('ModelTranslatorBase', () => {
 					gender: 'male'
 				},
 				sourceTwo = {
+					theID: 123,
 					name: 'gen-no-va',
 					address: '^!@'
 				};
@@ -53,18 +54,21 @@ describe('ModelTranslatorBase', () => {
 
 			// Act
 			try {
-				convertedOne = translator.whole(sourceOne, false);
+				convertedOne = translator.whole(sourceOne);
 			} catch (err) {
 				errorOne = err;
 			}
 
 			try {
-				convertedTwo = translator.whole(sourceTwo, false);
+				convertedTwo = translator.whole(sourceTwo, { isEdit: true });
 			} catch (err) {
 				errorTwo = err;
 			}
 
 			// Assert
+			if (errorOne) {
+				console.error(errorOne);
+			}
 			expect(errorOne).not.to.exist;
 			expect(convertedOne).to.exist;
 			expect(convertedOne).is.instanceOf(SampleModel);
@@ -76,6 +80,9 @@ describe('ModelTranslatorBase', () => {
 			// Make sure unknown property is stripped.
 			expect(convertedOne.unknown).not.to.exist;
 
+			if (errorTwo) {
+				console.error(errorOne);
+			}
 			expect(errorTwo).not.to.exist;
 			expect(convertedTwo).to.exist;
 			expect(convertedTwo).is.instanceOf(SampleModel);
@@ -103,7 +110,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act
 			try {
-				convertedArr = translator.whole(sourceArray, false);
+				convertedArr = translator.whole(sourceArray);
 			} catch (err) {
 				error = err;
 			}
@@ -129,7 +136,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act 1
 			try {
-				converted = translator.whole(null, false);
+				converted = translator.whole(null);
 			} catch (err) {
 				error = err;
 			}
@@ -141,7 +148,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act 2
 			try {
-				converted = translator.whole(undefined, false);
+				converted = translator.whole(undefined);
 			} catch (err) {
 				error = err;
 			}
@@ -153,7 +160,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act 3
 			try {
-				converted = translator.whole('abc', false);
+				converted = translator.whole('abc');
 			} catch (err) {
 				error = err;
 			}
@@ -165,7 +172,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act 4
 			try {
-				converted = translator.whole(999, false);
+				converted = translator.whole(999);
 			} catch (err) {
 				error = err;
 			}
@@ -187,7 +194,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act
 			try {
-				converted = translator.whole(source, false);
+				converted = translator.whole(source);
 			} catch (err) {
 				error = err;
 			}
@@ -202,7 +209,7 @@ describe('ModelTranslatorBase', () => {
 			expect(converted['loveMovie']).not.to.exist;
 		});
 
-		it('Should throw an error object if invalid and no error callback is given', () => {
+		it('Should throw an error object if VALIDATION fails and no error callback is given', () => {
 			// Arrange
 			let source = {
 				};
@@ -211,7 +218,7 @@ describe('ModelTranslatorBase', () => {
 			let error, converted;
 
 			try {
-				converted = translator.whole(source, false);
+				converted = translator.whole(source);
 			} catch (err) {
 				error = err;
 			}
@@ -221,7 +228,7 @@ describe('ModelTranslatorBase', () => {
 			expect(error).to.exist;
 		});
 
-		it('Should pass an error object to callback if invalid', () => {
+		it('Should pass an error object to callback if VALIDATION fails', () => {
 			// Arrange
 			let source = {
 				};
@@ -229,8 +236,11 @@ describe('ModelTranslatorBase', () => {
 			// Act
 			let error, converted;
 
-			converted = translator.whole(source, false, (err) => {
-				error = err;
+			converted = translator.whole(source, { 
+				isEdit: false,
+				errorCallback: (err) => {
+					error = err;
+				}
 			});
 
 			// Assert
@@ -238,7 +248,7 @@ describe('ModelTranslatorBase', () => {
 			expect(error).to.exist;
 		});
 
-		it('Should throw an error object if translating fails and no error callback is given', () => {
+		it('Should throw an error object if TRANSLATION fails and no error callback is given', () => {
 			// Arrange
 			let source = {
 					name: 'Gennova123',
@@ -259,7 +269,7 @@ describe('ModelTranslatorBase', () => {
 			let error: ValidationError, converted;
 
 			try {
-				converted = translator.whole(source, false);
+				converted = translator.whole(source);
 			} catch (err) {
 				error = err;
 			}
@@ -271,7 +281,7 @@ describe('ModelTranslatorBase', () => {
 			expect(error.details[0].message).to.equal('"name" is not allowed to be empty');
 		});
 
-		it('Should pass an error object to callback if translating fails', () => {
+		it('Should pass an error object to callback if TRANSLATION fails', () => {
 			// Arrange
 			let source = {
 					name: 'Gennova123',
@@ -290,8 +300,11 @@ describe('ModelTranslatorBase', () => {
 
 			// Act
 			let error: ValidationError, converted;
-			converted = translator.whole(source, false, (err) => {
-				error = err;
+			converted = translator.whole(source, { 
+				isEdit: false,
+				errorCallback: (err) => {
+					error = err;
+				}
 			});
 
 			// Assert
@@ -313,8 +326,38 @@ describe('ModelTranslatorBase', () => {
 			let error, converted;
 
 			translator.enableValidation = false;
-			converted = translator.whole(source, false, (err) => {
-				error = err;
+			converted = translator.whole(source, { 
+				isEdit: false,
+				errorCallback: (err) => {
+					error = err;
+				}
+			});
+
+			// Assert
+			expect(error).not.to.exist;
+			expect(converted).to.exist;
+			expect(converted.name).to.equal(source.name);
+			expect(converted.address).to.equal(source.address);
+			expect(converted.age).to.equal(source.age);
+		});
+	
+		it('Should blindly convert object if validation is temporarily disabled in mapping options', () => {
+			// Arrange
+			let source = {
+					name: 'ab',
+					address: '',
+					age: '10'
+				};
+			translator.enableValidation = true; // Enable to whole class
+
+			// Act
+			let error, converted;
+			converted = translator.whole(source, { 
+				isEdit: false,
+				enableValidation: false, // Temporarily disable
+				errorCallback: (err) => {
+					error = err;
+				}
 			});
 
 			// Assert
@@ -338,7 +381,7 @@ describe('ModelTranslatorBase', () => {
 
 			// Act
 			try {
-				converted = translator.partial(source, false);
+				converted = translator.partial(source);
 			} catch (err) {
 				error = err;
 			}

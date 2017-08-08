@@ -29,25 +29,21 @@ class ModelAutoMapper {
      * Validates then converts an object to type <T>.
      * but ONLY properties with value are validated and copied.
      * @param {any | any[]} source An object or array of objects to be translated.
-     * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
-     * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
      *
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
-    partial(source, isEdit, errorCallback) {
-        return this.tryTranslate('partial', source, isEdit, errorCallback);
+    partial(source, options) {
+        return this.tryTranslate('partial', source, options);
     }
     /**
      * Validates then converts an object to type <T>.
      * ALL properties are validated and copied regardless with or without value.
      * @param {any | any[]} source An object or array of objects to be translated.
-     * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
-     * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
      *
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
-    whole(source, isEdit, errorCallback) {
-        return this.tryTranslate('whole', source, isEdit, errorCallback);
+    whole(source, options) {
+        return this.tryTranslate('whole', source, options);
     }
     /**
      * Initializes the model mapping engine.
@@ -61,20 +57,24 @@ class ModelAutoMapper {
     map(source) {
         return automapper.map('any', this.ModelClass, source);
     }
-    tryTranslate(fn, source, isEdit, errorCallback) {
+    tryTranslate(fn, source, options) {
         if (source == null || typeof source !== 'object') {
             return null;
         }
-        if (!Array.isArray(source)) {
-            return this.translate.apply(this, arguments);
+        options = Object.assign({
+            enableValidation: this.enableValidation,
+            isEdit: false
+        }, options);
+        if (Array.isArray(source)) {
+            return source.map(s => this.translate(fn, s, options));
         }
-        return source.map(s => this.translate(fn, s, isEdit, errorCallback));
+        return this.translate(fn, source, options);
     }
-    translate(fn, source, isEdit, errorCallback) {
-        if (!this.enableValidation) {
+    translate(fn, source, options) {
+        if (!options.enableValidation) {
             return this.map(source);
         }
-        let [error, model] = this.validator[fn](source, { isEdit }), handleError = function (err, callback) {
+        let [error, model] = this.validator[fn](source, { isEdit: options.isEdit }), handleError = function (err, callback) {
             if (!err) {
                 return false;
             }
@@ -84,14 +84,14 @@ class ModelAutoMapper {
             callback(err);
             return true;
         };
-        if (handleError(error, errorCallback)) {
+        if (handleError(error, options.errorCallback)) {
             return null;
         }
         try {
             return this.map(model);
         }
         catch (ex) {
-            handleError(ex, errorCallback); // Mapping error
+            handleError(ex, options.errorCallback); // Mapping error
         }
         return null;
     }
