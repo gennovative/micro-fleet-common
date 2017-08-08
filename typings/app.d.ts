@@ -117,23 +117,23 @@ declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
 	    /**
 	     * Validates then converts an object to type <T>.
 	     * but ONLY properties with value are validated and copied.
-	     * @param {any} source
+	     * @param {any | any[]} source An object or array of objects to be translated.
 	     * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
 	     * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
-	    partial(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<T>;
+	    partial(source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<T> & Partial<T>[];
 	    /**
 	     * Validates then converts an object to type <T>.
 	     * ALL properties are validated and copied regardless with or without value.
-	     * @param {any} source
+	     * @param {any | any[]} source An object or array of objects to be translated.
 	     * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
 	     * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
-	    whole(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T;
+	    whole(source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): T & T[];
 	    /**
 	     * Initializes the model mapping engine.
 	     */
@@ -142,8 +142,7 @@ declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
 	     * Is invoked after source object is validated to map source object to target model.
 	     */
 	    protected map(source: any): T;
-	    protected translate(fn: string, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T;
-	}
+	    	    	}
 
 }
 declare module 'back-lib-common-contracts/models/GetSettingRequest' {

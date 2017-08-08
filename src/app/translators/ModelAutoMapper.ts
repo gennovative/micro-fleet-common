@@ -43,27 +43,27 @@ export class ModelAutoMapper<T> {
 	/**
 	 * Validates then converts an object to type <T>. 
 	 * but ONLY properties with value are validated and copied.
-	 * @param {any} source
+	 * @param {any | any[]} source An object or array of objects to be translated.
 	 * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
 	 * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
-	public partial(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<T> {
-		return this.translate('partial', source, isEdit, errorCallback);
+	public partial(source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<T> & Partial<T>[] {
+		return this.tryTranslate('partial', source, isEdit, errorCallback);
 	}
 
 	/**
 	 * Validates then converts an object to type <T>. 
 	 * ALL properties are validated and copied regardless with or without value.
-	 * @param {any} source
+	 * @param {any | any[]} source An object or array of objects to be translated.
 	 * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
 	 * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
-	public whole(source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
-		return this.translate('whole', source, isEdit, errorCallback);
+	public whole(source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): T & T[] {
+		return this.tryTranslate('whole', source, isEdit, errorCallback);
 	}
 
 
@@ -82,7 +82,15 @@ export class ModelAutoMapper<T> {
 	}
 
 
-	protected translate(fn: string, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
+	private tryTranslate(fn: string, source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): T & T[] {
+		if (source == null || typeof source !== 'object') { return null; }
+		if (!Array.isArray(source)) {
+			return this.translate.apply(this, arguments);
+		}
+		return <any>source.map(s => this.translate(fn, s, isEdit, errorCallback));
+	}
+
+	private translate(fn: string, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
 		if (!this.enableValidation) {
 			return this.map(source);
 		}
