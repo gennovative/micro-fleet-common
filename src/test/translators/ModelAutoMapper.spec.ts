@@ -85,6 +85,96 @@ describe('ModelTranslatorBase', () => {
 			expect(convertedTwo.gender).not.to.exist;
 		});
 
+		it('Should return an array if success', () => {
+			// Arrange
+			let sourceArray = [
+				{
+					name: 'Gennova123',
+					address: 'Unlimited length street name',
+					age: 18,
+					gender: 'male'
+				},
+				{
+					name: 'gen-no-va',
+					address: '^!@'
+				}
+			];
+			let error, convertedArr;
+
+			// Act
+			try {
+				convertedArr = translator.whole(sourceArray, false);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(error).not.to.exist;
+			expect(convertedArr).to.exist;
+			expect(convertedArr).to.be.instanceOf(Array);
+			expect(convertedArr.length).to.equal(2);
+
+			convertedArr.forEach((model, i) => {
+				expect(model, `Assert model[${i}]`).is.instanceOf(SampleModel);
+				expect(model.name, `Assert model[${i}].name`).to.equal(sourceArray[i].name);
+				expect(model.address, `Assert model[${i}].address`).to.equal(sourceArray[i].address);
+				expect(model.age, `Assert model[${i}].age`).to.equal(sourceArray[i]['age']);
+				expect(model.gender, `Assert model[${i}].gender`).to.equal(sourceArray[i]['gender']);
+			});
+		});
+
+		it('Should return null if giving empty or non-object source', () => {
+			// Arrange
+			let error, converted;
+
+			// Act 1
+			try {
+				converted = translator.whole(null, false);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(error).not.to.exist;
+			expect(converted).to.be.null;
+
+
+			// Act 2
+			try {
+				converted = translator.whole(undefined, false);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(error).not.to.exist;
+			expect(converted).to.be.null;
+
+
+			// Act 3
+			try {
+				converted = translator.whole('abc', false);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(error).not.to.exist;
+			expect(converted).to.be.null;
+
+
+			// Act 4
+			try {
+				converted = translator.whole(999, false);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(error).not.to.exist;
+			expect(converted).to.be.null;
+		});
+
 		it('Should not map unknown properties', () => {
 			// Arrange
 			let source = {
