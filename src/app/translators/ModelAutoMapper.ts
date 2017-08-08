@@ -8,6 +8,26 @@ import { JoiModelValidator } from '../validators/JoiModelValidator';
 import { ValidationError } from '../validators/ValidationError';
 
 
+export interface MappingOptions {
+	/**
+	 * Temporarily turns on or off model validation.
+	 * Can only be turned on if validator is provided to constructor.
+	 */
+	enableValidation?: boolean;
+
+	/**
+	 * If `true`, validates model ID. Otherwise, excludes model ID from validation.
+	 * Only takes effect when `enableValidation` is `true`.
+	 * Default is `false`.
+	 */
+	isEdit?: boolean;
+
+	/**
+	 * If specified, gives validation error to this callback. Otherwise, throw error.
+	 */
+	errorCallback?: (err: ValidationError) => void;
+}
+
 /**
  * Provides functions to auto mapping an arbitrary object to model of specific class type.
  */
@@ -44,26 +64,22 @@ export class ModelAutoMapper<T> {
 	 * Validates then converts an object to type <T>. 
 	 * but ONLY properties with value are validated and copied.
 	 * @param {any | any[]} source An object or array of objects to be translated.
-	 * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
-	 * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
-	public partial(source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): Partial<T> & Partial<T>[] {
-		return this.tryTranslate('partial', source, isEdit, errorCallback);
+	public partial(source: any | any[], options?: MappingOptions): Partial<T> & Partial<T>[] {
+		return this.tryTranslate('partial', source, options);
 	}
 
 	/**
 	 * Validates then converts an object to type <T>. 
 	 * ALL properties are validated and copied regardless with or without value.
 	 * @param {any | any[]} source An object or array of objects to be translated.
-	 * @param {boolean} isEdit If `true`, validates model ID. Otherwise, excludes model ID from validation. Only takes effect when `enableValidation` is `true`.
-	 * @param {Function} errorCallback If specified, gives validation error to this callback. Otherwise, throw error.
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
-	public whole(source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): T & T[] {
-		return this.tryTranslate('whole', source, isEdit, errorCallback);
+	public whole(source: any | any[], options?: MappingOptions): T & T[] {
+		return this.tryTranslate('whole', source, options);
 	}
 
 
@@ -82,20 +98,26 @@ export class ModelAutoMapper<T> {
 	}
 
 
-	private tryTranslate(fn: string, source: any | any[], isEdit: boolean, errorCallback?: (err: ValidationError) => void): T & T[] {
+	private tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T & T[] {
 		if (source == null || typeof source !== 'object') { return null; }
-		if (!Array.isArray(source)) {
-			return this.translate.apply(this, arguments);
+
+		options = Object.assign(<MappingOptions>{
+			enableValidation: this.enableValidation,
+			isEdit: false
+		}, options);
+
+		if (Array.isArray(source)) {
+			return <any>source.map(s => this.translate(fn, s, options));
 		}
-		return <any>source.map(s => this.translate(fn, s, isEdit, errorCallback));
+		return <any>this.translate(fn, source, options);
 	}
 
-	private translate(fn: string, source: any, isEdit: boolean, errorCallback?: (err: ValidationError) => void): T {
-		if (!this.enableValidation) {
+	private translate(fn: string, source: any, options: MappingOptions): T {
+		if (!options.enableValidation) {
 			return this.map(source);
 		}
 
-		let [error, model] = this.validator[fn](source, { isEdit }),
+		let [error, model] = this.validator[fn](source, { isEdit: options.isEdit }),
 			handleError = function (err, callback) {
 				if (!err) { return false; }
 				if (!callback) {
@@ -105,13 +127,13 @@ export class ModelAutoMapper<T> {
 				return true;
 			};
 
-		if (handleError(error, errorCallback)) { // Validation error
+		if (handleError(error, options.errorCallback)) { // Validation error
 			return null;
 		}
 		try {
 			return this.map(model);
 		} catch (ex) {
-			handleError(ex, errorCallback); // Mapping error
+			handleError(ex, options.errorCallback); // Mapping error
 		}
 		return null;
 	}
