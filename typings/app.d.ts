@@ -189,7 +189,11 @@ declare module 'back-lib-common-contracts/interfaces' {
 	     * Indicates whether `delete` method of this class really removes
 	     * records from database, or just marks them as deleted and allows undoing.
 	     */
-	    isSoftDelete: boolean;
+	    isSoftDeletable: boolean;
+	    /**
+	     * Indicates whether this class should update `createdAt` and `updatedAt` properties.
+	     */
+	    isAuditable: boolean;
 	    /**
 	     * Counts all records in a table.
 	     */
