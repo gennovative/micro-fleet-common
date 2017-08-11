@@ -27,4 +27,5 @@ Contains interfaces and models which are shared between data services and REST/w
 * **ModelValidatorBase**: Base class that provides methods to validate models.
 * **ModelTranslatorBase**: Base class that provides methods to convert arbitrary objects to models.
 * **GetSettingRequest**, **GetSettingRequestValidator**, **GetSettingRequestTranslator**: Request model to fetch service settings, comes with its validators and translators.
+* **AtomicSession** (use with **AtomicSessionFactory** and **AtomicSessionFlow**): supports transactional queries.
 * Test coverage: **100%**

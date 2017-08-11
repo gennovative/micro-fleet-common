@@ -4,3 +4,4 @@ export * from './validators/JoiModelValidator';
 export * from './validators/ValidationError';
 export * from './interfaces';
 export * from './PagedArray';
+export * from './AtomicSession';

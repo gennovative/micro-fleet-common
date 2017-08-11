@@ -9,5 +9,6 @@ __export(require("./translators/ModelAutoMapper"));
 __export(require("./validators/JoiModelValidator"));
 __export(require("./validators/ValidationError"));
 __export(require("./PagedArray"));
+__export(require("./AtomicSession"));
 
 //# sourceMappingURL=index.js.map
