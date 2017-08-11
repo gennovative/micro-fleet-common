@@ -1,6 +1,7 @@
 import * as joi from 'joi';
 
 import { PagedArray } from './PagedArray';
+import { AtomicSession } from './AtomicSession';
 
 /**
  * Provides common CRUD operations, based on Unit of Work pattern.
@@ -21,36 +22,36 @@ export interface IRepository<TModel extends IModelDTO> {
 	/**
 	 * Counts all records in a table.
 	 */
-	countAll(): Promise<number>;
+	countAll(atomicSession?: AtomicSession): Promise<number>;
 
 	/**
 	 * Inserts specified `model` to database.
 	 */
-	create(model: TModel): Promise<TModel>;
+	create(model: TModel, atomicSession?: AtomicSession): Promise<TModel>;
 
 	/**
 	 * Removes record with `id` from database, or marks it as deleted,
 	 * depending on `isSoftDelete` value.
 	 */
-	delete(id: BigSInt): Promise<number>;
+	delete(id: BigSInt, atomicSession?: AtomicSession): Promise<number>;
 
 	/**
 	 * Selects only one record with `id`.
 	 */
-	find(id: BigSInt): Promise<TModel>;
+	find(id: BigSInt, atomicSession?: AtomicSession): Promise<TModel>;
 
 	/**
 	 * Selects `pageSize` number of records at page `pageIndex`.
 	 */
-	page(pageIndex: number, pageSize: number): Promise<PagedArray<TModel>>;
+	page(pageIndex: number, pageSize: number, atomicSession?: AtomicSession): Promise<PagedArray<TModel>>;
 
 	/**
 	 * Updates new value for specified properties in `model`.
 	 */
-	patch(model: Partial<TModel>): Promise<number>;
+	patch(model: Partial<TModel>, atomicSession?: AtomicSession): Promise<number>;
 
 	/**
 	 * Replaces a record with `model`.
 	 */
-	update(model: TModel): Promise<number>;
+	update(model: TModel, atomicSession?: AtomicSession): Promise<number>;
 }

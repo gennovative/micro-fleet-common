@@ -1,5 +1,17 @@
 /// <reference path="./global.d.ts" />
 
+declare module 'back-lib-common-contracts/AtomicSession' {
+	/**
+	 * Wraps a database transaction and provides methods to
+	 * end the transaction either succefully or unsuccefully.
+	 */
+	export class AtomicSession {
+	    knexConnection: any;
+	    knexTransaction: any;
+	    constructor(knexConnection: any, knexTransaction: any);
+	}
+
+}
 declare module 'back-lib-common-contracts/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { Exception } from 'back-lib-common-util';
@@ -193,6 +205,7 @@ declare module 'back-lib-common-contracts/PagedArray' {
 }
 declare module 'back-lib-common-contracts/interfaces' {
 	import { PagedArray } from 'back-lib-common-contracts/PagedArray';
+	import { AtomicSession } from 'back-lib-common-contracts/AtomicSession';
 	/**
 	 * Provides common CRUD operations, based on Unit of Work pattern.
 	 */
@@ -209,32 +222,32 @@ declare module 'back-lib-common-contracts/interfaces' {
 	    /**
 	     * Counts all records in a table.
 	     */
-	    countAll(): Promise<number>;
+	    countAll(atomicSession?: AtomicSession): Promise<number>;
 	    /**
 	     * Inserts specified `model` to database.
 	     */
-	    create(model: TModel): Promise<TModel>;
+	    create(model: TModel, atomicSession?: AtomicSession): Promise<TModel>;
 	    /**
 	     * Removes record with `id` from database, or marks it as deleted,
 	     * depending on `isSoftDelete` value.
 	     */
-	    delete(id: BigSInt): Promise<number>;
+	    delete(id: BigSInt, atomicSession?: AtomicSession): Promise<number>;
 	    /**
 	     * Selects only one record with `id`.
 	     */
-	    find(id: BigSInt): Promise<TModel>;
+	    find(id: BigSInt, atomicSession?: AtomicSession): Promise<TModel>;
 	    /**
 	     * Selects `pageSize` number of records at page `pageIndex`.
 	     */
-	    page(pageIndex: number, pageSize: number): Promise<PagedArray<TModel>>;
+	    page(pageIndex: number, pageSize: number, atomicSession?: AtomicSession): Promise<PagedArray<TModel>>;
 	    /**
 	     * Updates new value for specified properties in `model`.
 	     */
-	    patch(model: Partial<TModel>): Promise<number>;
+	    patch(model: Partial<TModel>, atomicSession?: AtomicSession): Promise<number>;
 	    /**
 	     * Replaces a record with `model`.
 	     */
-	    update(model: TModel): Promise<number>;
+	    update(model: TModel, atomicSession?: AtomicSession): Promise<number>;
 	}
 
 }
@@ -245,5 +258,6 @@ declare module 'back-lib-common-contracts' {
 	export * from 'back-lib-common-contracts/validators/ValidationError';
 	export * from 'back-lib-common-contracts/interfaces';
 	export * from 'back-lib-common-contracts/PagedArray';
+	export * from 'back-lib-common-contracts/AtomicSession';
 
 }
