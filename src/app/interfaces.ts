@@ -1,7 +1,7 @@
 import * as joi from 'joi';
 
-import { PagedArray } from './PagedArray';
-import { AtomicSession } from './AtomicSession';
+import { AtomicSession } from './models/AtomicSession';
+import { PagedArray } from './models/PagedArray';
 
 /**
  * Provides common CRUD operations, based on Unit of Work pattern.

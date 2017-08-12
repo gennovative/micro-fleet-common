@@ -26,8 +26,25 @@ class ModelAutoMapper {
         return this._validator;
     }
     /**
+     * Copies properties from `sources` to dest then optionally validates
+     * the result (depends on `enableValidation`).
+     * If `enableValidation` is turned off, it works just like native `Object.assign()` function,
+     * therefore, use `Object.assign()` for better performance if validation is not needed.
+     * Note that it uses `partial()` internally, hence `required` validation is IGNORED.
+     *
+     * @throws {ValidationError}
+     */
+    merge(dest, ...sources) {
+        if (dest == null || typeof dest !== 'object') {
+            return dest;
+        }
+        dest = Object.assign(dest, ...sources);
+        return this.partial(dest);
+    }
+    /**
      * Validates then converts an object to type <T>.
      * but ONLY properties with value are validated and copied.
+     * Note that `required` validation is IGNORED.
      * @param {any | any[]} source An object or array of objects to be translated.
      *
      * @throws {ValidationError} If no `errorCallback` is provided.
@@ -59,12 +76,13 @@ class ModelAutoMapper {
     }
     tryTranslate(fn, source, options) {
         if (source == null || typeof source !== 'object') {
-            return null;
+            return source;
         }
         options = Object.assign({
             enableValidation: this.enableValidation,
             isEdit: false
         }, options);
+        // Translate an array or single item
         if (Array.isArray(source)) {
             return source.map(s => this.translate(fn, s, options));
         }

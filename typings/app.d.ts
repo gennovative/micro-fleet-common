@@ -1,9 +1,8 @@
 /// <reference path="./global.d.ts" />
 
-declare module 'back-lib-common-contracts/AtomicSession' {
+declare module 'back-lib-common-contracts/dist/app/models/AtomicSession' {
 	/**
-	 * Wraps a database transaction and provides methods to
-	 * end the transaction either succefully or unsuccefully.
+	 * Wraps a database connection and transaction.
 	 */
 	export class AtomicSession {
 	    knexConnection: any;
@@ -12,7 +11,7 @@ declare module 'back-lib-common-contracts/AtomicSession' {
 	}
 
 }
-declare module 'back-lib-common-contracts/validators/ValidationError' {
+declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { Exception } from 'back-lib-common-util';
 	/**
@@ -42,9 +41,9 @@ declare module 'back-lib-common-contracts/validators/ValidationError' {
 	    	}
 
 }
-declare module 'back-lib-common-contracts/validators/JoiModelValidator' {
+declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator' {
 	import * as joi from 'joi';
-	import { ValidationError } from 'back-lib-common-contracts/validators/ValidationError';
+	import { ValidationError } from 'back-lib-common-contracts/dist/app/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
 	    /**
 	     * If `true`, this validation is for edit model. Otherwise, for new model.
@@ -103,9 +102,9 @@ declare module 'back-lib-common-contracts/validators/JoiModelValidator' {
 	}
 
 }
-declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
-	import { JoiModelValidator } from 'back-lib-common-contracts/validators/JoiModelValidator';
-	import { ValidationError } from 'back-lib-common-contracts/validators/ValidationError';
+declare module 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper' {
+	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
+	import { ValidationError } from 'back-lib-common-contracts/dist/app/validators/ValidationError';
 	export interface MappingOptions {
 	    /**
 	     * Temporarily turns on or off model validation.
@@ -126,7 +125,7 @@ declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
 	/**
 	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
 	 */
-	export class ModelAutoMapper<T> {
+	export class ModelAutoMapper<T extends Object> {
 	    protected ModelClass: new () => any;
 	    protected _validator: JoiModelValidator<T>;
 	    /**
@@ -144,8 +143,19 @@ declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
 	     */
 	    readonly validator: JoiModelValidator<T>;
 	    /**
+	     * Copies properties from `sources` to dest then optionally validates
+	     * the result (depends on `enableValidation`).
+	     * If `enableValidation` is turned off, it works just like native `Object.assign()` function,
+	     * therefore, use `Object.assign()` for better performance if validation is not needed.
+	     * Note that it uses `partial()` internally, hence `required` validation is IGNORED.
+	     *
+	     * @throws {ValidationError}
+	     */
+	    merge(dest: Partial<T>, ...sources: Partial<T>[]): Partial<T>;
+	    /**
 	     * Validates then converts an object to type <T>.
 	     * but ONLY properties with value are validated and copied.
+	     * Note that `required` validation is IGNORED.
 	     * @param {any | any[]} source An object or array of objects to be translated.
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
@@ -170,9 +180,9 @@ declare module 'back-lib-common-contracts/translators/ModelAutoMapper' {
 	    	    	}
 
 }
-declare module 'back-lib-common-contracts/models/GetSettingRequest' {
-	import { ModelAutoMapper } from 'back-lib-common-contracts/translators/ModelAutoMapper';
-	import { JoiModelValidator } from 'back-lib-common-contracts/validators/JoiModelValidator';
+declare module 'back-lib-common-contracts/dist/app/models/GetSettingRequest' {
+	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
+	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
 	/**
 	 * Represents the request contract for GetSetting endpoint.
 	 */
@@ -190,7 +200,48 @@ declare module 'back-lib-common-contracts/models/GetSettingRequest' {
 	}
 
 }
-declare module 'back-lib-common-contracts/PagedArray' {
+declare module 'back-lib-common-contracts/dist/app/models/SettingItem' {
+	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
+	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
+	export enum SettingItemDataType {
+	    /**
+	     * Text data type, that is rendered as a text box on UI.
+	     */
+	    String = "string",
+	    /**
+	     * Numeric data type including integer and float, that is rendered as
+	     * a numeric box on UI.
+	     */
+	    Number = "number",
+	    /**
+	     * Logical data type (true/false), that is rendered as a checkbox on UI.
+	     */
+	    Boolean = "boolean",
+	}
+	/**
+	 * Represents a setting record.
+	 */
+	export class SettingItem {
+	    static validator: JoiModelValidator<SettingItem>;
+	    static translator: ModelAutoMapper<SettingItem>;
+	    /**
+	     * Gets or sets setting name (aka setting key).
+	     * This is also the key in `appconfig.json` and the name of environment variable.
+	     */
+	    name: string;
+	    /**
+	     * Gets or sets data type of setting value.
+	     * Must be one of: 'string', 'number', 'boolean'.
+	     */
+	    dataType: SettingItemDataType;
+	    /**
+	     *
+	     */
+	    value: any;
+	}
+
+}
+declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
 	/**
 	 * A wrapper array that contains paged items.
 	 */
@@ -203,9 +254,9 @@ declare module 'back-lib-common-contracts/PagedArray' {
 	}
 
 }
-declare module 'back-lib-common-contracts/interfaces' {
-	import { PagedArray } from 'back-lib-common-contracts/PagedArray';
-	import { AtomicSession } from 'back-lib-common-contracts/AtomicSession';
+declare module 'back-lib-common-contracts/dist/app/interfaces' {
+	import { AtomicSession } from 'back-lib-common-contracts/dist/app/models/AtomicSession';
+	import { PagedArray } from 'back-lib-common-contracts/dist/app/models/PagedArray';
 	/**
 	 * Provides common CRUD operations, based on Unit of Work pattern.
 	 */
@@ -252,12 +303,13 @@ declare module 'back-lib-common-contracts/interfaces' {
 
 }
 declare module 'back-lib-common-contracts' {
-	export { GetSettingRequest } from 'back-lib-common-contracts/models/GetSettingRequest';
-	export * from 'back-lib-common-contracts/translators/ModelAutoMapper';
-	export * from 'back-lib-common-contracts/validators/JoiModelValidator';
-	export * from 'back-lib-common-contracts/validators/ValidationError';
-	export * from 'back-lib-common-contracts/interfaces';
-	export * from 'back-lib-common-contracts/PagedArray';
-	export * from 'back-lib-common-contracts/AtomicSession';
+	export * from 'back-lib-common-contracts/dist/app/models/AtomicSession';
+	export * from 'back-lib-common-contracts/dist/app/models/GetSettingRequest';
+	export * from 'back-lib-common-contracts/dist/app/models/SettingItem';
+	export * from 'back-lib-common-contracts/dist/app/models/PagedArray';
+	export * from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
+	export * from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
+	export * from 'back-lib-common-contracts/dist/app/validators/ValidationError';
+	export * from 'back-lib-common-contracts/dist/app/interfaces';
 
 }

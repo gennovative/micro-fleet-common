@@ -7,7 +7,7 @@ import { SampleModel } from './SampleModel';
 
 let validator: JoiModelValidator<SampleModel>;
 
-describe('ModelValidatorBase', () => {
+describe('JoiModelValidator.spec', () => {
 	beforeEach(() => {
 		validator = JoiModelValidator.create<SampleModel>(
 			{
@@ -78,6 +78,9 @@ describe('ModelValidatorBase', () => {
 				[errorTwo, validatedTwo] = validator.whole(targetTwo);
 
 			// Assert
+			if (errorOne) {
+				console.error(errorOne);
+			}
 			expect(errorOne).not.to.exist;
 			expect(validatedOne).to.exist;
 			expect(validatedOne.name).to.equal(targetOne.name);
@@ -85,6 +88,9 @@ describe('ModelValidatorBase', () => {
 			expect(validatedOne.age).to.equal(targetOne.age);
 			expect(validatedOne.gender).to.equal(targetOne.gender);
 			
+			if (errorTwo) {
+				console.error(errorTwo);
+			}
 			expect(errorTwo).not.to.exist;
 			expect(validatedTwo).to.exist;
 			expect(validatedTwo.name).to.equal(targetTwo.name);
@@ -106,6 +112,9 @@ describe('ModelValidatorBase', () => {
 			let [error, value] = validator.whole(target);
 
 			// Assert
+			if (error) {
+				console.error(error);
+			}
 			expect(error).not.to.exist;
 			expect(value).to.exist;
 			expect(value.name).to.equal(target.name);
@@ -172,7 +181,7 @@ describe('ModelValidatorBase', () => {
 			let targetOne = {
 				},
 				targetTwo = {
-					name: 'ab',
+					name: null,
 					address: '',
 					age: '10'
 				},
@@ -201,7 +210,7 @@ describe('ModelValidatorBase', () => {
 			expect(errorTwo).to.exist;
 			expect(errorTwo.details).to.have.length(3);
 			expect(errorTwo.details[0].path).to.equal('name');
-			expect(errorTwo.details[0].message).to.equal('"name" length must be at least 3 characters long');
+			expect(errorTwo.details[0].message).to.equal('"name" must be a string');
 			expect(errorTwo.details[1].path).to.equal('address');
 			expect(errorTwo.details[1].message).to.equal('"address" is not allowed to be empty');
 			expect(errorTwo.details[2].path).to.equal('age');
@@ -224,7 +233,7 @@ describe('ModelValidatorBase', () => {
 	}); // END describe 'whole'
 
 	describe('partial', () => {
-		it('Should return the validated object if valid', () => {
+		it('Should only validate existing properties', () => {
 			// Arrange
 			let target = {
 					theID: 1,
@@ -243,6 +252,33 @@ describe('ModelValidatorBase', () => {
 			expect(error.details.length).to.equal(1);
 			expect(error.details[0].path).to.equal('name');
 			//=> No "required" error for `address`.
+		});
+
+		it('Should ignore `required` validation, but not allow `null` value', () => {
+			// Arrange
+			let targetOne = {
+				},
+				targetTwo = {
+					name: null,
+					age: null
+				};
+
+			// Act
+			let [errorOne, validatedOne] = validator.partial(targetOne),
+				[errorTwo, validatedTwo] = validator.partial(targetTwo);
+
+			// Assert: `required` validation is ignored.
+			expect(validatedOne).to.exist;
+			expect(errorOne).not.to.exist;
+
+			// Assert: `required` properties don't allow `null`.
+			expect(validatedTwo).not.to.exist;
+			expect(errorTwo).to.exist;
+			expect(errorTwo.details).to.have.length(2);
+			expect(errorTwo.details[0].path).to.equal('name');
+			expect(errorTwo.details[0].message).to.equal('"name" must be a string');
+			expect(errorTwo.details[1].path).to.equal('age');
+			expect(errorTwo.details[1].message).to.equal('"age" must be a number');
 		});
 	}); // END describe 'partial'
 });

@@ -31,7 +31,7 @@ export interface MappingOptions {
 /**
  * Provides functions to auto mapping an arbitrary object to model of specific class type.
  */
-export class ModelAutoMapper<T> {
+export class ModelAutoMapper<T extends Object> {
 
 	/**
 	 * Turns on or off model validation before translating.
@@ -61,8 +61,24 @@ export class ModelAutoMapper<T> {
 	}
 
 	/**
+	 * Copies properties from `sources` to dest then optionally validates
+	 * the result (depends on `enableValidation`).
+	 * If `enableValidation` is turned off, it works just like native `Object.assign()` function,
+	 * therefore, use `Object.assign()` for better performance if validation is not needed.
+	 * Note that it uses `partial()` internally, hence `required` validation is IGNORED.
+	 * 
+	 * @throws {ValidationError}
+	 */
+	public merge(dest: Partial<T>, ...sources: Partial<T>[]): Partial<T> {
+		if (dest == null || typeof dest !== 'object') { return dest; }
+		dest = Object.assign(dest, ...sources);
+		return this.partial(dest);
+	}
+
+	/**
 	 * Validates then converts an object to type <T>. 
 	 * but ONLY properties with value are validated and copied.
+	 * Note that `required` validation is IGNORED.
 	 * @param {any | any[]} source An object or array of objects to be translated.
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
@@ -99,13 +115,14 @@ export class ModelAutoMapper<T> {
 
 
 	private tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T & T[] {
-		if (source == null || typeof source !== 'object') { return null; }
+		if (source == null || typeof source !== 'object') { return source; }
 
 		options = Object.assign(<MappingOptions>{
 			enableValidation: this.enableValidation,
 			isEdit: false
 		}, options);
 
+		// Translate an array or single item
 		if (Array.isArray(source)) {
 			return <any>source.map(s => this.translate(fn, s, options));
 		}
