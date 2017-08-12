@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { NotImplementedException } from 'back-lib-common-util';
 
-import { GetSettingRequest } from '../../app/models/GetSettingRequest';
+import { GetSettingRequest } from '../../app';
 
 
 describe('GetSettingRequest\'s validator', () => {

@@ -36,6 +36,133 @@ describe('ModelAutoMapper', () => {
 		translator = new ModelAutoMapper(SampleModel, SampleModel.validator);
 	});
 
+	describe('merge', () => {
+		it('Should copy properties from one source then validate', () => {
+			// Arrange
+			let origin: Partial<SampleModel> = {
+					name: 'Gennova123',
+					age: 18,
+					gender: 'male'
+				},
+				source = {
+					name: 'gen-no-va',
+					address: '^!@',
+					unknown: 'I am a spy!'
+				};
+			let copied,
+				error;
+
+			// Act
+			try {
+				copied = translator.merge(origin, [source]);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			if (error) {
+				console.error(error);
+			}
+			expect(error).not.to.exist;
+			expect(copied).to.exist;
+			expect(copied).is.instanceOf(SampleModel);
+			expect(copied.name).to.equal(source.name);
+			expect(copied.address).to.equal(source.address);
+			expect(copied.age).to.equal(origin.age);
+			expect(copied.gender).to.equal(origin.gender);
+
+			// Assert: Unknown property is stripped.
+			expect(copied.unknown).not.to.exist;
+		});
+
+		it('Should copy properties from multiple sources then validate', () => {
+			// Arrange
+			let origin: Partial<SampleModel> = {
+					name: 'Gennova123',
+					age: 18,
+					gender: 'male'
+				},
+				sourceOne = {
+					name: 'gen-no-va',
+					address: '^!@',
+					unknown: 'I am a spy!'
+				},
+				sourceTwo = {
+					address: 'Earth',
+					age: 99
+				};
+			let copied,
+				error;
+
+			// Act
+			try {
+				copied = translator.merge(origin, [sourceOne, sourceTwo]);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			if (error) {
+				console.error(error);
+			}
+			expect(error).not.to.exist;
+			expect(copied).to.exist;
+			expect(copied).is.instanceOf(SampleModel);
+			expect(copied.name).to.equal(sourceOne.name);
+			expect(copied.address).to.equal(sourceTwo.address);
+			expect(copied.age).to.equal(sourceTwo.age);
+			expect(copied.gender).to.equal(origin.gender);
+
+			// Assert: Unknown property is stripped.
+			expect(copied.unknown).not.to.exist;
+		});
+
+		it('Should throw an error object if VALIDATION fails', () => {
+			// Arrange
+			let origin: Partial<SampleModel> = {
+					name: 'Gennova123',
+					age: 18,
+					gender: 'male'
+				},
+				source = {
+					name: 'A name that is unacceptably too long and lengthy',
+					age: NaN
+				};
+
+			// Act
+			let error, converted;
+
+			try {
+				converted = translator.merge(origin, source);
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(converted).not.to.exist;
+			expect(error).to.exist;
+			expect(error.details.length).to.equal(2);
+			expect(error.details[0].message).to.equal('"name" length must be less than or equal to 10 characters long');
+			expect(error.details[1].message).to.equal('"age" must be a number');
+		});
+
+		it('Should return the input if it is not an object', () => {
+			// Act
+			let input: any = 'not-an-object { }',
+				error, converted;
+
+			try {
+				converted = translator.merge(input, {});
+			} catch (err) {
+				error = err;
+			}
+
+			// Assert
+			expect(converted).to.equal(input);
+			expect(error).not.to.exist;
+		});
+	});
+
 	describe('whole', () => {
 		it('Should return an object of target type if success', () => {
 			// Arrange
@@ -76,9 +203,6 @@ describe('ModelAutoMapper', () => {
 			expect(convertedOne.address).to.equal(sourceOne.address);
 			expect(convertedOne.age).to.equal(sourceOne.age);
 			expect(convertedOne.gender).to.equal(sourceOne.gender);
-
-			// Make sure unknown property is stripped.
-			expect(convertedOne.unknown).not.to.exist;
 
 			if (errorTwo) {
 				console.error(errorOne);
@@ -130,56 +254,60 @@ describe('ModelAutoMapper', () => {
 			});
 		});
 
-		it('Should return null if giving empty or non-object source', () => {
+		it('Should return the input if it is not an object', () => {
 			// Arrange
-			let error, converted;
+			let error, converted,
+				inputOne = null,
+				inputTwo = undefined,
+				inputThree = 'abc',
+				inputFour = 999;
 
 			// Act 1
 			try {
-				converted = translator.whole(null);
+				converted = translator.whole(inputOne);
 			} catch (err) {
 				error = err;
 			}
 
 			// Assert
 			expect(error).not.to.exist;
-			expect(converted).to.be.null;
+			expect(converted).to.equal(inputOne);
 
 
 			// Act 2
 			try {
-				converted = translator.whole(undefined);
+				converted = translator.whole(inputTwo);
 			} catch (err) {
 				error = err;
 			}
 
 			// Assert
 			expect(error).not.to.exist;
-			expect(converted).to.be.null;
+			expect(converted).to.equal(inputTwo);
 
 
 			// Act 3
 			try {
-				converted = translator.whole('abc');
+				converted = translator.whole(inputThree);
 			} catch (err) {
 				error = err;
 			}
 
 			// Assert
 			expect(error).not.to.exist;
-			expect(converted).to.be.null;
+			expect(converted).to.equal(inputThree);
 
 
 			// Act 4
 			try {
-				converted = translator.whole(999);
+				converted = translator.whole(inputFour);
 			} catch (err) {
 				error = err;
 			}
 
 			// Assert
 			expect(error).not.to.exist;
-			expect(converted).to.be.null;
+			expect(converted).to.equal(inputFour);
 		});
 
 		it('Should not map unknown properties', () => {

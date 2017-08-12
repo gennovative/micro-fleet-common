@@ -1,6 +1,5 @@
 /**
- * Wraps a database transaction and provides methods to 
- * end the transaction either succefully or unsuccefully.
+ * Wraps a database connection and transaction.
  */
 export class AtomicSession {
 
