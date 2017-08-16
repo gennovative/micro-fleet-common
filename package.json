@@ -11,6 +11,7 @@
     "npm": "^4.6.1"
   },
   "dependencies": {
+    "automapper-ts": "^1.8.2",
     "back-lib-common-util": "git+ssh://git@bitbucket.org:firstinteractive/back-lib-common-util.git#1.0.0",
     "joi": "^10.6.0"
   },
