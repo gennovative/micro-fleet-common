@@ -1,4 +1,5 @@
 "use strict";
+/// <reference types="automapper-ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 /* istanbul ignore else */
 if (!global['automapper']) {

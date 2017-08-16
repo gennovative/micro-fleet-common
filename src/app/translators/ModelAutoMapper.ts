@@ -1,3 +1,5 @@
+/// <reference types="automapper-ts" />
+
 /* istanbul ignore else */
 if (!global['automapper']) {
 	// AutoMapper registers itself as a singleton global variable.
