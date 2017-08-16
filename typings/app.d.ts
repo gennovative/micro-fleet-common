@@ -36,8 +36,8 @@ declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
 	 * Represents an error when a model does not pass validation.
 	 */
 	export class ValidationError extends Exception {
-	    	    constructor(details: joi.ValidationErrorItem[]);
 	    readonly details: IValidationErrorItem[];
+	    constructor(joiDetails: joi.ValidationErrorItem[]);
 	    	}
 
 }

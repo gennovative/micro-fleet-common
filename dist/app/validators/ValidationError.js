@@ -5,26 +5,25 @@ const back_lib_common_util_1 = require("back-lib-common-util");
  * Represents an error when a model does not pass validation.
  */
 class ValidationError extends back_lib_common_util_1.Exception {
-    constructor(details) {
+    constructor(joiDetails) {
         super(null, false, ValidationError);
-        this.parseDetails(details);
-    }
-    get details() {
-        return this._details;
+        this.name = 'ValidationError';
+        this.details = this.parseDetails(joiDetails);
     }
     parseDetails(joiDetails) {
-        this._details = [];
+        let details = [];
         /* istanbul ignore next */
         if (!joiDetails || !joiDetails.length) {
-            return;
+            return details;
         }
         joiDetails.forEach(d => {
-            this._details.push({
+            details.push({
                 message: d.message,
                 path: d.path,
                 value: d.context.value
             });
         });
+        return details;
     }
 }
 exports.ValidationError = ValidationError;
