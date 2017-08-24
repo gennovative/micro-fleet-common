@@ -1,8 +1,8 @@
 import * as joi from 'joi';
 import { NotImplementedException } from 'back-lib-common-util';
 
-import { ModelAutoMapper } from '../translators/ModelAutoMapper';
-import { JoiModelValidator } from '../validators/JoiModelValidator';
+import { ModelAutoMapper } from '../../translators/ModelAutoMapper';
+import { JoiModelValidator } from '../../validators/JoiModelValidator';
 
 
 /**
@@ -16,12 +16,12 @@ export class GetSettingRequest {
 	/**
 	 * Gets or sets program slug.
 	 */
-	public slug: string = undefined;
+	public readonly slug: string = undefined;
 
 	/**
 	 * Gets or sets IP address where the calling program is running.
 	 */
-	public ipAddress: string = undefined;
+	public readonly ipAddress: string = undefined;
 }
 
 let validator = GetSettingRequest.validator = JoiModelValidator.create({

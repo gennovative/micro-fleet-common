@@ -12,7 +12,7 @@ describe('GetSettingRequest\'s validator', () => {
 					slug: 'SettingSvc',
 					ipAddress: '127.0.0.1'
 				},
-				targetTwo = new GetSettingRequest();
+				targetTwo: any = new GetSettingRequest();
 
 			targetTwo.slug = 'setting-svc';
 			targetTwo.ipAddress = '192.168.10.23';

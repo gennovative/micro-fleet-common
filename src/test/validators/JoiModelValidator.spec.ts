@@ -7,7 +7,7 @@ import { SampleModel } from './SampleModel';
 
 let validator: JoiModelValidator<SampleModel>;
 
-describe('JoiModelValidator.spec', () => {
+describe('JoiModelValidator', () => {
 	beforeEach(() => {
 		validator = JoiModelValidator.create<SampleModel>(
 			{
@@ -16,6 +16,7 @@ describe('JoiModelValidator.spec', () => {
 				age: joi.number().min(15).max(99).integer().optional(),
 				gender: joi.only('male', 'female').optional()
 			},
+			null,
 			{ theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required() }
 		);
 	});
@@ -26,22 +27,49 @@ describe('JoiModelValidator.spec', () => {
 		});
 
 		it('schemaMapId', () => {
-			expect(validator.schemaMapId).to.equal(validator['_schemaMapId']);
+			expect(validator.schemaMapPk).to.equal(validator['_schemaMapPk']);
+		});
+
+		it('isCompoundPk', () => {
+			expect(validator.isCompoundPk).to.equal(validator['_isCompositePk']);
 		});
 	}); // END describe 'getters'
 
-	describe('id', () => {
-		it('Should return the validated model ID if valid', () => {
+	describe('pk', () => {
+		it('Should return the validated single PK if valid', () => {
 			// Arrange
 			let theID = 999;
 
 			// Act
-			let [error, id] = validator.id(theID);
+			let [error, pk] = validator.pk(theID);
 
 			// Assert
+			if (error) { console.error(error); }
 			expect(error).not.to.exist;
-			expect(id).to.exist;
-			expect(id).to.equal(theID);
+			expect(pk).to.exist;
+			expect(pk).to.equal(theID);
+		});
+
+		it('Should return the validated compound PK if valid', () => {
+			// Arrange
+			let validator = JoiModelValidator.create<SampleModel>(
+					{ name: joi.string() },
+					true
+				),
+				target = <TenantPk>{
+					id: '999',
+					tenantId: '888'
+				};
+
+			// Act
+			let [error, pk] = validator.pk(target);
+
+			// Assert
+			if (error) { console.error(error); }
+			expect(error).not.to.exist;
+			expect(pk).to.exist;
+			expect(pk.id).to.equal(target.id);
+			expect(pk.tenantId).to.equal(target.tenantId);
 		});
 
 		it('Should return an error object if invalid', () => {
@@ -49,10 +77,10 @@ describe('JoiModelValidator.spec', () => {
 			let theID = 0;
 
 			// Act
-			let [error, id] = validator.id(theID);
+			let [error, pk] = validator.pk(theID);
 
 			// Assert
-			expect(id).not.to.exist;
+			expect(pk).not.to.exist;
 			expect(error).to.exist;
 			expect(error.details[0].path).to.equal('value');
 			expect(error.details[0].message).to.equal('"value" must be larger than or equal to 1');
@@ -126,7 +154,7 @@ describe('JoiModelValidator.spec', () => {
 		it('Should validate model ID for edit mode', () => {
 			// Arrange
 			let target = {
-				name: 'Gennova123',
+					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					age: 18,
 					gender: 'male'
@@ -142,6 +170,31 @@ describe('JoiModelValidator.spec', () => {
 			expect(error).to.exist;
 			expect(error.details[0].path).to.equal('theID');
 			expect(error.details[0].message).to.equal('"theID" is required');
+		});
+
+		it('Should validate compound PK for edit mode', () => {
+			// Arrange
+			let validator = JoiModelValidator.create<SampleModel>(
+					{ name: joi.string() },
+					true
+				),
+				target = {
+					name: 'Gennova123'
+				};
+
+			// Act
+			let [error, validated] = validator.whole(target, {
+				isEdit: true
+			});
+
+			// Assert
+			expect(validated).not.to.exist;
+			expect(error).to.exist;
+			expect(error.details.length).to.equal(2);
+			expect(error.details[0].path).to.equal('id');
+			expect(error.details[0].message).to.equal('"id" is required');
+			expect(error.details[1].path).to.equal('tenantId');
+			expect(error.details[1].message).to.equal('"tenantId" is required');
 		});
 
 		it('Should return an error object if invalid', () => {

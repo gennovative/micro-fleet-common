@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { NotImplementedException } from 'back-lib-common-util';
 
-import { SettingItem, SettingItemDataType } from '../../app/models/SettingItem';
+import { SettingItem, SettingItemDataType } from '../../app/models/settings/SettingItem';
 
 
 describe('SettingItem\'s validator', () => {
@@ -13,7 +13,7 @@ describe('SettingItem\'s validator', () => {
 					dataType: SettingItemDataType.String,
 					value: '127.0.0.1'
 				},
-				targetTwo = new SettingItem();
+				targetTwo: any = new SettingItem();
 
 			targetTwo.name = 'max_conn';
 			targetTwo.dataType = SettingItemDataType.Number;

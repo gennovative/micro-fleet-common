@@ -4,9 +4,11 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./models/AtomicSession"));
-__export(require("./models/GetSettingRequest"));
-__export(require("./models/SettingItem"));
 __export(require("./models/PagedArray"));
+__export(require("./models/settings/DatabaseSettings"));
+__export(require("./models/settings/DbConnectionSetting"));
+__export(require("./models/settings/GetSettingRequest"));
+__export(require("./models/settings/SettingItem"));
 __export(require("./translators/ModelAutoMapper"));
 __export(require("./validators/JoiModelValidator"));
 __export(require("./validators/ValidationError"));
