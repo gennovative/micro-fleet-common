@@ -1,7 +1,7 @@
 import * as joi from 'joi';
 
-import { AtomicSession } from './models/AtomicSession';
-import { PagedArray } from './models/PagedArray';
+import { AtomicSession } from '../models/AtomicSession';
+import { PagedArray } from '../models/PagedArray';
 
 /**
  * Options for repository's operations.
@@ -94,5 +94,5 @@ export interface IHardDelRepository<TModel extends IModelDTO, TPk = BigSInt>
 	/**
 	 * Permanently deletes one or many records regardless `isSoftDeletable` is on or off.
 	 */
-	hardDelete(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
+	deleteHard(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
 }

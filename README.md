@@ -31,6 +31,7 @@ Contains interfaces and models which are shared between data services and REST/w
 * **SettingItemDataType**: Added 2 types StringArray and NumberArray.
 * **DatabaseSettings**: Wraps an array of database settings.
 * **DbConnectionSetting**: Wraps an array of database connection settings.
+* **Types**: Dependency identifier for `IConfigurationProvider` and `IDependencyContainer` (moved from `back-lib-foundation`).
 
 ### 1.0.0
 

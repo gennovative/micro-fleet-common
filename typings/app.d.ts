@@ -24,6 +24,65 @@ declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
 	}
 
 }
+declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
+	/**
+	 * Stores a database connection detail.
+	 */
+	export interface IConnectionDetail {
+	    /**
+	     * Database driver name, should use constants in class DbClient.
+	     * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
+	     */
+	    clientName: string;
+	    /**
+	     * Connection string for specified `clientName`.
+	     */
+	    connectionString?: string;
+	    /**
+	     * Absolute path to database file name.
+	     */
+	    filePath?: string;
+	    host?: {
+	        /**
+	         * IP Address or Host name.
+	         */
+	        address: string;
+	        /**
+	         * Username to login database.
+	         */
+	        user: string;
+	        /**
+	         * Password to login database.
+	         */
+	        password: string;
+	        /**
+	         * Database name.
+	         */
+	        database: string;
+	    };
+	}
+	export interface IConfigurationProvider extends IServiceAddOn {
+	    /**
+	     * Turns on or off remote settings fetching.
+	     */
+	    enableRemote: boolean;
+	    /**
+	     * Attempts to get settings from cached Configuration Service, environmetal variable,
+	     * and `appconfig.json` file, respectedly.
+	     */
+	    get(key: string): number & boolean & string;
+	    /**
+	     * Attempts to fetch settings from remote Configuration Service.
+	     */
+	    fetch(): Promise<boolean>;
+	    /**
+	     * Invokes everytime new settings are updated.
+	     * The callback receives an array of changed setting keys.
+	     */
+	    onUpdate(listener: (changedKeys: string[]) => void): void;
+	}
+
+}
 declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { Exception } from 'back-lib-common-util';
@@ -249,42 +308,23 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/SettingItem' 
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/settings/DbConnectionSetting' {
-	import { DbClient } from 'back-lib-common-constants';
-	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
-	export type DbConnectionSettingConstructor = {
-	    engine: DbClient;
-	    host?: string;
-	    username?: string;
-	    password?: string;
-	    database?: string;
-	    filePath?: string;
-	    connectionString?: string;
-	};
-	/**
-	 * Wraps an array of database connection settings.
-	 */
-	export class DbConnectionSetting extends Array<SettingItem> {
-	    constructor(opts: DbConnectionSettingConstructor);
-	}
-
-}
 declare module 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings' {
+	import { IConfigurationProvider, IConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
 	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
-	import { DbConnectionSetting } from 'back-lib-common-contracts/dist/app/models/settings/DbConnectionSetting';
 	/**
 	 * Wraps an array of database settings.
 	 */
 	export class DatabaseSettings extends Array<SettingItem> {
-	    	    constructor(...items: DbConnectionSetting[]);
+	    static fromProvider(provider: IConfigurationProvider): IConnectionDetail[];
+	    	    	    constructor();
 	    /**
 	     * Gets number of connection settings.
 	     */
 	    readonly total: number;
 	    /**
-	     * Adds a database connection setting.
+	     * Parses then adds connection detail to setting item array.
 	     */
-	    pushConnection(conn: DbConnectionSetting): void;
+	    pushConnection(detail: IConnectionDetail): void;
 	}
 
 }
@@ -308,7 +348,7 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/GetSettingReq
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/interfaces' {
+declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	import { AtomicSession } from 'back-lib-common-contracts/dist/app/models/AtomicSession';
 	import { PagedArray } from 'back-lib-common-contracts/dist/app/models/PagedArray';
 	/**
@@ -387,7 +427,14 @@ declare module 'back-lib-common-contracts/dist/app/interfaces' {
 	    /**
 	     * Permanently deletes one or many records regardless `isSoftDeletable` is on or off.
 	     */
-	    hardDelete(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
+	    deleteHard(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
+	}
+
+}
+declare module 'back-lib-common-contracts/dist/app/Types' {
+	export class Types {
+	    static readonly CONFIG_PROVIDER: symbol;
+	    static readonly DEPENDENCY_CONTAINER: symbol;
 	}
 
 }
@@ -395,12 +442,13 @@ declare module 'back-lib-common-contracts' {
 	export * from 'back-lib-common-contracts/dist/app/models/AtomicSession';
 	export * from 'back-lib-common-contracts/dist/app/models/PagedArray';
 	export * from 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings';
-	export * from 'back-lib-common-contracts/dist/app/models/settings/DbConnectionSetting';
 	export * from 'back-lib-common-contracts/dist/app/models/settings/GetSettingRequest';
 	export * from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
 	export * from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
 	export * from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
 	export * from 'back-lib-common-contracts/dist/app/validators/ValidationError';
-	export * from 'back-lib-common-contracts/dist/app/interfaces';
+	export * from 'back-lib-common-contracts/dist/app/interfaces/configurations';
+	export * from 'back-lib-common-contracts/dist/app/interfaces/repositories';
+	export * from 'back-lib-common-contracts/dist/app/Types';
 
 }

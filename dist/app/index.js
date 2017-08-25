@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./models/AtomicSession"));
 __export(require("./models/PagedArray"));
 __export(require("./models/settings/DatabaseSettings"));
-__export(require("./models/settings/DbConnectionSetting"));
 __export(require("./models/settings/GetSettingRequest"));
 __export(require("./models/settings/SettingItem"));
 __export(require("./translators/ModelAutoMapper"));
 __export(require("./validators/JoiModelValidator"));
 __export(require("./validators/ValidationError"));
+__export(require("./Types"));
 
 //# sourceMappingURL=index.js.map
