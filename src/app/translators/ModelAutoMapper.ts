@@ -1,5 +1,3 @@
-/// <reference types="automapper-ts" />
-
 /* istanbul ignore else */
 if (!global['automapper']) {
 	// AutoMapper registers itself as a singleton global variable.
@@ -18,7 +16,7 @@ export interface MappingOptions {
 	enableValidation?: boolean;
 
 	/**
-	 * If `true`, validates model ID. Otherwise, excludes model ID from validation.
+	 * If `true`, validates model PK. Otherwise, excludes model PK from validation.
 	 * Only takes effect when `enableValidation` is `true`.
 	 * Default is `false`.
 	 */

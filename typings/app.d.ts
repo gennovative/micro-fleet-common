@@ -11,6 +11,78 @@ declare module 'back-lib-common-contracts/dist/app/models/AtomicSession' {
 	}
 
 }
+declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
+	/**
+	 * A wrapper array that contains paged items.
+	 */
+	export class PagedArray<T> extends Array<T> {
+	    	    /**
+	     * Gets total number of items.
+	     */
+	    readonly total: number;
+	    constructor(_total?: number, ...items: T[]);
+	}
+
+}
+declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
+	/**
+	 * Stores a database connection detail.
+	 */
+	export interface IConnectionDetail {
+	    /**
+	     * Database driver name, should use constants in class DbClient.
+	     * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
+	     */
+	    clientName: string;
+	    /**
+	     * Connection string for specified `clientName`.
+	     */
+	    connectionString?: string;
+	    /**
+	     * Absolute path to database file name.
+	     */
+	    filePath?: string;
+	    host?: {
+	        /**
+	         * IP Address or Host name.
+	         */
+	        address: string;
+	        /**
+	         * Username to login database.
+	         */
+	        user: string;
+	        /**
+	         * Password to login database.
+	         */
+	        password: string;
+	        /**
+	         * Database name.
+	         */
+	        database: string;
+	    };
+	}
+	export interface IConfigurationProvider extends IServiceAddOn {
+	    /**
+	     * Turns on or off remote settings fetching.
+	     */
+	    enableRemote: boolean;
+	    /**
+	     * Attempts to get settings from cached Configuration Service, environmetal variable,
+	     * and `appconfig.json` file, respectedly.
+	     */
+	    get(key: string): number & boolean & string;
+	    /**
+	     * Attempts to fetch settings from remote Configuration Service.
+	     */
+	    fetch(): Promise<boolean>;
+	    /**
+	     * Invokes everytime new settings are updated.
+	     * The callback receives an array of changed setting keys.
+	     */
+	    onUpdate(listener: (changedKeys: string[]) => void): void;
+	}
+
+}
 declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { Exception } from 'back-lib-common-util';
@@ -46,24 +118,27 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	import { ValidationError } from 'back-lib-common-contracts/dist/app/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
 	    /**
-	     * If `true`, this validation is for edit model. Otherwise, for new model.
+	     * If `true`, validates model PK. Otherwise, excludes model PK from validation.
 	     * Default to `false`.
 	     */
 	    isEdit?: boolean;
 	}
 	export class JoiModelValidator<T> {
 	    protected _schemaMap: joi.SchemaMap;
-	    protected _schemaMapId: joi.SchemaMap;
+	    protected _isCompositePk: boolean;
+	    protected _schemaMapPk: joi.SchemaMap;
 	    /**
 	     * Builds a new instance of ModelValidatorBase.
 	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
-	     * @param {joi.SchemaMap} schemaMapId Rule to validate model ID. Only the first property rule is used.
+	     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
+	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	     */
-	    static create<T>(schemaMapModel: joi.SchemaMap, schemaMapId?: joi.SchemaMap): JoiModelValidator<T>;
+	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
 	    /**
-	     * Compiled rules for model ID.
+	     * Compiled rules for compound model primary key.
 	     */
-	    protected _compiledId: joi.ObjectSchema;
+	    protected _compiledPk: joi.ObjectSchema;
 	    /**
 	     * Compiled rules for model properties.
 	     */
@@ -76,21 +151,24 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	    /**
 	     *
 	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID. Only the first property rule is used.
+	     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
+	     * 		This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
 	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _schemaMapId?: joi.SchemaMap);
+	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk?: boolean, _schemaMapPk?: joi.SchemaMap);
 	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapId: joi.SchemaMap;
+	    readonly schemaMapPk: joi.SchemaMap;
+	    readonly isCompoundPk: boolean;
 	    /**
-	     * Validates model ID.
+	     * Validates model PK.
 	     */
-	    id(id: any): [ValidationError, any];
+	    pk(pk: any): [ValidationError, any];
 	    /**
-	     * Validates model for creation operation, which doesn't need `id` property.
+	     * Validates model for creation operation, which doesn't need `pk` property.
 	     */
 	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
 	    /**
-	     * Validates model for modification operation, which requires `id` property.
+	     * Validates model for modification operation, which requires `pk` property.
 	     */
 	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
 	    /**
@@ -112,7 +190,7 @@ declare module 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper' 
 	     */
 	    enableValidation?: boolean;
 	    /**
-	     * If `true`, validates model ID. Otherwise, excludes model ID from validation.
+	     * If `true`, validates model PK. Otherwise, excludes model PK from validation.
 	     * Only takes effect when `enableValidation` is `true`.
 	     * Default is `false`.
 	     */
@@ -180,27 +258,7 @@ declare module 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper' 
 	    	    	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/GetSettingRequest' {
-	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
-	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
-	/**
-	 * Represents the request contract for GetSetting endpoint.
-	 */
-	export class GetSettingRequest {
-	    static validator: JoiModelValidator<GetSettingRequest>;
-	    static translator: ModelAutoMapper<GetSettingRequest>;
-	    /**
-	     * Gets or sets program slug.
-	     */
-	    slug: string;
-	    /**
-	     * Gets or sets IP address where the calling program is running.
-	     */
-	    ipAddress: string;
-	}
-
-}
-declare module 'back-lib-common-contracts/dist/app/models/SettingItem' {
+declare module 'back-lib-common-contracts/dist/app/models/settings/SettingItem' {
 	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
 	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
 	export enum SettingItemDataType {
@@ -209,10 +267,18 @@ declare module 'back-lib-common-contracts/dist/app/models/SettingItem' {
 	     */
 	    String = "string",
 	    /**
+	     * Array of strings.
+	     */
+	    StringArray = "string[]",
+	    /**
 	     * Numeric data type including integer and float, that is rendered as
 	     * a numeric box on UI.
 	     */
 	    Number = "number",
+	    /**
+	     * Array of numbers.
+	     */
+	    NumberArray = "number[]",
 	    /**
 	     * Logical data type (true/false), that is rendered as a checkbox on UI.
 	     */
@@ -228,88 +294,161 @@ declare module 'back-lib-common-contracts/dist/app/models/SettingItem' {
 	     * Gets or sets setting name (aka setting key).
 	     * This is also the key in `appconfig.json` and the name of environment variable.
 	     */
-	    name: string;
+	    readonly name: string;
 	    /**
 	     * Gets or sets data type of setting value.
-	     * Must be one of: 'string', 'number', 'boolean'.
+	     * Must be one of: 'string', 'string[]', 'number', 'number[]', 'boolean'.
 	     */
-	    dataType: SettingItemDataType;
+	    readonly dataType: SettingItemDataType;
 	    /**
-	     *
+	     * Gets or set value.
+	     * Whatever `dataType` is, value must always be string.
 	     */
-	    value: any;
+	    readonly value: string;
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
+declare module 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings' {
+	import { IConfigurationProvider, IConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
+	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
 	/**
-	 * A wrapper array that contains paged items.
+	 * Wraps an array of database settings.
 	 */
-	export class PagedArray<T> extends Array<T> {
-	    	    /**
-	     * Gets total number of items.
+	export class DatabaseSettings extends Array<SettingItem> {
+	    static fromProvider(provider: IConfigurationProvider): IConnectionDetail[];
+	    	    	    constructor();
+	    /**
+	     * Gets number of connection settings.
 	     */
 	    readonly total: number;
-	    constructor(_total?: number, ...items: T[]);
+	    /**
+	     * Parses then adds connection detail to setting item array.
+	     */
+	    pushConnection(detail: IConnectionDetail): void;
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/interfaces' {
+declare module 'back-lib-common-contracts/dist/app/models/settings/GetSettingRequest' {
+	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
+	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
+	/**
+	 * Represents the request contract for GetSetting endpoint.
+	 */
+	export class GetSettingRequest {
+	    static validator: JoiModelValidator<GetSettingRequest>;
+	    static translator: ModelAutoMapper<GetSettingRequest>;
+	    /**
+	     * Gets or sets program slug.
+	     */
+	    readonly slug: string;
+	    /**
+	     * Gets or sets IP address where the calling program is running.
+	     */
+	    readonly ipAddress: string;
+	}
+
+}
+declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	import { AtomicSession } from 'back-lib-common-contracts/dist/app/models/AtomicSession';
 	import { PagedArray } from 'back-lib-common-contracts/dist/app/models/PagedArray';
 	/**
+	 * Options for repository's operations.
+	 * Note that different operations care about different option properties.
+	 */
+	export type RepositoryOptions = {
+	    /**
+	     * Whether to include records marked as soft-deleted.
+	     * Default to `false`.
+	     */
+	    includeDeleted?: boolean;
+	    /**
+	     * A transaction to which this operation is restricted.
+	     */
+	    atomicSession?: AtomicSession;
+	    /**
+	     * Tenant ID.
+	     */
+	    tenantId?: BigSInt;
+	};
+	/**
 	 * Provides common CRUD operations, based on Unit of Work pattern.
 	 */
-	export interface IRepository<TModel extends IModelDTO> {
+	export interface IRepository<TModel extends IModelDTO, TPk = BigSInt> {
 	    /**
 	     * Indicates whether `delete` method of this class really removes
 	     * records from database, or just marks them as deleted and allows undoing.
 	     */
-	    isSoftDeletable: boolean;
+	    readonly isSoftDeletable: boolean;
 	    /**
 	     * Indicates whether this class should update `createdAt` and `updatedAt` properties.
 	     */
-	    isAuditable: boolean;
+	    readonly isAuditable: boolean;
 	    /**
 	     * Counts all records in a table.
 	     */
-	    countAll(atomicSession?: AtomicSession): Promise<number>;
+	    countAll(options?: RepositoryOptions): Promise<number>;
 	    /**
-	     * Inserts specified `model` to database.
+	     * Inserts one or more `model` to database.
+	     * @param {DTO model} model The model to be inserted.
 	     */
-	    create(model: TModel, atomicSession?: AtomicSession): Promise<TModel>;
+	    create(model: TModel | TModel[], options?: RepositoryOptions): Promise<TModel & TModel[]>;
 	    /**
-	     * Removes record with `id` from database, or marks it as deleted,
+	     * Removes one or many records with `pk` from database, or marks it/them as deleted,
 	     * depending on `isSoftDelete` value.
+	     * @param {PK Type} pk The primary key object.
 	     */
-	    delete(id: BigSInt, atomicSession?: AtomicSession): Promise<number>;
+	    delete(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
 	    /**
-	     * Selects only one record with `id`.
+	     * Selects only one record with `pk`.
+	     * @param {PK Type} pk The primary key object.
 	     */
-	    find(id: BigSInt, atomicSession?: AtomicSession): Promise<TModel>;
+	    findByPk(pk: TPk, options?: RepositoryOptions): Promise<TModel>;
 	    /**
 	     * Selects `pageSize` number of records at page `pageIndex`.
+	     * @param {number} pageIndex Index of the page.
+	     * @param {number} pageSize Number of records in a page.
+	     * @param {boolean} includeDeleted Whether to count records marked as soft-deleted. Default should be `false`.
+	     * @param {AtomicSession} atomicSession A transaction in which this operation is restricted.
 	     */
-	    page(pageIndex: number, pageSize: number, atomicSession?: AtomicSession): Promise<PagedArray<TModel>>;
+	    page(pageIndex: number, pageSize: number, options?: RepositoryOptions): Promise<PagedArray<TModel>>;
 	    /**
 	     * Updates new value for specified properties in `model`.
 	     */
-	    patch(model: Partial<TModel>, atomicSession?: AtomicSession): Promise<number>;
+	    patch(model: Partial<TModel> | Partial<TModel>[], options?: RepositoryOptions): Promise<Partial<TModel> & Partial<TModel>[]>;
 	    /**
 	     * Replaces a record with `model`.
 	     */
-	    update(model: TModel, atomicSession?: AtomicSession): Promise<number>;
+	    update(model: TModel | TModel[], options?: RepositoryOptions): Promise<TModel & TModel[]>;
+	}
+	/**
+	 * Provides common CRUD operations with composite primary key that supports multi-tenancy, based on Unit of Work pattern.
+	 */
+	export interface IHardDelRepository<TModel extends IModelDTO, TPk = BigSInt> extends IRepository<TModel, TPk> {
+	    /**
+	     * Permanently deletes one or many records regardless `isSoftDeletable` is on or off.
+	     */
+	    deleteHard(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
+	}
+
+}
+declare module 'back-lib-common-contracts/dist/app/Types' {
+	export class Types {
+	    static readonly CONFIG_PROVIDER: symbol;
+	    static readonly DEPENDENCY_CONTAINER: symbol;
 	}
 
 }
 declare module 'back-lib-common-contracts' {
 	export * from 'back-lib-common-contracts/dist/app/models/AtomicSession';
-	export * from 'back-lib-common-contracts/dist/app/models/GetSettingRequest';
-	export * from 'back-lib-common-contracts/dist/app/models/SettingItem';
 	export * from 'back-lib-common-contracts/dist/app/models/PagedArray';
+	export * from 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings';
+	export * from 'back-lib-common-contracts/dist/app/models/settings/GetSettingRequest';
+	export * from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
 	export * from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
 	export * from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
 	export * from 'back-lib-common-contracts/dist/app/validators/ValidationError';
-	export * from 'back-lib-common-contracts/dist/app/interfaces';
+	export * from 'back-lib-common-contracts/dist/app/interfaces/configurations';
+	export * from 'back-lib-common-contracts/dist/app/interfaces/repositories';
+	export * from 'back-lib-common-contracts/dist/app/Types';
 
 }

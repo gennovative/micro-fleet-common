@@ -1,7 +1,7 @@
 import * as joi from 'joi';
 
-import { ModelAutoMapper } from '../translators/ModelAutoMapper';
-import { JoiModelValidator } from '../validators/JoiModelValidator';
+import { ModelAutoMapper } from '../../translators/ModelAutoMapper';
+import { JoiModelValidator } from '../../validators/JoiModelValidator';
 
 
 export enum SettingItemDataType { 
@@ -11,10 +11,20 @@ export enum SettingItemDataType {
 	String = 'string',
 
 	/**
+	 * Array of strings.
+	 */
+	StringArray = 'string[]',
+
+	/**
 	 * Numeric data type including integer and float, that is rendered as
 	 * a numeric box on UI.
 	 */
 	Number = 'number',
+
+	/**
+	 * Array of numbers.
+	 */
+	NumberArray = 'number[]',
 
 	/**
 	 * Logical data type (true/false), that is rendered as a checkbox on UI.
@@ -34,23 +44,24 @@ export class SettingItem {
 	 * Gets or sets setting name (aka setting key).
 	 * This is also the key in `appconfig.json` and the name of environment variable.
 	 */
-	public name: string = undefined;
+	public readonly name: string = undefined;
 
 	/**
 	 * Gets or sets data type of setting value.
-	 * Must be one of: 'string', 'number', 'boolean'.
+	 * Must be one of: 'string', 'string[]', 'number', 'number[]', 'boolean'.
 	 */
-	public dataType: SettingItemDataType = undefined;
+	public readonly dataType: SettingItemDataType = undefined;
 
 	/**
-	 * 
+	 * Gets or set value.
+	 * Whatever `dataType` is, value must always be string.
 	 */
-	public value: any = undefined;
+	public readonly value: string = undefined;
 }
 
 SettingItem.validator = JoiModelValidator.create({
 	name: joi.string().token().required(),
-	dataType: joi.string().required().only(SettingItemDataType.String, SettingItemDataType.Number, SettingItemDataType.Boolean),
+	dataType: joi.string().required().only(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
 	value: joi.string().allow('').required()
 });
 

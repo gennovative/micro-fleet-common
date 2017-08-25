@@ -21,6 +21,7 @@ SampleModel.validator = JoiModelValidator.create<SampleModel>(
 			.allow(null).optional(), // This pair (allow, optional) must go together.
 		gender: joi.only('male', 'female').allow(null).optional()
 	},
+	null,
 	{ 
 		theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required() 
 	}

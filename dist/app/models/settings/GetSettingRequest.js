@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
 const back_lib_common_util_1 = require("back-lib-common-util");
-const ModelAutoMapper_1 = require("../translators/ModelAutoMapper");
-const JoiModelValidator_1 = require("../validators/JoiModelValidator");
+const ModelAutoMapper_1 = require("../../translators/ModelAutoMapper");
+const JoiModelValidator_1 = require("../../validators/JoiModelValidator");
 /**
  * Represents the request contract for GetSetting endpoint.
  */

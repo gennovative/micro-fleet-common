@@ -7,48 +7,74 @@ class JoiModelValidator {
     /**
      *
      * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID. Only the first property rule is used.
+     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
+     * 		This param is IGNORED if param `schemaMapPk` has value.
+     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
      */
-    constructor(_schemaMap, _schemaMapId) {
+    constructor(_schemaMap, _isCompositePk = false, _schemaMapPk) {
         this._schemaMap = _schemaMap;
-        this._schemaMapId = _schemaMapId;
+        this._isCompositePk = _isCompositePk;
+        this._schemaMapPk = _schemaMapPk;
         // As default, model ID is a string of 64-bit integer.
         // JS cannot handle 64-bit integer, that's why we must use string.
         // The database will convert to BigInt type when inserting.
-        this._schemaMapId = _schemaMapId || { id: joi.string().regex(/^\d+$/).required() };
+        let idSchema = joi.string().regex(/^\d+$/).required();
+        if (_schemaMapPk) {
+            this._schemaMapPk = _schemaMapPk;
+        }
+        else if (_isCompositePk) {
+            // this._compiledPk = joi.object({
+            // 		id: idSchema,
+            // 		tenantId: idSchema
+            // 	})
+            // 	.required();
+            this._schemaMapPk = {
+                id: idSchema,
+                tenantId: idSchema
+            };
+        }
+        else {
+            this._schemaMapPk = { id: idSchema };
+            this._compiledPk = idSchema;
+        }
     }
     /**
      * Builds a new instance of ModelValidatorBase.
      * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
-     * @param {joi.SchemaMap} schemaMapId Rule to validate model ID. Only the first property rule is used.
+     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
+     * 	This param is IGNORED if param `schemaMapPk` has value.
+     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
      */
-    static create(schemaMapModel, schemaMapId) {
-        let validator = new JoiModelValidator(schemaMapModel, schemaMapId);
+    static create(schemaMapModel, isCompoundPk = false, schemaMapPk) {
+        let validator = new JoiModelValidator(schemaMapModel, isCompoundPk, schemaMapPk);
         validator.compile();
         return validator;
     }
     get schemaMap() {
         return this._schemaMap;
     }
-    get schemaMapId() {
-        return this._schemaMapId;
+    get schemaMapPk() {
+        return this._schemaMapPk;
+    }
+    get isCompoundPk() {
+        return this._isCompositePk;
     }
     /**
-     * Validates model ID.
+     * Validates model PK.
      */
-    id(id) {
-        back_lib_common_util_1.Guard.assertIsDefined(this._compiledId, 'Must call `compile` before using this function!');
-        let { error, value } = this._compiledId.validate(id);
+    pk(pk) {
+        back_lib_common_util_1.Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!');
+        let { error, value } = this._compiledPk.validate(pk);
         return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
     }
     /**
-     * Validates model for creation operation, which doesn't need `id` property.
+     * Validates model for creation operation, which doesn't need `pk` property.
      */
     whole(target, options = {}) {
         return this.validate(this._compiledWhole, target, options);
     }
     /**
-     * Validates model for modification operation, which requires `id` property.
+     * Validates model for modification operation, which requires `pk` property.
      */
     partial(target, options = {}) {
         return this.validate(this._compiledPartial, target, options);
@@ -73,13 +99,19 @@ class JoiModelValidator {
             }
         }
         this._compiledPartial = joi.object(partialSchema);
-        // Compile rule for id
-        let idMap = this._schemaMapId;
+        if (this._compiledPk) {
+            return;
+        }
+        if (this._isCompositePk) {
+            this._compiledPk = joi.object(this._schemaMapPk);
+            return;
+        }
+        // Compile rule for simple PK with only one property
+        let idMap = this.schemaMapPk;
         for (let key in idMap) {
             /* istanbul ignore else */
             if (idMap.hasOwnProperty(key)) {
-                // key can be `id`, `ID`, `Id`... whatever
-                this._compiledId = idMap[key];
+                this._compiledPk = idMap[key];
                 break; // Only get the first rule
             }
         }
@@ -92,8 +124,8 @@ class JoiModelValidator {
             stripUnknown: true,
             isEdit: false
         }, options);
-        // If edit mode, validate id property.
-        schema = opts.isEdit ? schema.keys(this._schemaMapId) : schema;
+        // If edit mode, validate pk property.
+        schema = opts.isEdit ? schema.keys(this._schemaMapPk) : schema;
         delete opts.isEdit;
         let { error, value } = schema.validate(target, opts);
         return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];

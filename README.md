@@ -19,6 +19,20 @@ Contains interfaces and models which are shared between data services and REST/w
 
 ## VERSIONS
 
+### 1.1.0
+
+* **IRepository**: 
+	- Added generic param for id data type, to support composite primary key.
+	- Supports write operations (update, path, delete) on multiple items.
+	- Differentiates read operations between active and soft-deleted records.
+* **TenantPk**: Primary key data type that support multi-tenancy.
+* **IHardDelRepository**: Extends from `IRepository`, supports hard deletion.
+* **JoiModelValidator**: Added support for composite primary key.
+* **SettingItemDataType**: Added 2 types StringArray and NumberArray.
+* **DatabaseSettings**: Wraps an array of database settings.
+* **DbConnectionSetting**: Wraps an array of database connection settings.
+* **Types**: Dependency identifier for `IConfigurationProvider` and `IDependencyContainer` (moved from `back-lib-foundation`).
+
 ### 1.0.0
 
 * **PagedArray<T>**: A derived Array class that supports pagination.

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
-const ModelAutoMapper_1 = require("../translators/ModelAutoMapper");
-const JoiModelValidator_1 = require("../validators/JoiModelValidator");
+const ModelAutoMapper_1 = require("../../translators/ModelAutoMapper");
+const JoiModelValidator_1 = require("../../validators/JoiModelValidator");
 var SettingItemDataType;
 (function (SettingItemDataType) {
     /**
@@ -10,10 +10,18 @@ var SettingItemDataType;
      */
     SettingItemDataType["String"] = "string";
     /**
+     * Array of strings.
+     */
+    SettingItemDataType["StringArray"] = "string[]";
+    /**
      * Numeric data type including integer and float, that is rendered as
      * a numeric box on UI.
      */
     SettingItemDataType["Number"] = "number";
+    /**
+     * Array of numbers.
+     */
+    SettingItemDataType["NumberArray"] = "number[]";
     /**
      * Logical data type (true/false), that is rendered as a checkbox on UI.
      */
@@ -31,11 +39,12 @@ class SettingItem {
         this.name = undefined;
         /**
          * Gets or sets data type of setting value.
-         * Must be one of: 'string', 'number', 'boolean'.
+         * Must be one of: 'string', 'string[]', 'number', 'number[]', 'boolean'.
          */
         this.dataType = undefined;
         /**
-         *
+         * Gets or set value.
+         * Whatever `dataType` is, value must always be string.
          */
         this.value = undefined;
     }
@@ -43,7 +52,7 @@ class SettingItem {
 exports.SettingItem = SettingItem;
 SettingItem.validator = JoiModelValidator_1.JoiModelValidator.create({
     name: joi.string().token().required(),
-    dataType: joi.string().required().only(SettingItemDataType.String, SettingItemDataType.Number, SettingItemDataType.Boolean),
+    dataType: joi.string().required().only(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
     value: joi.string().allow('').required()
 });
 SettingItem.translator = new ModelAutoMapper_1.ModelAutoMapper(SettingItem, SettingItem.validator);
