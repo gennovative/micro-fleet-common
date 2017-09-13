@@ -3,96 +3,176 @@ import * as joi from 'joi';
 import { AtomicSession } from '../models/AtomicSession';
 import { PagedArray } from '../models/PagedArray';
 
+
 /**
  * Options for repository's operations.
  * Note that different operations care about different option properties.
+ * @deprecated
  */
-export type RepositoryOptions = {
+export interface RepositoryOptions {
+	/**
+	 * A transaction to which this operation is restricted.
+	 */
+	atomicSession?: AtomicSession;
+
+	/**
+	 * Account ID.
+	 */
+	accountId?: BigSInt;
+}
+
+export interface RepositoryExistsOptions extends RepositoryOptions {
 	/**
 	 * Whether to include records marked as soft-deleted.
 	 * Default to `false`.
 	 */
-	includeDeleted?: boolean,
-
-	/**
-	 * A transaction to which this operation is restricted.
-	 */
-	atomicSession?: AtomicSession,
+	includeDeleted?: boolean;
 
 	/**
 	 * Tenant ID.
 	 */
-	tenantId?: BigSInt
-};
+	tenantId?: BigSInt;
+}
+
+export interface RepositoryCountAllOptions extends RepositoryExistsOptions {
+}
+
+export interface RepositoryCreateOptions extends RepositoryOptions {
+}
+
+export interface RepositoryDeleteOptions extends RepositoryOptions {
+}
+
+export interface RepositoryFindOptions extends RepositoryOptions {
+	version?: number;
+}
+
+export interface RepositoryPageOptions extends RepositoryCountAllOptions {
+}
+
+export interface RepositoryPatchOptions extends RepositoryOptions {
+}
+
+export interface RepositoryRecoverOptions extends RepositoryOptions {
+}
+
+export interface RepositoryUpdateOptions extends RepositoryOptions {
+}
+
+export interface RepositorySetMainOptions extends RepositoryOptions {
+}
+
+export interface RepositoryDelVersionOptions extends RepositoryOptions {
+	olderThan?: Date;
+}
+
+export interface RepositoryRestrictOptions extends RepositoryOptions {
+}
 
 /**
  * Provides common CRUD operations, based on Unit of Work pattern.
  */
-export interface IRepository<TModel extends IModelDTO, TPk = BigSInt> {
-
-	/**
-	 * Indicates whether `delete` method of this class really removes
-	 * records from database, or just marks them as deleted and allows undoing.
-	 */
-	readonly isSoftDeletable: boolean;
-
-	/**
-	 * Indicates whether this class should update `createdAt` and `updatedAt` properties.
-	 */
-	readonly isAuditable: boolean;
+export interface IRepository<TModel extends IModelDTO, TPk extends PkType = BigSInt, TUk = NameUk> {
 
 	/**
 	 * Counts all records in a table.
 	 */
-	countAll(options?: RepositoryOptions): Promise<number>;
+	countAll(options?: RepositoryCountAllOptions): Promise<number>;
 
 	/**
 	 * Inserts one or more `model` to database.
 	 * @param {DTO model} model The model to be inserted.
 	 */
-	create(model: TModel | TModel[], options?: RepositoryOptions): Promise<TModel & TModel[]>;
+	create(model: TModel | TModel[], options?: RepositoryCreateOptions): Promise<TModel & TModel[]>;
 
 	/**
-	 * Removes one or many records with `pk` from database, or marks it/them as deleted,
-	 * depending on `isSoftDelete` value.
+	 * Permanently deletes one or many records.
 	 * @param {PK Type} pk The primary key object.
 	 */
-	delete(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
+	deleteHard(pk: TPk | TPk[], options?: RepositoryDeleteOptions): Promise<number>;
 
+	/**
+	 * Checks if a record exists or not.
+	 * @param {TUk} props An object with non-primary unique properties.
+	 */
+	exists(props: TUk, options?: RepositoryExistsOptions): Promise<boolean>;
+	
 	/**
 	 * Selects only one record with `pk`.
 	 * @param {PK Type} pk The primary key object.
 	 */
-	findByPk(pk: TPk, options?: RepositoryOptions): Promise<TModel>;
+	findByPk(pk: TPk, options?: RepositoryFindOptions): Promise<TModel>;
 
 	/**
 	 * Selects `pageSize` number of records at page `pageIndex`.
 	 * @param {number} pageIndex Index of the page.
 	 * @param {number} pageSize Number of records in a page.
-	 * @param {boolean} includeDeleted Whether to count records marked as soft-deleted. Default should be `false`.
-	 * @param {AtomicSession} atomicSession A transaction in which this operation is restricted.
 	 */
-	page(pageIndex: number, pageSize: number, options?: RepositoryOptions): Promise<PagedArray<TModel>>;
+	page(pageIndex: number, pageSize: number, options?: RepositoryPageOptions): Promise<PagedArray<TModel>>;
 
 	/**
 	 * Updates new value for specified properties in `model`.
 	 */
-	patch(model: Partial<TModel> | Partial<TModel>[], options?: RepositoryOptions): Promise<Partial<TModel> & Partial<TModel>[]>;
+	patch(model: Partial<TModel> | Partial<TModel>[], options?: RepositoryPatchOptions): Promise<Partial<TModel> & Partial<TModel>[]>;
 
 	/**
 	 * Replaces a record with `model`.
 	 */
-	update(model: TModel | TModel[], options?: RepositoryOptions): Promise<TModel & TModel[]>;
+	update(model: TModel | TModel[], options?: RepositoryUpdateOptions): Promise<TModel & TModel[]>;
 }
 
 /**
- * Provides common CRUD operations with composite primary key that supports multi-tenancy, based on Unit of Work pattern.
+ * Provides common operations to soft-delete and recover models.
  */
-export interface IHardDelRepository<TModel extends IModelDTO, TPk = BigSInt>
-		extends IRepository<TModel, TPk> {
+export interface ISoftDelRepository<TModel extends IModelDTO, TPk extends PkType = BigSInt, TUk = NameUk>
+		extends IRepository<TModel, TPk, TUk> {
 
 	/**
-	 * Permanently deletes one or many records regardless `isSoftDeletable` is on or off.
+	 * Marks one or many records with `pk` as deleted.
+	 * @param {PK Type} pk The primary key object.
 	 */
-	deleteHard(pk: TPk | TPk[], options?: RepositoryOptions): Promise<number>;
+	deleteSoft(pk: TPk | TPk[], options?: RepositoryDeleteOptions): Promise<number>;
+
+	/**
+	 * Marks one or many records with `pk` as NOT deleted.
+	 * @param {PK Type} pk The primary key object.
+	 */
+	recover(pk: TPk | TPk[], options?: RepositoryRecoverOptions): Promise<number>;
+
+}
+
+/**
+ * Provides common operations to control models' revisions.
+ */
+export interface IVersionRepository<TModel extends IVersionControlled, TPk extends PkType = BigSInt, TUk = NameUk>
+		extends ISoftDelRepository<TModel, TPk, TUk> {
+
+	/**
+	 * Permanently deletes one or many version of a record.
+	 * Can be filtered with `olderThan` option.
+	 * @param {PK Type} pk The primary key object.
+	 */
+	deleteHardVersions(pk: TPk, versions: number | number[], options?: RepositoryDelVersionOptions): Promise<number>;
+
+	/**
+	 * Selects `pageSize` number of version of a record at page `pageIndex`.
+	 * @param {PK Type} pk The primary key object.
+	 * @param {number} pageIndex Index of the page.
+	 * @param {number} pageSize Number of records in a page.
+	 */
+	pageVersions(pk: TPk, pageIndex: number, pageSize: number, options?: RepositoryPageOptions): Promise<number>;
+
+	/**
+	 * Marks a revision as main version of the record with `pk`.
+	 * @param {PK Type} pk The primary key object.
+	 * @param {number} version The version number.
+	 */
+	setAsMain(pk: TPk, version: number, options?: RepositorySetMainOptions): Promise<number>;
+
+	/**
+	 * Removes old versions to keep number of version to be equal or less than `nVersion`.
+	 * @param {PK Type} pk The primary key object.
+	 * @param {number} nVersion Number of versions to keep.
+	 */
+	restrictQuantity(pk: TPk, nVersion: number, options?: RepositoryRestrictOptions);
 }

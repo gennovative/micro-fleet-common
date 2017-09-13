@@ -17,7 +17,7 @@ class MockConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve();
 	}
 
-	public get(key: string): number & boolean & string {
+	public get(key: string, dataType?: SettingItemDataType): number & boolean & string {
 		switch (key) {
 			case S.DB_NUM_CONN: return <any>4; // Plus 1 missed connection (due to bug when inserting)
 			case S.DB_ENGINE + '0': return <any>DbClient.POSTGRESQL;
@@ -30,6 +30,10 @@ class MockConfigurationProvider implements IConfigurationProvider {
 			case S.DB_ENGINE + '2': return <any>DbClient.MYSQL;
 			case S.DB_CONN_STRING + '2': return <any>'mysql://user@pass';
 		}
+	}
+
+	deadLetter(): Promise<void> {
+		return Promise.resolve();
 	}
 
 	fetch(): Promise<boolean> {
@@ -52,8 +56,12 @@ class EmptyConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve();
 	}
 
-	public get(key: string): number & boolean & string {
+	public get(key: string, dataType?: SettingItemDataType): number & boolean & string {
 		return null;
+	}
+
+	deadLetter(): Promise<void> {
+		return Promise.resolve();
 	}
 
 	fetch(): Promise<boolean> {

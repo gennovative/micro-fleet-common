@@ -1,3 +1,4 @@
+import { SettingItemDataType } from '../models/settings/SettingItem';
 
 /**
  * Stores a database connection detail.
@@ -51,8 +52,11 @@ export interface IConfigurationProvider extends IServiceAddOn {
 	/**
 	 * Attempts to get settings from cached Configuration Service, environmetal variable,
 	 * and `appconfig.json` file, respectedly.
+	 * @param {string} key Setting key
+	 * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
+	 * 		Has no effect with remote settings.
 	 */
-	get(key: string): number & boolean & string;
+	get(key: string, dataType?: SettingItemDataType): number & boolean & string;
 
 	/**
 	 * Attempts to fetch settings from remote Configuration Service.

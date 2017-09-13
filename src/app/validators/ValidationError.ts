@@ -1,6 +1,6 @@
 import * as joi from 'joi';
 
-import { Exception } from 'back-lib-common-util';
+import { Exception, MinorException } from 'back-lib-common-util';
 
 
 /**
@@ -27,15 +27,16 @@ export interface IValidationErrorItem {
 /**
  * Represents an error when a model does not pass validation.
  */
-export class ValidationError extends Exception {
+export class ValidationError extends MinorException {
 	
 	public readonly details: IValidationErrorItem[];
 
 
 	constructor(joiDetails: joi.ValidationErrorItem[]) {
-		super(null, false, ValidationError);
+		super(null);
 		this.name = 'ValidationError';
 		this.details = this.parseDetails(joiDetails);
+		Error.captureStackTrace(this, ValidationError);
 	}
 
 	private parseDetails(joiDetails: joi.ValidationErrorItem[]): IValidationErrorItem[] {
