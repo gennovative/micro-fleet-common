@@ -5,10 +5,23 @@
  */
 type BigSInt = string;
 
+/**
+ * A datatype that presents composite primary key.
+ */
 type TenantPk = {
-	id: BigSInt;
-	tenantId: BigSInt;
+	id: BigSInt,
+	tenantId: BigSInt
 };
+
+/**
+ * A datatype that presents non-primary unique properties.
+ */
+type NameUk = {
+	name: string
+}
+
+
+type PkType = BigSInt | TenantPk;
 
 /**
  * Represents a data transfer object, aka: business model.
@@ -21,7 +34,7 @@ declare interface IModelDTO {
 /**
  * Represents a model that is never really removed from database.
  */
-declare interface ISoftDeletable {
+declare interface ISoftDeletable extends IModelDTO {
 	/**
 	 * If has value, this model is marked as deleted.
 	 * Otherwise, it is still active.
@@ -30,27 +43,56 @@ declare interface ISoftDeletable {
 }
 
 /**
- * Represents a model whose history is tracked.
- */
-declare interface IAuditable {
-	/**
-	 * The time when this model is created.
-	 */
-	createdAt: Date;
-
-	/**
-	 * The time when this model is last edited.
-	 */
-	updatedAt: Date;
-}
-
-/**
  * Represents a model that can be added more properties.
  */
-declare interface IExtensible {
+declare interface IExtensible extends IModelDTO {
 	/**
 	 * Contains additional properties.
 	 */
 	attributes?: any; // Should map to JSON type in PostreSQL.
 }
 
+
+/**
+ * Represents a model whose history is tracked.
+ */
+declare interface IVersionControlled extends IModelDTO {
+	/**
+	 * The time when this version is created.
+	 */
+	createdAt: Date;
+
+	/**
+	 * Whether this is official version.
+	 */
+	isMain: boolean;
+
+	/**
+	 * The version of records with same Id.
+	 */
+	version: number;
+}
+
+
+/**
+ * If an object wants to be initialized when microservice proccess starts, it must
+ * implements this interface to be able to add to add-on list.
+ */
+declare interface IServiceAddOn {
+	/**
+	 * Initializes this add-on.
+	 * @returns A promise that resolves `true` if success, rejects if otherwise.
+	 */
+	init(): Promise<void>;
+
+	/**
+	 * Invoked before `dispose` is called.
+	 */
+	deadLetter(): Promise<void>;
+
+	/**
+	 * Stops this add-on and cleans all resources.
+	 */
+	dispose(): Promise<void>;
+
+}

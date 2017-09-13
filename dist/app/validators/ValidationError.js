@@ -4,11 +4,12 @@ const back_lib_common_util_1 = require("back-lib-common-util");
 /**
  * Represents an error when a model does not pass validation.
  */
-class ValidationError extends back_lib_common_util_1.Exception {
+class ValidationError extends back_lib_common_util_1.MinorException {
     constructor(joiDetails) {
-        super(null, false, ValidationError);
+        super(null);
         this.name = 'ValidationError';
         this.details = this.parseDetails(joiDetails);
+        Error.captureStackTrace(this, ValidationError);
     }
     parseDetails(joiDetails) {
         let details = [];
