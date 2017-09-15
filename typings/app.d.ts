@@ -58,11 +58,6 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	import * as joi from 'joi';
 	import { ValidationError } from 'back-lib-common-contracts/dist/app/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
-	    /**
-	     * If `true`, validates model PK. Otherwise, excludes model PK from validation.
-	     * Default to `false`.
-	     */
-	    isEdit?: boolean;
 	}
 	export class JoiModelValidator<T> {
 	    protected _schemaMap: joi.SchemaMap;
@@ -73,9 +68,11 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
 	     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
 	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {boolean} requirePk Whether to validate PK.
+	     * 	This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	     */
-	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
+	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, requirePk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
 	    /**
 	     * Compiled rules for compound model primary key.
 	     */
@@ -90,13 +87,14 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	     */
 	    protected _compiledPartial: joi.ObjectSchema;
 	    /**
-	     *
 	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
 	     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
-	     * 		This param is IGNORED if param `schemaMapPk` has value.
+	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {boolean} requirePk Whether to validate ID.
+	     * 	This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
 	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk?: boolean, _schemaMapPk?: joi.SchemaMap);
+	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
 	    readonly schemaMap: joi.SchemaMap;
 	    readonly schemaMapPk: joi.SchemaMap;
 	    readonly isCompoundPk: boolean;
@@ -130,12 +128,6 @@ declare module 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper' 
 	     * Can only be turned on if validator is provided to constructor.
 	     */
 	    enableValidation?: boolean;
-	    /**
-	     * If `true`, validates model PK. Otherwise, excludes model PK from validation.
-	     * Only takes effect when `enableValidation` is `true`.
-	     * Default is `false`.
-	     */
-	    isEdit?: boolean;
 	    /**
 	     * If specified, gives validation error to this callback. Otherwise, throw error.
 	     */

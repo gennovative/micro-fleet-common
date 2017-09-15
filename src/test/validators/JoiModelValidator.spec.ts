@@ -17,7 +17,8 @@ describe('JoiModelValidator', () => {
 				gender: joi.only('male', 'female').optional()
 			},
 			null,
-			{ theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required() }
+			false,
+			{ theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER) }
 		);
 	});
 
@@ -54,7 +55,12 @@ describe('JoiModelValidator', () => {
 			// Arrange
 			let validator = JoiModelValidator.create<SampleModel>(
 					{ name: joi.string() },
-					true
+					true,
+					true,
+					{
+						id: joi.string().required(),
+						tenantId: joi.string().required()
+					}
 				),
 				target = <TenantPk>{
 					id: '999',
@@ -151,9 +157,19 @@ describe('JoiModelValidator', () => {
 			expect(value['loveMovie']).not.to.exist;
 		});
 
-		it('Should validate model ID for edit mode', () => {
+		it('Should validate model ID if required', () => {
 			// Arrange
-			let target = {
+			let validator = JoiModelValidator.create<SampleModel>(
+					{
+						name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
+						address: joi.string().required(),
+						age: joi.number().min(15).max(99).integer().optional(),
+						gender: joi.only('male', 'female').optional()
+					},
+					null,
+					true
+				),
+				target = {
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					age: 18,
@@ -161,18 +177,16 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, validated] = validator.whole(target, {
-				isEdit: true
-			});
+			let [error, validated] = validator.whole(target);
 
 			// Assert
 			expect(validated).not.to.exist;
 			expect(error).to.exist;
-			expect(error.details[0].path).to.equal('theID');
-			expect(error.details[0].message).to.equal('"theID" is required');
+			expect(error.details[0].path).to.equal('id');
+			expect(error.details[0].message).to.equal('"id" is required');
 		});
 
-		it('Should validate compound PK for edit mode', () => {
+		it('Should validate compound PK if required', () => {
 			// Arrange
 			let validator = JoiModelValidator.create<SampleModel>(
 					{ name: joi.string() },
@@ -183,9 +197,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, validated] = validator.whole(target, {
-				isEdit: true
-			});
+			let [error, validated] = validator.whole(target);
 
 			// Assert
 			expect(validated).not.to.exist;
@@ -295,9 +307,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, validated] = validator.partial(target, {
-				isEdit: true
-			});
+			let [error, validated] = validator.partial(target);
 
 			// Assert
 			expect(validated).not.to.exist;

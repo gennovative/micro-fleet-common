@@ -80,7 +80,6 @@ class ModelAutoMapper {
         }
         options = Object.assign({
             enableValidation: this.enableValidation,
-            isEdit: false
         }, options);
         // Translate an array or single item
         if (Array.isArray(source)) {
@@ -92,7 +91,7 @@ class ModelAutoMapper {
         if (!options.enableValidation) {
             return this.map(source);
         }
-        let [error, model] = this.validator[fn](source, { isEdit: options.isEdit }), handleError = function (err, callback) {
+        let [error, model] = this.validator[fn](source), handleError = function (err, callback) {
             if (!err) {
                 return false;
             }

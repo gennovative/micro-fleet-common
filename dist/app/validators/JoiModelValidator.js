@@ -5,20 +5,24 @@ const back_lib_common_util_1 = require("back-lib-common-util");
 const ValidationError_1 = require("./ValidationError");
 class JoiModelValidator {
     /**
-     *
      * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
      * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
-     * 		This param is IGNORED if param `schemaMapPk` has value.
+     * 	This param is IGNORED if param `schemaMapPk` has value.
+     * @param {boolean} requirePk Whether to validate ID.
+     * 	This param is IGNORED if param `schemaMapPk` has value.
      * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
      */
-    constructor(_schemaMap, _isCompositePk = false, _schemaMapPk) {
+    constructor(_schemaMap, _isCompositePk = false, requirePk, _schemaMapPk) {
         this._schemaMap = _schemaMap;
         this._isCompositePk = _isCompositePk;
         this._schemaMapPk = _schemaMapPk;
         // As default, model ID is a string of 64-bit integer.
         // JS cannot handle 64-bit integer, that's why we must use string.
         // The database will convert to BigInt type when inserting.
-        let idSchema = joi.string().regex(/^\d+$/).required();
+        let idSchema = joi.string().regex(/^\d+$/);
+        if (requirePk) {
+            idSchema = idSchema.required();
+        }
         if (_schemaMapPk) {
             this._schemaMapPk = _schemaMapPk;
         }
@@ -43,10 +47,12 @@ class JoiModelValidator {
      * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
      * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
      * 	This param is IGNORED if param `schemaMapPk` has value.
+     * @param {boolean} requirePk Whether to validate PK.
+     * 	This param is IGNORED if param `schemaMapPk` has value.
      * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
      */
-    static create(schemaMapModel, isCompoundPk = false, schemaMapPk) {
-        let validator = new JoiModelValidator(schemaMapModel, isCompoundPk, schemaMapPk);
+    static create(schemaMapModel, isCompoundPk = false, requirePk = true, schemaMapPk) {
+        let validator = new JoiModelValidator(schemaMapModel, isCompoundPk, requirePk, schemaMapPk);
         validator.compile();
         return validator;
     }
@@ -84,6 +90,22 @@ class JoiModelValidator {
      * or after `schemaMap` or `schemaMapId` is changed.
      */
     compile() {
+        if (!this._compiledPk) {
+            if (this._isCompositePk) {
+                this._compiledPk = joi.object(this._schemaMapPk);
+            }
+            else {
+                // Compile rule for simple PK with only one property
+                let idMap = this.schemaMapPk;
+                for (let key in idMap) {
+                    /* istanbul ignore else */
+                    if (idMap.hasOwnProperty(key)) {
+                        this._compiledPk = idMap[key];
+                        break; // Only get the first rule
+                    }
+                }
+            }
+        }
         let wholeSchema = this._schemaMap;
         this._compiledWhole = joi.object(wholeSchema);
         // Make all rules optional for partial schema.
@@ -99,34 +121,16 @@ class JoiModelValidator {
             }
         }
         this._compiledPartial = joi.object(partialSchema);
-        if (this._compiledPk) {
-            return;
-        }
-        if (this._isCompositePk) {
-            this._compiledPk = joi.object(this._schemaMapPk);
-            return;
-        }
-        // Compile rule for simple PK with only one property
-        let idMap = this.schemaMapPk;
-        for (let key in idMap) {
-            /* istanbul ignore else */
-            if (idMap.hasOwnProperty(key)) {
-                this._compiledPk = idMap[key];
-                break; // Only get the first rule
-            }
-        }
+        this._compiledWhole = this._compiledWhole.keys(this._schemaMapPk);
+        this._compiledPartial = this._compiledPartial.keys(this._schemaMapPk);
     }
     validate(schema, target, options = {}) {
         back_lib_common_util_1.Guard.assertIsDefined(schema, 'Must call `compile` before using this function!');
         let opts = Object.assign({
             abortEarly: false,
             allowUnknown: true,
-            stripUnknown: true,
-            isEdit: false
+            stripUnknown: true
         }, options);
-        // If edit mode, validate pk property.
-        schema = opts.isEdit ? schema.keys(this._schemaMapPk) : schema;
-        delete opts.isEdit;
         let { error, value } = schema.validate(target, opts);
         return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
     }

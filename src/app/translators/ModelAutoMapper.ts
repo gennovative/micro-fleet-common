@@ -16,13 +16,6 @@ export interface MappingOptions {
 	enableValidation?: boolean;
 
 	/**
-	 * If `true`, validates model PK. Otherwise, excludes model PK from validation.
-	 * Only takes effect when `enableValidation` is `true`.
-	 * Default is `false`.
-	 */
-	isEdit?: boolean;
-
-	/**
 	 * If specified, gives validation error to this callback. Otherwise, throw error.
 	 */
 	errorCallback?: (err: ValidationError) => void;
@@ -119,7 +112,6 @@ export class ModelAutoMapper<T extends Object> {
 
 		options = Object.assign(<MappingOptions>{
 			enableValidation: this.enableValidation,
-			isEdit: false
 		}, options);
 
 		// Translate an array or single item
@@ -134,7 +126,7 @@ export class ModelAutoMapper<T extends Object> {
 			return this.map(source);
 		}
 
-		let [error, model] = this.validator[fn](source, { isEdit: options.isEdit }),
+		let [error, model] = this.validator[fn](source),
 			handleError = function (err, callback) {
 				if (!err) { return false; }
 				if (!callback) {

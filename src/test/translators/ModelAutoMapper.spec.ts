@@ -5,7 +5,7 @@ import { ModelAutoMapper, JoiModelValidator, ValidationError } from '../../app';
 import { SampleModel } from '../validators/SampleModel';
 
 
-const itemValidator = JoiModelValidator.create({ name: joi.string().required() });
+const itemValidator = JoiModelValidator.create({ name: joi.string().required() }, false, false);
 
 class NestingTranslator extends ModelAutoMapper<SampleModel> {
 	/**
@@ -45,6 +45,7 @@ describe('ModelAutoMapper', () => {
 					gender: 'male'
 				},
 				source = {
+					theID: 1,
 					name: 'gen-no-va',
 					address: '^!@',
 					unknown: 'I am a spy!'
@@ -88,6 +89,7 @@ describe('ModelAutoMapper', () => {
 					unknown: 'I am a spy!'
 				},
 				sourceTwo = {
+					theID: 1,
 					address: 'Earth',
 					age: 99
 				};
@@ -125,6 +127,7 @@ describe('ModelAutoMapper', () => {
 					gender: 'male'
 				},
 				source = {
+					theID: 1,
 					name: 'A name that is unacceptably too long and lengthy',
 					age: NaN
 				};
@@ -167,6 +170,7 @@ describe('ModelAutoMapper', () => {
 		it('Should return an object of target type if success', () => {
 			// Arrange
 			let sourceOne = {
+					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					age: 18,
@@ -187,7 +191,7 @@ describe('ModelAutoMapper', () => {
 			}
 
 			try {
-				convertedTwo = translator.whole(sourceTwo, { isEdit: true });
+				convertedTwo = translator.whole(sourceTwo);
 			} catch (err) {
 				errorTwo = err;
 			}
@@ -220,12 +224,14 @@ describe('ModelAutoMapper', () => {
 			// Arrange
 			let sourceArray = [
 				{
+					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					age: 18,
 					gender: 'male'
 				},
 				{
+					theID: 1,
 					name: 'gen-no-va',
 					address: '^!@'
 				}
@@ -240,6 +246,9 @@ describe('ModelAutoMapper', () => {
 			}
 
 			// Assert
+			if (error) {
+				console.error(error);
+			}
 			expect(error).not.to.exist;
 			expect(convertedArr).to.exist;
 			expect(convertedArr).to.be.instanceOf(Array);
@@ -313,6 +322,7 @@ describe('ModelAutoMapper', () => {
 		it('Should not map unknown properties', () => {
 			// Arrange
 			let source = {
+					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					hobbies: ['sport', 'books'],
@@ -365,7 +375,6 @@ describe('ModelAutoMapper', () => {
 			let error, converted;
 
 			converted = translator.whole(source, { 
-				isEdit: false,
 				errorCallback: (err) => {
 					error = err;
 				}
@@ -379,6 +388,7 @@ describe('ModelAutoMapper', () => {
 		it('Should throw an error object if TRANSLATION fails and no error callback is given', () => {
 			// Arrange
 			let source = {
+					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					items: [
@@ -412,6 +422,7 @@ describe('ModelAutoMapper', () => {
 		it('Should pass an error object to callback if TRANSLATION fails', () => {
 			// Arrange
 			let source = {
+					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					items: [
@@ -429,7 +440,6 @@ describe('ModelAutoMapper', () => {
 			// Act
 			let error: ValidationError, converted;
 			converted = translator.whole(source, { 
-				isEdit: false,
 				errorCallback: (err) => {
 					error = err;
 				}
@@ -455,7 +465,6 @@ describe('ModelAutoMapper', () => {
 
 			translator.enableValidation = false;
 			converted = translator.whole(source, { 
-				isEdit: false,
 				errorCallback: (err) => {
 					error = err;
 				}
@@ -481,7 +490,6 @@ describe('ModelAutoMapper', () => {
 			// Act
 			let error, converted;
 			converted = translator.whole(source, { 
-				isEdit: false,
 				enableValidation: false, // Temporarily disable
 				errorCallback: (err) => {
 					error = err;
@@ -502,6 +510,7 @@ describe('ModelAutoMapper', () => {
 		it('Should copy properties with value', () => {
 			// Arrange
 			let source = {
+					theID: 1,
 					name: 'gen-no-va',
 					// address: '^!@' => not specified, although this property is required
 				};

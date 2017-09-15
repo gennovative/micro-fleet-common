@@ -63,6 +63,6 @@ SettingItem.validator = JoiModelValidator.create({
 	name: joi.string().token().required(),
 	dataType: joi.string().required().only(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
 	value: joi.string().allow('').required()
-});
+}, false, false);
 
 SettingItem.translator = new ModelAutoMapper(SettingItem, SettingItem.validator);
