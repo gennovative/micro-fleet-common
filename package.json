@@ -11,7 +11,7 @@
     "npm": "^4.6.1"
   },
   "dependencies": {
-    "automapper-ts": "^1.8.3",
+    "automapper-ts": "~1.8.3",
     "back-lib-common-constants": "git+ssh://git@bitbucket.org/firstinteractive/back-lib-common-constants.git#1.2.0",
     "back-lib-common-util": "git+ssh://git@bitbucket.org:firstinteractive/back-lib-common-util.git#1.1.1",
     "joi": "^10.6.0"
@@ -44,6 +44,6 @@
     "remap-istanbul": "^0.9.5",
     "through2": "^2.0.3",
     "tslint": "^5.5.0",
-    "typescript": "^2.4.2"
+    "typescript": "~2.5.2"
   }
 }
