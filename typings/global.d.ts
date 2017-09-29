@@ -32,6 +32,21 @@ declare interface IModelDTO {
 }
 
 /**
+ * Represents a model that is tracked when it is created and last updated.
+ */
+declare interface IAuditable extends IModelDTO {
+	/**
+	 * The time when this model is created.
+	 */
+	createdAt?: Date;
+
+	/**
+	 * The time when this model is last updated.
+	 */
+	updatedAt?: Date;
+}
+
+/**
  * Represents a model that is never really removed from database.
  */
 declare interface ISoftDeletable extends IModelDTO {
