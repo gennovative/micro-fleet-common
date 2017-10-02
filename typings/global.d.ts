@@ -95,6 +95,11 @@ declare interface IVersionControlled extends IModelDTO {
  */
 declare interface IServiceAddOn {
 	/**
+	 * Gets or sets add-on name.
+	 */
+	name?: string;
+
+	/**
 	 * Initializes this add-on.
 	 * @returns A promise that resolves `true` if success, rejects if otherwise.
 	 */

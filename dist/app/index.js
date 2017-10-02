@@ -5,6 +5,7 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./models/AtomicSession"));
 __export(require("./models/PagedArray"));
+__export(require("./models/settings/CacheSettings"));
 __export(require("./models/settings/DatabaseSettings"));
 __export(require("./models/settings/GetSettingRequest"));
 __export(require("./models/settings/SettingItem"));

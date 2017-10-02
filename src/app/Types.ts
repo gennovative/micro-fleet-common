@@ -1,4 +1,4 @@
 export class Types {
-	public static readonly CONFIG_PROVIDER = Symbol('IConfigurationProvider');
-	public static readonly DEPENDENCY_CONTAINER = Symbol('IDependencyContainer');
+	public static readonly CONFIG_PROVIDER = 'common-contracts.IConfigurationProvider';
+	public static readonly DEPENDENCY_CONTAINER = 'common-contracts.IDependencyContainer';
 }

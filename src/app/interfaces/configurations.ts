@@ -3,7 +3,7 @@ import { SettingItemDataType } from '../models/settings/SettingItem';
 /**
  * Stores a database connection detail.
  */
-export interface IConnectionDetail {
+export interface IDbConnectionDetail {
 	/**
 	 * Database driver name, should use constants in class DbClient. 
 	 * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
@@ -41,6 +41,18 @@ export interface IConnectionDetail {
 		 */
 		database: string
 	};
+}
+
+export interface ICacheConnectionDetail {
+	/**
+		 * Address of remote cache service.
+		 */
+	host?: string;
+
+	/**
+	 * Port of remote cache service.
+	 */
+	port?: number;
 }
 
 export interface IConfigurationProvider extends IServiceAddOn {

@@ -1,6 +1,6 @@
 import { DbSettingKeys as S } from 'back-lib-common-constants';
 
-import { IConfigurationProvider, IConnectionDetail } from '../../interfaces/configurations';
+import { IConfigurationProvider, IDbConnectionDetail } from '../../interfaces/configurations';
 import { SettingItem, SettingItemDataType } from './SettingItem';
 
 
@@ -10,7 +10,7 @@ import { SettingItem, SettingItemDataType } from './SettingItem';
 export class DatabaseSettings
 	extends Array<SettingItem> {
 
-	public static fromProvider(provider: IConfigurationProvider): IConnectionDetail[] {
+	public static fromProvider(provider: IConfigurationProvider): IDbConnectionDetail[] {
 		let nConn = <number>provider.get(S.DB_NUM_CONN),
 			details = [],
 			d;
@@ -23,8 +23,8 @@ export class DatabaseSettings
 		return details.length ? details : null;
 	}
 
-	private static buildConnDetails(connIdx: number, provider: IConfigurationProvider): IConnectionDetail {
-		let cnnDetail: IConnectionDetail = {
+	private static buildConnDetails(connIdx: number, provider: IConfigurationProvider): IDbConnectionDetail {
+		let cnnDetail: IDbConnectionDetail = {
 				clientName: provider.get(S.DB_ENGINE + connIdx) // Must belong to `DbClient`
 			},
 			value: string;
@@ -64,7 +64,7 @@ export class DatabaseSettings
 		super();
 		this._countSetting = SettingItem.translator.whole({
 			name: S.DB_NUM_CONN,
-			dataType: SettingItemDataType.String,
+			dataType: SettingItemDataType.Number,
 			value: '0'
 		});
 
@@ -82,52 +82,52 @@ export class DatabaseSettings
 	/**
 	 * Parses then adds connection detail to setting item array.
 	 */
-	public pushConnection(detail: IConnectionDetail) {
-		let total = parseInt(this._countSetting.value);
+	public pushConnection(detail: IDbConnectionDetail) {
+		let newIdx = parseInt(this._countSetting.value);
 
 		this.push(SettingItem.translator.whole({
-				name: S.DB_ENGINE + total,
+				name: S.DB_ENGINE + newIdx,
 				dataType: SettingItemDataType.String,
 				value: detail.clientName
 			}));
 
 		if (detail.host) {
 			this.push(SettingItem.translator.whole({
-					name: S.DB_HOST + total,
+					name: S.DB_HOST + newIdx,
 					dataType: SettingItemDataType.String,
 					value: detail.host.address
 				}));
 			this.push(SettingItem.translator.whole({
-					name: S.DB_USER + total,
+					name: S.DB_USER + newIdx,
 					dataType: SettingItemDataType.String,
 					value: detail.host.user
 				}));
 			this.push(SettingItem.translator.whole({
-					name: S.DB_PASSWORD + total,
+					name: S.DB_PASSWORD + newIdx,
 					dataType: SettingItemDataType.String,
 					value: detail.host.password
 				}));
 			this.push(SettingItem.translator.whole({
-					name: S.DB_NAME + total,
+					name: S.DB_NAME + newIdx,
 					dataType: SettingItemDataType.String,
 					value: detail.host.database
 				}));
 		} else if (detail.filePath) {
 			this.push(SettingItem.translator.whole({
-					name: S.DB_FILE + total,
+					name: S.DB_FILE + newIdx,
 					dataType: SettingItemDataType.String,
 					value: detail.filePath
 				}));
 		} else {
 			this.push(SettingItem.translator.whole(
 				{
-					name: S.DB_CONN_STRING + total,
+					name: S.DB_CONN_STRING + newIdx,
 					dataType: SettingItemDataType.String,
 					value: detail.connectionString
 				}));
 		}
 
 		let setting: any = this._countSetting;
-		setting.value = (total + 1) + '';
+		setting.value = (newIdx + 1) + '';
 	}
 }

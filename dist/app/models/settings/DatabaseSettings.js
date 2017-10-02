@@ -50,7 +50,7 @@ class DatabaseSettings extends Array {
         super();
         this._countSetting = SettingItem_1.SettingItem.translator.whole({
             name: back_lib_common_constants_1.DbSettingKeys.DB_NUM_CONN,
-            dataType: SettingItem_1.SettingItemDataType.String,
+            dataType: SettingItem_1.SettingItemDataType.Number,
             value: '0'
         });
         this.push(this._countSetting);
@@ -65,50 +65,50 @@ class DatabaseSettings extends Array {
      * Parses then adds connection detail to setting item array.
      */
     pushConnection(detail) {
-        let total = parseInt(this._countSetting.value);
+        let newIdx = parseInt(this._countSetting.value);
         this.push(SettingItem_1.SettingItem.translator.whole({
-            name: back_lib_common_constants_1.DbSettingKeys.DB_ENGINE + total,
+            name: back_lib_common_constants_1.DbSettingKeys.DB_ENGINE + newIdx,
             dataType: SettingItem_1.SettingItemDataType.String,
             value: detail.clientName
         }));
         if (detail.host) {
             this.push(SettingItem_1.SettingItem.translator.whole({
-                name: back_lib_common_constants_1.DbSettingKeys.DB_HOST + total,
+                name: back_lib_common_constants_1.DbSettingKeys.DB_HOST + newIdx,
                 dataType: SettingItem_1.SettingItemDataType.String,
                 value: detail.host.address
             }));
             this.push(SettingItem_1.SettingItem.translator.whole({
-                name: back_lib_common_constants_1.DbSettingKeys.DB_USER + total,
+                name: back_lib_common_constants_1.DbSettingKeys.DB_USER + newIdx,
                 dataType: SettingItem_1.SettingItemDataType.String,
                 value: detail.host.user
             }));
             this.push(SettingItem_1.SettingItem.translator.whole({
-                name: back_lib_common_constants_1.DbSettingKeys.DB_PASSWORD + total,
+                name: back_lib_common_constants_1.DbSettingKeys.DB_PASSWORD + newIdx,
                 dataType: SettingItem_1.SettingItemDataType.String,
                 value: detail.host.password
             }));
             this.push(SettingItem_1.SettingItem.translator.whole({
-                name: back_lib_common_constants_1.DbSettingKeys.DB_NAME + total,
+                name: back_lib_common_constants_1.DbSettingKeys.DB_NAME + newIdx,
                 dataType: SettingItem_1.SettingItemDataType.String,
                 value: detail.host.database
             }));
         }
         else if (detail.filePath) {
             this.push(SettingItem_1.SettingItem.translator.whole({
-                name: back_lib_common_constants_1.DbSettingKeys.DB_FILE + total,
+                name: back_lib_common_constants_1.DbSettingKeys.DB_FILE + newIdx,
                 dataType: SettingItem_1.SettingItemDataType.String,
                 value: detail.filePath
             }));
         }
         else {
             this.push(SettingItem_1.SettingItem.translator.whole({
-                name: back_lib_common_constants_1.DbSettingKeys.DB_CONN_STRING + total,
+                name: back_lib_common_constants_1.DbSettingKeys.DB_CONN_STRING + newIdx,
                 dataType: SettingItem_1.SettingItemDataType.String,
                 value: detail.connectionString
             }));
         }
         let setting = this._countSetting;
-        setting.value = (total + 1) + '';
+        setting.value = (newIdx + 1) + '';
     }
 }
 exports.DatabaseSettings = DatabaseSettings;

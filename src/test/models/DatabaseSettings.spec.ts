@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { DbSettingKeys as S, DbClient } from 'back-lib-common-constants';
 import { NotImplementedException } from 'back-lib-common-util';
 
-import { SettingItem, SettingItemDataType, IConfigurationProvider, IConnectionDetail,
+import { SettingItem, SettingItemDataType, IConfigurationProvider, IDbConnectionDetail,
 	DatabaseSettings } from '../../app/';
 
 
@@ -90,7 +90,7 @@ describe('DatabaseSettings', () => {
 	describe('pushConnection', () => {
 		it('Should add setting items', () => {
 			// Arrange
-			let connOne: IConnectionDetail = {
+			let connOne: IDbConnectionDetail = {
 					clientName: DbClient.POSTGRESQL,
 					host: {
 						address: 'localhost',
@@ -99,11 +99,11 @@ describe('DatabaseSettings', () => {
 						database: 'postgre'
 					}
 				},
-				connTwo: IConnectionDetail = {
+				connTwo: IDbConnectionDetail = {
 					clientName: DbClient.SQLITE3,
 					filePath: '/var/data/storage.sqlite3'
 				},
-				connThree: IConnectionDetail = {
+				connThree: IDbConnectionDetail = {
 					clientName: DbClient.MYSQL,
 					connectionString: 'mysql://user@pass'
 				};

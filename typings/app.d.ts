@@ -246,7 +246,7 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
 	/**
 	 * Stores a database connection detail.
 	 */
-	export interface IConnectionDetail {
+	export interface IDbConnectionDetail {
 	    /**
 	     * Database driver name, should use constants in class DbClient.
 	     * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
@@ -279,6 +279,16 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
 	        database: string;
 	    };
 	}
+	export interface ICacheConnectionDetail {
+	    /**
+	         * Address of remote cache service.
+	         */
+	    host?: string;
+	    /**
+	     * Port of remote cache service.
+	     */
+	    port?: number;
+	}
 	export interface IConfigurationProvider extends IServiceAddOn {
 	    /**
 	     * Turns on or off remote settings fetching.
@@ -304,14 +314,34 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
 	}
 
 }
+declare module 'back-lib-common-contracts/dist/app/models/settings/CacheSettings' {
+	import { IConfigurationProvider, ICacheConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
+	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
+	/**
+	 * Wraps an array of database settings.
+	 */
+	export class CacheSettings extends Array<SettingItem> {
+	    static fromProvider(provider: IConfigurationProvider): ICacheConnectionDetail[];
+	    	    constructor();
+	    /**
+	     * Gets number of connection settings.
+	     */
+	    readonly total: number;
+	    /**
+	     * Parses then adds connection detail to setting item array.
+	     */
+	    pushConnection(detail: ICacheConnectionDetail): void;
+	}
+
+}
 declare module 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings' {
-	import { IConfigurationProvider, IConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
+	import { IConfigurationProvider, IDbConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
 	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
 	/**
 	 * Wraps an array of database settings.
 	 */
 	export class DatabaseSettings extends Array<SettingItem> {
-	    static fromProvider(provider: IConfigurationProvider): IConnectionDetail[];
+	    static fromProvider(provider: IConfigurationProvider): IDbConnectionDetail[];
 	    	    	    constructor();
 	    /**
 	     * Gets number of connection settings.
@@ -320,7 +350,7 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/DatabaseSetti
 	    /**
 	     * Parses then adds connection detail to setting item array.
 	     */
-	    pushConnection(detail: IConnectionDetail): void;
+	    pushConnection(detail: IDbConnectionDetail): void;
 	}
 
 }
@@ -489,14 +519,15 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 }
 declare module 'back-lib-common-contracts/dist/app/Types' {
 	export class Types {
-	    static readonly CONFIG_PROVIDER: symbol;
-	    static readonly DEPENDENCY_CONTAINER: symbol;
+	    static readonly CONFIG_PROVIDER: string;
+	    static readonly DEPENDENCY_CONTAINER: string;
 	}
 
 }
 declare module 'back-lib-common-contracts' {
 	export * from 'back-lib-common-contracts/dist/app/models/AtomicSession';
 	export * from 'back-lib-common-contracts/dist/app/models/PagedArray';
+	export * from 'back-lib-common-contracts/dist/app/models/settings/CacheSettings';
 	export * from 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings';
 	export * from 'back-lib-common-contracts/dist/app/models/settings/GetSettingRequest';
 	export * from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
