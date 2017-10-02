@@ -19,6 +19,9 @@ Contains interfaces and models which are shared between data services and REST/w
 
 ## VERSIONS
 
+### 1.2.0
+- Added **CacheSettings** and **ICacheConnectionDetail**.
+
 ### 1.1.0
 
 * **IRepository**: 

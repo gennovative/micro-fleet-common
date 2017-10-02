@@ -1,5 +1,6 @@
 export * from './models/AtomicSession';
 export * from './models/PagedArray';
+export * from './models/settings/CacheSettings';
 export * from './models/settings/DatabaseSettings';
 export * from './models/settings/GetSettingRequest';
 export * from './models/settings/SettingItem';
