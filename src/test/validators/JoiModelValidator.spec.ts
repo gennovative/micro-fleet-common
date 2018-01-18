@@ -88,7 +88,7 @@ describe('JoiModelValidator', () => {
 			// Assert
 			expect(pk).not.to.exist;
 			expect(error).to.exist;
-			expect(error.details[0].path).to.equal('value');
+			expect(error.details[0].path.length).to.equal(0);
 			expect(error.details[0].message).to.equal('"value" must be larger than or equal to 1');
 		});
 	}); // END describe 'id'
@@ -182,7 +182,8 @@ describe('JoiModelValidator', () => {
 			// Assert
 			expect(validated).not.to.exist;
 			expect(error).to.exist;
-			expect(error.details[0].path).to.equal('id');
+			expect(error.details[0].path.length).to.equal(1);
+			expect(error.details[0].path[0]).to.equal('id');
 			expect(error.details[0].message).to.equal('"id" is required');
 		});
 
@@ -190,6 +191,7 @@ describe('JoiModelValidator', () => {
 			// Arrange
 			let validator = JoiModelValidator.create<SampleModel>(
 					{ name: joi.string() },
+					true,
 					true
 				),
 				target = {
@@ -203,9 +205,11 @@ describe('JoiModelValidator', () => {
 			expect(validated).not.to.exist;
 			expect(error).to.exist;
 			expect(error.details.length).to.equal(2);
-			expect(error.details[0].path).to.equal('id');
+			expect(error.details[0].path.length).to.equal(1);
+			expect(error.details[0].path[0]).to.equal('id');
 			expect(error.details[0].message).to.equal('"id" is required');
-			expect(error.details[1].path).to.equal('tenantId');
+			expect(error.details[1].path.length).to.equal(1);
+			expect(error.details[1].path[0]).to.equal('tenantId');
 			expect(error.details[1].message).to.equal('"tenantId" is required');
 		});
 
@@ -266,33 +270,43 @@ describe('JoiModelValidator', () => {
 			expect(validatedOne).not.to.exist;
 			expect(errorOne).to.exist;
 			expect(errorOne.details).to.have.length(2);
-			expect(errorOne.details[0].path).to.equal('name');
+			expect(errorOne.details[0].path.length).to.equal(1);
+			expect(errorOne.details[0].path[0]).to.equal('name');
 			expect(errorOne.details[0].message).to.equal('"name" is required');
-			expect(errorOne.details[1].path).to.equal('address');
+			expect(errorOne.details[1].path.length).to.equal(1);
+			expect(errorOne.details[1].path[0]).to.equal('address');
 			expect(errorOne.details[1].message).to.equal('"address" is required');
 			
 			expect(validatedTwo).not.to.exist;
 			expect(errorTwo).to.exist;
 			expect(errorTwo.details).to.have.length(3);
-			expect(errorTwo.details[0].path).to.equal('name');
+			expect(errorTwo.details[0].path.length).to.equal(1);
+			expect(errorTwo.details[0].path[0]).to.equal('name');
 			expect(errorTwo.details[0].message).to.equal('"name" must be a string');
-			expect(errorTwo.details[1].path).to.equal('address');
+			expect(errorTwo.details[1].path.length).to.equal(1);
+			expect(errorTwo.details[1].path[0]).to.equal('address');
 			expect(errorTwo.details[1].message).to.equal('"address" is not allowed to be empty');
-			expect(errorTwo.details[2].path).to.equal('age');
+			expect(errorTwo.details[2].path.length).to.equal(1);
+			expect(errorTwo.details[2].path[0]).to.equal('age');
 			expect(errorTwo.details[2].message).to.equal('"age" must be larger than or equal to 15');
 			
 			expect(validatedThree).not.to.exist;
 			expect(errorThree).to.exist;
 			expect(errorThree.details).to.have.length(5);
-			expect(errorThree.details[0].path).to.equal('name');
+			expect(errorThree.details[0].path.length).to.equal(1);
+			expect(errorThree.details[0].path[0]).to.equal('name');
 			expect(errorThree.details[0].message).to.contain('fails to match the required pattern');
-			expect(errorThree.details[1].path).to.equal('name');
+			expect(errorThree.details[1].path.length).to.equal(1);
+			expect(errorThree.details[1].path[0]).to.equal('name');
 			expect(errorThree.details[1].message).to.equal('"name" length must be less than or equal to 10 characters long');
-			expect(errorThree.details[2].path).to.equal('address');
+			expect(errorThree.details[2].path.length).to.equal(1);
+			expect(errorThree.details[2].path[0]).to.equal('address');
 			expect(errorThree.details[2].message).to.equal('"address" must be a string');
-			expect(errorThree.details[3].path).to.equal('age');
+			expect(errorThree.details[3].path.length).to.equal(1);
+			expect(errorThree.details[3].path[0]).to.equal('age');
 			expect(errorThree.details[3].message).to.equal('"age" must be larger than or equal to 15');
-			expect(errorThree.details[4].path).to.equal('gender');
+			expect(errorThree.details[4].path.length).to.equal(1);
+			expect(errorThree.details[4].path[0]).to.equal('gender');
 			expect(errorThree.details[4].message).to.equal('"gender" must be one of [male, female]');
 		});
 	}); // END describe 'whole'
@@ -313,7 +327,8 @@ describe('JoiModelValidator', () => {
 			expect(validated).not.to.exist;
 			expect(error).to.exist;
 			expect(error.details.length).to.equal(1);
-			expect(error.details[0].path).to.equal('name');
+			expect(error.details[0].path.length).to.equal(1);
+			expect(error.details[0].path[0]).to.equal('name');
 			//=> No "required" error for `address`.
 		});
 
@@ -338,9 +353,11 @@ describe('JoiModelValidator', () => {
 			expect(validatedTwo).not.to.exist;
 			expect(errorTwo).to.exist;
 			expect(errorTwo.details).to.have.length(2);
-			expect(errorTwo.details[0].path).to.equal('name');
+			expect(errorTwo.details[0].path.length).to.equal(1);
+			expect(errorTwo.details[0].path[0]).to.equal('name');
 			expect(errorTwo.details[0].message).to.equal('"name" must be a string');
-			expect(errorTwo.details[1].path).to.equal('age');
+			expect(errorTwo.details[1].path.length).to.equal(1);
+			expect(errorTwo.details[1].path[0]).to.equal('age');
 			expect(errorTwo.details[1].message).to.equal('"age" must be a number');
 		});
 	}); // END describe 'partial'

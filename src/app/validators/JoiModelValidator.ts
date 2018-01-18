@@ -16,9 +16,10 @@ export class JoiModelValidator<T> {
 	 * 	This param is IGNORED if param `schemaMapPk` has value.
 	 * @param {boolean} requirePk Whether to validate PK.
 	 * 	This param is IGNORED if param `schemaMapPk` has value.
+	 * 	Default to be `false`.
 	 * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	 */
-	public static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk: boolean = false, requirePk: boolean = true, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T> {
+	public static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk: boolean = false, requirePk: boolean = false, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T> {
 		let validator = new JoiModelValidator<T>(schemaMapModel, isCompoundPk, requirePk, schemaMapPk);
 		validator.compile();
 		return validator;

@@ -415,7 +415,8 @@ describe('ModelAutoMapper', () => {
 			// Assert
 			expect(converted).not.to.exist;
 			expect(error).to.exist;
-			expect(error.details[0].path).to.equal('name');
+			expect(error.details[0].path.length).to.equal(1);
+			expect(error.details[0].path[0]).to.equal('name');
 			expect(error.details[0].message).to.equal('"name" is not allowed to be empty');
 		});
 
@@ -448,7 +449,8 @@ describe('ModelAutoMapper', () => {
 			// Assert
 			expect(converted).not.to.exist;
 			expect(error).to.exist;
-			expect(error.details[0].path).to.equal('name');
+			expect(error.details[0].path.length).to.equal(1);
+			expect(error.details[0].path[0]).to.equal('name');
 			expect(error.details[0].message).to.equal('"name" is not allowed to be empty');
 		});
 	

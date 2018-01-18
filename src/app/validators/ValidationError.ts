@@ -16,7 +16,7 @@ export interface IValidationErrorItem {
 	/**
 	 * Path to the target property in validation schema.
 	 */
-	path: string;
+	path: string[];
 
 	/**
 	 * The invalid property value.
