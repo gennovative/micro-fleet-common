@@ -16,11 +16,18 @@ declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
 	 * A wrapper array that contains paged items.
 	 */
 	export class PagedArray<T> extends Array<T> {
-	    	    /**
+	    /**
 	     * Gets total number of items.
 	     */
 	    readonly total: number;
-	    constructor(_total?: number, ...items: T[]);
+	    constructor(total?: number, ...items: T[]);
+	    /**
+	     * Returns a serializable object.
+	     */
+	    asObject(): {
+	        total: number;
+	        data: any[];
+	    };
 	}
 
 }
@@ -39,7 +46,7 @@ declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
 	    /**
 	     * Path to the target property in validation schema.
 	     */
-	    path: string;
+	    path: string[];
 	    /**
 	     * The invalid property value.
 	     */
@@ -70,6 +77,7 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	     * 	This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {boolean} requirePk Whether to validate PK.
 	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     * 	Default to be `false`.
 	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	     */
 	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, requirePk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;

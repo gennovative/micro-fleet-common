@@ -43,4 +43,30 @@ describe('PagedArray', () => {
 		// Assert
 		expect(pagedStr).to.equal(normalStr);
 	});
+
+	it('Should support normal array functions', () => {
+		// Act
+		let arr = new PagedArray(100, 'a', 'b', 'c');
+		
+		let pagedStr = arr.concat(['d', 'e']).join(','),
+			normalStr = ['a', 'b', 'c', 'd', 'e'].join(',');
+
+		// Assert
+		expect(pagedStr).to.equal(normalStr);
+	});
+
+	describe('asObject', () => {
+		it('Should return a serializable object.', () => {
+			// Arrange
+			let pagedArr = new PagedArray(100, 'a', 'b', 'c'),
+				normalArr = ['a', 'b', 'c'];
+
+			// Act
+			let obj = pagedArr.asObject();
+
+			// Assert
+			expect(obj.total).to.equal(pagedArr.total);
+			expect(obj.data).to.deep.equal(normalArr);
+		});
+	});
 });

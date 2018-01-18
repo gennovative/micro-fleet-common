@@ -21,6 +21,9 @@ Contains interfaces and models which are shared between data services and REST/w
 
 ### 1.2.0
 - Added **CacheSettings** and **ICacheConnectionDetail**.
+- Added function `asObject` to **PagedArray**.
+- Set **JoiModelValidator** to not require PK as default.
+- Updated to latest dependency versions and relevant unittests.
 
 ### 1.1.0
 
