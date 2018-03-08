@@ -421,6 +421,8 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	    version?: number;
 	}
 	export interface RepositoryPageOptions extends RepositoryCountAllOptions {
+	    sortBy?: string;
+	    sortType?: string;
 	}
 	export interface RepositoryPatchOptions extends RepositoryOptions {
 	}

@@ -48,6 +48,8 @@ export interface RepositoryFindOptions extends RepositoryOptions {
 }
 
 export interface RepositoryPageOptions extends RepositoryCountAllOptions {
+	sortBy?: string;
+	sortType?: string;
 }
 
 export interface RepositoryPatchOptions extends RepositoryOptions {
