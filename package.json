@@ -1,7 +1,7 @@
 {
   "name": "back-lib-common-contracts",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Contains interfaces and models which are shared between data services and REST/web services.",
   "main": "./dist/app/index.js",
   "types": "./typings/app.d.ts",
