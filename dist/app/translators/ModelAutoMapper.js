@@ -101,7 +101,7 @@ class ModelAutoMapper {
             callback(err);
             return true;
         };
-        if (handleError(error, options.errorCallback)) {
+        if (handleError(error, options.errorCallback)) { // Validation error
             return null;
         }
         try {

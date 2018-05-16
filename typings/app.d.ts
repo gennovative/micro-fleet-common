@@ -1,6 +1,13 @@
 /// <reference path="./global.d.ts" />
 
-declare module 'back-lib-common-contracts/dist/app/models/AtomicSession' {
+declare module '@micro-fleet/common-contracts/dist/app/Types' {
+	export class Types {
+	    static readonly CONFIG_PROVIDER: string;
+	    static readonly DEPENDENCY_CONTAINER: string;
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/models/AtomicSession' {
 	/**
 	 * Wraps a database connection and transaction.
 	 */
@@ -11,7 +18,7 @@ declare module 'back-lib-common-contracts/dist/app/models/AtomicSession' {
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
+declare module '@micro-fleet/common-contracts/dist/app/models/PagedArray' {
 	/**
 	 * A wrapper array that contains paged items.
 	 */
@@ -31,9 +38,443 @@ declare module 'back-lib-common-contracts/dist/app/models/PagedArray' {
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
+declare module '@micro-fleet/common-contracts/dist/app/constants/DbClient' {
+	/**
+	 * Db driver names.
+	 */
+	export enum DbClient {
+	    /**
+	     * Microsoft SQL Server
+	     */
+	    MSSQL = "mssql",
+	    /**
+	     * MySQL
+	     */
+	    MYSQL = "mysql",
+	    /**
+	     * PostgreSQL
+	     */
+	    POSTGRESQL = "pg",
+	    /**
+	     * SQLite 3
+	     */
+	    SQLITE3 = "sqlite3",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/ports' {
+	export enum ServicePorts {
+	    SETTINGS = 50100,
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/names/actions' {
+	export enum ActionNames {
+	    /**
+	     * Assign to group
+	     */
+	    ASSIGN_TO_GROUP = "assignToGroup",
+	    /**
+	     * Can deploy
+	     */
+	    CAN_DEPLOY = "canDeploy",
+	    /**
+	     * Create
+	     */
+	    CREATE = "create",
+	    /**
+	     * Count all
+	     */
+	    COUNT_ALL = "countAll",
+	    /**
+	     * Configure program
+	     */
+	    CONFIGURE_PROGRAM = "configureProgram",
+	    /**
+	     * Configure program group
+	     */
+	    CONFIGURE_PROGRAM_GROUP = "configureProgramGroup",
+	    /**
+	     * Deploy
+	     */
+	    DEPLOY = "deploy",
+	    /**
+	     * Soft delete
+	     */
+	    DELETE_SOFT = "deleteSoft",
+	    /**
+	     * Hard delete
+	     */
+	    DELETE_HARD = "deleteHard",
+	    /**
+	     * Hard delete versions
+	     */
+	    DELETE_HARD_VERSIONS = "deleteHardVersions",
+	    /**
+	     * Exists
+	     */
+	    EXISTS = "exists",
+	    /**
+	     * Find by PK
+	     */
+	    FIND_BY_PK = "findByPk",
+	    /**
+	     * Get by host ID
+	     */
+	    GET_BY_HOST_ID = "getByHostId",
+	    /**
+	     * Get by program slug
+	     */
+	    GET_BY_PROGRAM_SLUG = "getByProgramSlug",
+	    /**
+	     * Get by program ID
+	     */
+	    GET_BY_PROGRAM_ID = "getByProgramId",
+	    /**
+	     * Get settings
+	     */
+	    GET_SETTINGS = "getSettings",
+	    /**
+	     * Get programs
+	     */
+	    GET_PROGRAMS = "getPrograms",
+	    /**
+	     * Next big int
+	     */
+	    NEXT_BIG_INT = "nextBigInt",
+	    /**
+	     * Next short ID
+	     */
+	    NEXT_SHORT_ID = "nextShortId",
+	    /**
+	     * Next version-4 UUID
+	     */
+	    NEXT_UUID_V4 = "nextUuidv4",
+	    /**
+	     * Page
+	     */
+	    PAGE = "page",
+	    /**
+	     * Page
+	     */
+	    PAGE_VERSIONS = "pageVersions",
+	    /**
+	     * Patch
+	     */
+	    PATCH = "patch",
+	    /**
+	     * Recover
+	     */
+	    RECOVER = "recover",
+	    /**
+	     * Restrict quantity
+	     */
+	    RESTRICT_QUANTITY = "restrictQuantity",
+	    /**
+	     * Recover
+	     */
+	    SET_AS_MAIN = "setAsMain",
+	    /**
+	     * Upload
+	     */
+	    UPLOAD = "upload",
+	    /**
+	     * Update
+	     */
+	    UPDATE = "update",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/names/modules' {
+	export enum ModuleNames {
+	    /**
+	     * Account
+	     */
+	    ACCOUNT = "account",
+	    /**
+	     * Account configuration
+	     */
+	    ACCOUNT_CONFIGURATION = "accConfig",
+	    /**
+	     * Agency
+	     */
+	    AGENCY = "agency",
+	    /**
+	     * Asset
+	     */
+	    ASSET = "asset",
+	    /**
+	     * Audit
+	     */
+	    AUDIT = "audit",
+	    /**
+	     * Brand
+	     */
+	    BRAND = "brand",
+	    /**
+	     * Bio-profile
+	     */
+	    BIO_PROFILE = "bioProfile",
+	    /**
+	     * Civilian
+	     */
+	    CIVILIAN = "civilian",
+	    /**
+	     * Country
+	     */
+	    COUNTRY = "country",
+	    /**
+	     * Device
+	     */
+	    DEVICE = "device",
+	    /**
+	     * Device group
+	     */
+	    DEVICE_GROUP = "deviceGroup",
+	    /**
+	     * Event
+	     */
+	    EVENT = "event",
+	    /**
+	     * Host
+	     */
+	    HOST = "host",
+	    /**
+	     * ID Generator
+	     */
+	    ID_GEN = "idGen",
+	    /**
+	     * Geo-profile
+	     */
+	    GEO_PROFILE = "geoProfile",
+	    /**
+	     * Gift
+	     */
+	    GIFT = "gift",
+	    /**
+	     * Location
+	     */
+	    LOCATION = "location",
+	    /**
+	     * Playlist
+	     */
+	    PLAYLIST = "playlist",
+	    /**
+	     * Profile
+	     */
+	    PROFILE = "profile",
+	    /**
+	     * Program
+	     */
+	    PROGRAM = "program",
+	    /**
+	     * Program configuration
+	     */
+	    PROGRAM_CONFIGURATION = "progConfig",
+	    /**
+	     * Program group
+	     */
+	    PROGRAM_GROUP = "progGroup",
+	    /**
+	     * Region
+	     */
+	    REGION = "region",
+	    /**
+	     * Role
+	     */
+	    ROLE = "role",
+	    /**
+	     * Settings
+	     */
+	    SETTINGS = "settings",
+	    /**
+	     * Schedule
+	     */
+	    SCHEDULE = "schedule",
+	    /**
+	     * Tenant
+	     */
+	    TENANT = "tenant",
+	    /**
+	     * Tenant configuration
+	     */
+	    TENANT_CONFIGURATION = "tenantConfig",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/setting-keys/cache' {
+	export enum CacheSettingKeys {
+	    /**
+	     * Number of cache servers in cluster.
+	     * Data type: number
+	     */
+	    CACHE_NUM_CONN = "cache_num_conn",
+	    /**
+	     * IP or host name of cache service.
+	     * Must use with connection index: CACHE_HOST + '0', CACHE_HOST + '1'
+	     * Data type: string
+	     */
+	    CACHE_HOST = "cache_host_",
+	    /**
+	     * Port number.
+	     * Data type: number
+	     */
+	    CACHE_PORT = "db_port_",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/setting-keys/database' {
+	export enum DbSettingKeys {
+	    /**
+	     * Number of database connections.
+	     * Data type: number
+	     */
+	    DB_NUM_CONN = "db_num_conn",
+	    /**
+	     * Name of database engine.
+	     * Data type: enum `DbClient` in `back-lib-persistence`
+	     */
+	    DB_ENGINE = "db_engine_",
+	    /**
+	     * IP or host name of database.
+	     * Must use with connection index: DB_HOST + '0', DB_HOST + '1'
+	     * Data type: string
+	     */
+	    DB_HOST = "db_host_",
+	    /**
+	     * Username to log into database.
+	     * Must use with connection index: DB_USER + '0', DB_USER + '1'
+	     * Data type: string
+	     */
+	    DB_USER = "db_user_",
+	    /**
+	     * Password to log into database.
+	     * Must use with connection index: DB_PASSWORD + '0', DB_PASSWORD + '1'
+	     * Data type: string
+	     */
+	    DB_PASSWORD = "db_pass_",
+	    /**
+	     * Database name.
+	     * Must use with connection index: DB_NAME + '0', DB_NAME + '1'
+	     * Data type: string
+	     */
+	    DB_NAME = "db_name_",
+	    /**
+	     * Path to database file.
+	     * Must use with connection index: DB_FILE + '0', DB_FILE + '1'
+	     * Data type: string
+	     */
+	    DB_FILE = "db_file_",
+	    /**
+	     * Database connection string.
+	     * Must use with connection index: DB_CONN_STRING + '0', DB_CONN_STRING + '1'
+	     * Data type: string
+	     */
+	    DB_CONN_STRING = "db_connStr_",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/setting-keys/message-broker' {
+	export enum MbSettingKeys {
+	    /**
+	     * IP or host name of message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_HOST = "msgBroker_host",
+	    /**
+	     * Exchange name on message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_EXCHANGE = "msgBroker_exchange",
+	    /**
+	     * Default queue name to connect to.
+	     * Data type: string
+	     */
+	    MSG_BROKER_QUEUE = "msgBroker_queue",
+	    /**
+	     * Number of milliseconds to delay before reconnect to message broker.
+	     * Data type: number
+	     */
+	    MSG_BROKER_RECONN_TIMEOUT = "msgBroker_reconnectTimeout",
+	    /**
+	     * Username to log into message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_USERNAME = "msgBroker_username",
+	    /**
+	     * Password to log into message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_PASSWORD = "msgBroker_password",
+	    /**
+	     * Number of milliseconds that messages live in queue.
+	     * Data type: number
+	     */
+	    MSG_BROKER_MSG_EXPIRE = "msgBroker_msg_expr",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/setting-keys/rpc' {
+	export enum RpcSettingKeys {
+	    /**
+	     * Number of milliseconds after which RPC caller stops waiting for response.
+	     * Data type: number
+	     */
+	    RPC_CALLER_TIMEOUT = "rpc_caller_timeout",
+	    /**
+	     * Http port to which HTTP RPC handler listens.
+	     * Data type: number
+	     */
+	    RPC_HANDLER_PORT = "rpc_handler_port",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/setting-keys/service' {
+	export enum SvcSettingKeys {
+	    /**
+	     * Number of milliseconds to wait before actually stop addons.
+	     * Date type: number
+	     */
+	    ADDONS_DEADLETTER_TIMEOUT = "addons_deadletter_timeout",
+	    /**
+	     * Array of addresses to SettingService.
+	     * Data type: string[]
+	     */
+	    SETTINGS_SERVICE_ADDRESSES = "settings_service_addresses",
+	    /**
+	     * Array of addresses to IdGeneratorService.
+	     * Data type: string[]
+	     */
+	    ID_SERVICE_ADDRESSES = "id_service_addresses",
+	    /**
+	     * Number of milliseconds between refetchings.
+	     * Date type: number
+	     */
+	    SETTINGS_REFETCH_INTERVAL = "settings_refetch_interval",
+	    /**
+	     * Service URL-safe name.
+	     * Data type: string
+	     */
+	    SERVICE_SLUG = "service_slug",
+	}
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/constants/index' {
+	import { DbClient } from '@micro-fleet/common-contracts/dist/app/constants/DbClient';
+	import { ServicePorts } from '@micro-fleet/common-contracts/dist/app/constants/ports';
+	import { ActionNames } from '@micro-fleet/common-contracts/dist/app/constants/names/actions';
+	import { ModuleNames } from '@micro-fleet/common-contracts/dist/app/constants/names/modules';
+	import { CacheSettingKeys } from '@micro-fleet/common-contracts/dist/app/constants/setting-keys/cache';
+	import { DbSettingKeys } from '@micro-fleet/common-contracts/dist/app/constants/setting-keys/database';
+	import { MbSettingKeys } from '@micro-fleet/common-contracts/dist/app/constants/setting-keys/message-broker';
+	import { RpcSettingKeys } from '@micro-fleet/common-contracts/dist/app/constants/setting-keys/rpc';
+	import { SvcSettingKeys } from '@micro-fleet/common-contracts/dist/app/constants/setting-keys/service';
+	export { DbClient, ServicePorts, ActionNames, ModuleNames, CacheSettingKeys, DbSettingKeys, MbSettingKeys, RpcSettingKeys, SvcSettingKeys };
+
+}
+declare module '@micro-fleet/common-contracts/dist/app/validators/ValidationError' {
 	import * as joi from 'joi';
-	import { MinorException } from 'back-lib-common-util';
+	import { MinorException } from '@micro-fleet/common-util';
 	/**
 	 * Represents a validation error for a property.
 	 * UI Form should use this information to highlight the particular input.
@@ -61,9 +502,9 @@ declare module 'back-lib-common-contracts/dist/app/validators/ValidationError' {
 	    	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator' {
+declare module '@micro-fleet/common-contracts/dist/app/validators/JoiModelValidator' {
 	import * as joi from 'joi';
-	import { ValidationError } from 'back-lib-common-contracts/dist/app/validators/ValidationError';
+	import { ValidationError } from '@micro-fleet/common-contracts/dist/app/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
 	}
 	export class JoiModelValidator<T> {
@@ -127,9 +568,9 @@ declare module 'back-lib-common-contracts/dist/app/validators/JoiModelValidator'
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper' {
-	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
-	import { ValidationError } from 'back-lib-common-contracts/dist/app/validators/ValidationError';
+declare module '@micro-fleet/common-contracts/dist/app/translators/ModelAutoMapper' {
+	import { JoiModelValidator } from '@micro-fleet/common-contracts/dist/app/validators/JoiModelValidator';
+	import { ValidationError } from '@micro-fleet/common-contracts/dist/app/validators/ValidationError';
 	export interface MappingOptions {
 	    /**
 	     * Temporarily turns on or off model validation.
@@ -199,9 +640,9 @@ declare module 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper' 
 	    	    	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/settings/SettingItem' {
-	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
-	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
+declare module '@micro-fleet/common-contracts/dist/app/models/settings/SettingItem' {
+	import { ModelAutoMapper } from '@micro-fleet/common-contracts/dist/app/translators/ModelAutoMapper';
+	import { JoiModelValidator } from '@micro-fleet/common-contracts/dist/app/validators/JoiModelValidator';
 	export enum SettingItemDataType {
 	    /**
 	     * Text data type, that is rendered as a text box on UI.
@@ -249,8 +690,8 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/SettingItem' 
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
-	import { SettingItemDataType } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
+declare module '@micro-fleet/common-contracts/dist/app/interfaces/configurations' {
+	import { SettingItemDataType } from '@micro-fleet/common-contracts/dist/app/models/settings/SettingItem';
 	/**
 	 * Stores a database connection detail.
 	 */
@@ -322,9 +763,9 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/configurations' {
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/settings/CacheSettings' {
-	import { IConfigurationProvider, ICacheConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
-	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
+declare module '@micro-fleet/common-contracts/dist/app/models/settings/CacheSettings' {
+	import { IConfigurationProvider, ICacheConnectionDetail } from '@micro-fleet/common-contracts/dist/app/interfaces/configurations';
+	import { SettingItem } from '@micro-fleet/common-contracts/dist/app/models/settings/SettingItem';
 	/**
 	 * Wraps an array of database settings.
 	 */
@@ -342,9 +783,9 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/CacheSettings
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings' {
-	import { IConfigurationProvider, IDbConnectionDetail } from 'back-lib-common-contracts/dist/app/interfaces/configurations';
-	import { SettingItem } from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
+declare module '@micro-fleet/common-contracts/dist/app/models/settings/DatabaseSettings' {
+	import { IConfigurationProvider, IDbConnectionDetail } from '@micro-fleet/common-contracts/dist/app/interfaces/configurations';
+	import { SettingItem } from '@micro-fleet/common-contracts/dist/app/models/settings/SettingItem';
 	/**
 	 * Wraps an array of database settings.
 	 */
@@ -362,9 +803,9 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/DatabaseSetti
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/models/settings/GetSettingRequest' {
-	import { ModelAutoMapper } from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
-	import { JoiModelValidator } from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
+declare module '@micro-fleet/common-contracts/dist/app/models/settings/GetSettingRequest' {
+	import { ModelAutoMapper } from '@micro-fleet/common-contracts/dist/app/translators/ModelAutoMapper';
+	import { JoiModelValidator } from '@micro-fleet/common-contracts/dist/app/validators/JoiModelValidator';
 	/**
 	 * Represents the request contract for GetSetting endpoint.
 	 */
@@ -382,9 +823,9 @@ declare module 'back-lib-common-contracts/dist/app/models/settings/GetSettingReq
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
-	import { AtomicSession } from 'back-lib-common-contracts/dist/app/models/AtomicSession';
-	import { PagedArray } from 'back-lib-common-contracts/dist/app/models/PagedArray';
+declare module '@micro-fleet/common-contracts/dist/app/interfaces/repositories' {
+	import { AtomicSession } from '@micro-fleet/common-contracts/dist/app/models/AtomicSession';
+	import { PagedArray } from '@micro-fleet/common-contracts/dist/app/models/PagedArray';
 	/**
 	 * Options for repository's operations.
 	 * Note that different operations care about different option properties.
@@ -398,7 +839,7 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	    /**
 	     * Account ID.
 	     */
-	    accountId?: BigSInt;
+	    accountId?: BigInt;
 	}
 	export interface RepositoryExistsOptions extends RepositoryOptions {
 	    /**
@@ -409,7 +850,7 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	    /**
 	     * Tenant ID.
 	     */
-	    tenantId?: BigSInt;
+	    tenantId?: BigInt;
 	}
 	export interface RepositoryCountAllOptions extends RepositoryExistsOptions {
 	}
@@ -440,7 +881,7 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	/**
 	 * Provides common CRUD operations, based on Unit of Work pattern.
 	 */
-	export interface IRepository<TModel extends IModelDTO, TPk extends PkType = BigSInt, TUk = NameUk> {
+	export interface IRepository<TModel extends IModelDTO, TPk extends PkType = BigInt, TUk = NameUk> {
 	    /**
 	     * Counts all records in a table.
 	     */
@@ -483,7 +924,7 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	/**
 	 * Provides common operations to soft-delete and recover models.
 	 */
-	export interface ISoftDelRepository<TModel extends IModelDTO, TPk extends PkType = BigSInt, TUk = NameUk> extends IRepository<TModel, TPk, TUk> {
+	export interface ISoftDelRepository<TModel extends IModelDTO, TPk extends PkType = BigInt, TUk = NameUk> extends IRepository<TModel, TPk, TUk> {
 	    /**
 	     * Marks one or many records with `pk` as deleted.
 	     * @param {PK Type} pk The primary key object.
@@ -498,7 +939,7 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	/**
 	 * Provides common operations to control models' revisions.
 	 */
-	export interface IVersionRepository<TModel extends IVersionControlled, TPk extends PkType = BigSInt, TUk = NameUk> extends ISoftDelRepository<TModel, TPk, TUk> {
+	export interface IVersionRepository<TModel extends IVersionControlled, TPk extends PkType = BigInt, TUk = NameUk> extends ISoftDelRepository<TModel, TPk, TUk> {
 	    /**
 	     * Permanently deletes one or many version of a record.
 	     * Can be filtered with `olderThan` option.
@@ -527,25 +968,19 @@ declare module 'back-lib-common-contracts/dist/app/interfaces/repositories' {
 	}
 
 }
-declare module 'back-lib-common-contracts/dist/app/Types' {
-	export class Types {
-	    static readonly CONFIG_PROVIDER: string;
-	    static readonly DEPENDENCY_CONTAINER: string;
-	}
-
-}
-declare module 'back-lib-common-contracts' {
-	export * from 'back-lib-common-contracts/dist/app/models/AtomicSession';
-	export * from 'back-lib-common-contracts/dist/app/models/PagedArray';
-	export * from 'back-lib-common-contracts/dist/app/models/settings/CacheSettings';
-	export * from 'back-lib-common-contracts/dist/app/models/settings/DatabaseSettings';
-	export * from 'back-lib-common-contracts/dist/app/models/settings/GetSettingRequest';
-	export * from 'back-lib-common-contracts/dist/app/models/settings/SettingItem';
-	export * from 'back-lib-common-contracts/dist/app/translators/ModelAutoMapper';
-	export * from 'back-lib-common-contracts/dist/app/validators/JoiModelValidator';
-	export * from 'back-lib-common-contracts/dist/app/validators/ValidationError';
-	export * from 'back-lib-common-contracts/dist/app/interfaces/configurations';
-	export * from 'back-lib-common-contracts/dist/app/interfaces/repositories';
-	export * from 'back-lib-common-contracts/dist/app/Types';
+declare module '@micro-fleet/common-contracts' {
+	export * from '@micro-fleet/common-contracts/dist/app/models/AtomicSession';
+	export * from '@micro-fleet/common-contracts/dist/app/models/PagedArray';
+	export * from '@micro-fleet/common-contracts/dist/app/models/settings/CacheSettings';
+	export * from '@micro-fleet/common-contracts/dist/app/models/settings/DatabaseSettings';
+	export * from '@micro-fleet/common-contracts/dist/app/models/settings/GetSettingRequest';
+	export * from '@micro-fleet/common-contracts/dist/app/models/settings/SettingItem';
+	export * from '@micro-fleet/common-contracts/dist/app/translators/ModelAutoMapper';
+	export * from '@micro-fleet/common-contracts/dist/app/validators/JoiModelValidator';
+	export * from '@micro-fleet/common-contracts/dist/app/validators/ValidationError';
+	export * from '@micro-fleet/common-contracts/dist/app/interfaces/configurations';
+	export * from '@micro-fleet/common-contracts/dist/app/interfaces/repositories';
+	export * from '@micro-fleet/common-contracts/dist/app/Types';
+	export const constants: any;
 
 }

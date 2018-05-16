@@ -3,14 +3,14 @@
 /**
  * Basically a string, but presents a 64-bit big integer value.
  */
-type BigSInt = string;
+type BigInt = string;
 
 /**
  * A datatype that presents composite primary key.
  */
 type TenantPk = {
-	id: BigSInt,
-	tenantId: BigSInt
+	id: BigInt,
+	tenantId: BigInt
 };
 
 /**
@@ -21,14 +21,14 @@ type NameUk = {
 }
 
 
-type PkType = BigSInt | TenantPk;
+type PkType = BigInt | TenantPk;
 
 /**
  * Represents a data transfer object, aka: business model.
  */
 declare interface IModelDTO {
-	id: BigSInt;
-	tenantId?: BigSInt;
+	id?: BigInt;
+	tenantId?: BigInt;
 }
 
 /**

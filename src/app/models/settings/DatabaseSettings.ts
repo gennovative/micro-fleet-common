@@ -1,5 +1,4 @@
-import { DbSettingKeys as S } from 'back-lib-common-constants';
-
+import { DbSettingKeys as S } from '../../constants';
 import { IConfigurationProvider, IDbConnectionDetail } from '../../interfaces/configurations';
 import { SettingItem, SettingItemDataType } from './SettingItem';
 

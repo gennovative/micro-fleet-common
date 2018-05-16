@@ -1,6 +1,5 @@
 import * as joi from 'joi';
-
-import { Exception, MinorException } from 'back-lib-common-util';
+import { Exception, MinorException } from '@micro-fleet/common-util';
 
 
 /**

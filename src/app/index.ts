@@ -10,3 +10,5 @@ export * from './validators/ValidationError';
 export * from './interfaces/configurations';
 export * from './interfaces/repositories';
 export * from './Types';
+
+export const constants = require('./constants');

@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-import { DbSettingKeys as S, DbClient } from 'back-lib-common-constants';
-import { NotImplementedException } from 'back-lib-common-util';
+import { NotImplementedException } from '@micro-fleet/common-util';
 
+import { DbSettingKeys as S, DbClient } from '../../app/constants';
 import { SettingItem, SettingItemDataType, IConfigurationProvider, IDbConnectionDetail,
-	DatabaseSettings } from '../../app/';
+	DatabaseSettings, constants } from '../../app/';
 
 
 class MockConfigurationProvider implements IConfigurationProvider {

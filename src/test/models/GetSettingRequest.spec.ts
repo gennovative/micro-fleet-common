@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { NotImplementedException } from 'back-lib-common-util';
+import { NotImplementedException } from '@micro-fleet/common-util';
 
 import { GetSettingRequest } from '../../app';
 

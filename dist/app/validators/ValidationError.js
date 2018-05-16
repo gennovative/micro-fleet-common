@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const back_lib_common_util_1 = require("back-lib-common-util");
+const common_util_1 = require("@micro-fleet/common-util");
 /**
  * Represents an error when a model does not pass validation.
  */
-class ValidationError extends back_lib_common_util_1.MinorException {
+class ValidationError extends common_util_1.MinorException {
     constructor(joiDetails) {
         super(null);
         this.name = 'ValidationError';

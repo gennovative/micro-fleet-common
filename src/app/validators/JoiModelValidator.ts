@@ -1,5 +1,5 @@
 import * as joi from 'joi';
-import { Guard } from 'back-lib-common-util';
+import { Guard } from '@micro-fleet/common-util';
 
 import { ValidationError } from './ValidationError';
 

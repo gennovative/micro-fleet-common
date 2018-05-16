@@ -1,5 +1,4 @@
-import { CacheSettingKeys as S } from 'back-lib-common-constants';
-
+import { CacheSettingKeys as S } from '../../constants';
 import { IConfigurationProvider, ICacheConnectionDetail } from '../../interfaces/configurations';
 import { SettingItem, SettingItemDataType } from './SettingItem';
 

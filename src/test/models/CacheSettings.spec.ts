@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { CacheSettingKeys as S } from 'back-lib-common-constants';
-import { NotImplementedException } from 'back-lib-common-util';
+import { NotImplementedException } from '@micro-fleet/common-util';
 
+import { CacheSettingKeys as S } from '../../app/constants';
 import { SettingItem, SettingItemDataType, IConfigurationProvider, ICacheConnectionDetail,
 	CacheSettings } from '../../app/';
 

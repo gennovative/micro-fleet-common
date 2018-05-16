@@ -1,23 +1,30 @@
-# Gennova backend common contracts
+# Micro Fleet - Backend Common Contracts
 
-Contains interfaces and models which are shared between data services and REST/web services.
-
----
+One of the packages of Micro Fleet framework, contains interfaces, models and constants which are shared between micro services.
 
 ## INSTALLATION
 
-`npm i`: To install dependencies.
-`gulp` to transpile TypeScript.
+- Stable version: `npm i @micro-fleet/common-contracts`
+- Edge (development) version: `npm i git://github.com/gennovative/micro-fleet-common-contracts.git`
 
 ## DEVELOPMENT
 
-`gulp watch`: To transpile and watch for edit.
+- Install packages in `peerDependencies` section.
+- `gulp` to transpile TypeScript then run unit tests (equiv. `gulp compile` + `gulp test`).
+- `gulp compile`: To transpile TypeScript into JavaScript.
+- `gulp watch`: To transpile without running unit tests, then watch for changes in *.ts files and re-transpile on save.
+- `gulp test`: To run unit tests.
+  * After tests finish, open file `/coverage/remapped-report/index.html` with a web browser to see the code coverage report which is mapped to TypeScript code.
 
 ## RELEASE
 
-`gulp release`: To transpile and create `app.d.ts` definition file.
+- `gulp release`: To transpile and create `app.d.ts` definition file.
+- **Note:** Please commit transpiled code in folder `dist` and definition file `app.d.ts` relevant to the TypeScript version.
 
 ## VERSIONS
+
+### 1.2.1
+- Merged with deprecated `common-constants` package.
 
 ### 1.2.0
 - Added **CacheSettings** and **ICacheConnectionDetail**.
