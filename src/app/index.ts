@@ -11,4 +11,5 @@ export * from './interfaces/configurations';
 export * from './interfaces/repositories';
 export * from './Types';
 
-export const constants = require('./constants');
+import constantObj = require('./constants/index');
+export const constants = constantObj.constants;

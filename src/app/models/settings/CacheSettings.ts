@@ -1,7 +1,6 @@
-import { CacheSettingKeys as S } from '../../constants';
+import { CacheSettingKeys as S } from '../../constants/setting-keys/cache';
 import { IConfigurationProvider, ICacheConnectionDetail } from '../../interfaces/configurations';
 import { SettingItem, SettingItemDataType } from './SettingItem';
-
 
 /**
  * Wraps an array of database settings.

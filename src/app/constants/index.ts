@@ -8,5 +8,18 @@ import { MbSettingKeys } from './setting-keys/message-broker';
 import { RpcSettingKeys } from './setting-keys/rpc';
 import { SvcSettingKeys } from './setting-keys/service';
 
-export { DbClient, ServicePorts, ActionNames, ModuleNames, CacheSettingKeys,
+
+export type Constants = {
+	DbClient: typeof DbClient,
+	ServicePorts: typeof ServicePorts,
+	ActionNames: typeof ActionNames,
+	ModuleNames: typeof ModuleNames,
+	CacheSettingKeys: typeof CacheSettingKeys,
+	DbSettingKeys: typeof DbSettingKeys,
+	MbSettingKeys: typeof MbSettingKeys,
+	RpcSettingKeys: typeof RpcSettingKeys,
+	SvcSettingKeys: typeof SvcSettingKeys 
+};
+
+export const constants: Constants = { DbClient, ServicePorts, ActionNames, ModuleNames, CacheSettingKeys,
 	DbSettingKeys, MbSettingKeys, RpcSettingKeys, SvcSettingKeys };

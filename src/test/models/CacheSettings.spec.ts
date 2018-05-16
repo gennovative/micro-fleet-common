@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { NotImplementedException } from '@micro-fleet/common-util';
 
-import { CacheSettingKeys as S } from '../../app/constants';
 import { SettingItem, SettingItemDataType, IConfigurationProvider, ICacheConnectionDetail,
-	CacheSettings } from '../../app/';
+	CacheSettings, constants } from '../../app/';
 
+const { CacheSettingKeys: S } = constants;
 
 class MockConfigurationProvider implements IConfigurationProvider {
 	public enableRemote: boolean = false;

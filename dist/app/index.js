@@ -13,6 +13,7 @@ __export(require("./translators/ModelAutoMapper"));
 __export(require("./validators/JoiModelValidator"));
 __export(require("./validators/ValidationError"));
 __export(require("./Types"));
-exports.constants = require('./constants');
+const constantObj = require("./constants/index");
+exports.constants = constantObj.constants;
 
 //# sourceMappingURL=index.js.map

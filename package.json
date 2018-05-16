@@ -4,6 +4,7 @@
     "name": "gennovative",
     "url": "https://github.com/gennovative"
   },
+  "license": "MIT",
   "private": false,
   "version": "1.2.1",
   "description": "Contains interfaces, models and constants which are shared between micro services.",

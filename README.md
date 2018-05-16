@@ -1,6 +1,6 @@
 # Micro Fleet - Backend Common Contracts
 
-One of the packages of Micro Fleet framework, contains interfaces, models and constants which are shared between micro services.
+Belongs to Micro Fleet framework, contains interfaces, models and constants which are shared between micro services.
 
 ## INSTALLATION
 

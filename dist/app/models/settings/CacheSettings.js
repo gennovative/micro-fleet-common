@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../../constants");
+const cache_1 = require("../../constants/setting-keys/cache");
 const SettingItem_1 = require("./SettingItem");
 /**
  * Wraps an array of database settings.
  */
 class CacheSettings extends Array {
     static fromProvider(provider) {
-        let nConn = provider.get(constants_1.CacheSettingKeys.CACHE_NUM_CONN), details = [], d;
+        let nConn = provider.get(cache_1.CacheSettingKeys.CACHE_NUM_CONN), details = [], d;
         for (let i = 0; i < nConn; ++i) {
             details.push({
-                host: provider.get(constants_1.CacheSettingKeys.CACHE_HOST + i),
-                port: provider.get(constants_1.CacheSettingKeys.CACHE_PORT + i)
+                host: provider.get(cache_1.CacheSettingKeys.CACHE_HOST + i),
+                port: provider.get(cache_1.CacheSettingKeys.CACHE_PORT + i)
             });
         }
         return details.length ? details : null;
@@ -19,7 +19,7 @@ class CacheSettings extends Array {
     constructor() {
         super();
         this._numSetting = SettingItem_1.SettingItem.translator.whole({
-            name: constants_1.CacheSettingKeys.CACHE_NUM_CONN,
+            name: cache_1.CacheSettingKeys.CACHE_NUM_CONN,
             dataType: SettingItem_1.SettingItemDataType.Number,
             value: '0'
         });
@@ -37,12 +37,12 @@ class CacheSettings extends Array {
     pushConnection(detail) {
         let newIdx = parseInt(this._numSetting.value);
         this.push(SettingItem_1.SettingItem.translator.whole({
-            name: constants_1.CacheSettingKeys.CACHE_HOST + newIdx,
+            name: cache_1.CacheSettingKeys.CACHE_HOST + newIdx,
             dataType: SettingItem_1.SettingItemDataType.String,
             value: detail.host
         }));
         this.push(SettingItem_1.SettingItem.translator.whole({
-            name: constants_1.CacheSettingKeys.CACHE_PORT + newIdx,
+            name: cache_1.CacheSettingKeys.CACHE_PORT + newIdx,
             dataType: SettingItem_1.SettingItemDataType.Number,
             value: detail.port + ''
         }));
