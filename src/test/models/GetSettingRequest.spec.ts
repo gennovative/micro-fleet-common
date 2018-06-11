@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import { NotImplementedException } from '@micro-fleet/common-util';
 
-import { GetSettingRequest } from '../../app';
+import { GetSettingRequest, NotImplementedException } from '../../app';
 
 
 describe('GetSettingRequest\'s validator', () => {

@@ -38,5 +38,4 @@ var MbSettingKeys;
      */
     MbSettingKeys["MSG_BROKER_MSG_EXPIRE"] = "msgBroker_msg_expr";
 })(MbSettingKeys = exports.MbSettingKeys || (exports.MbSettingKeys = {}));
-
 //# sourceMappingURL=message-broker.js.map

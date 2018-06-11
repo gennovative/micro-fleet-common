@@ -1,8 +1,8 @@
 import * as joi from 'joi';
-import { NotImplementedException } from '@micro-fleet/common-util';
 
 import { ModelAutoMapper } from '../../translators/ModelAutoMapper';
 import { JoiModelValidator } from '../../validators/JoiModelValidator';
+import { NotImplementedException } from '../Exceptions';
 
 
 /**

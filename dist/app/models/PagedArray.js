@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class PagedArray extends Array {
     constructor(total = 0, ...items) {
         super();
+        this._total = 0;
         /* istanbul ignore else */
         if (Array.isArray(items)) {
             Array.prototype.push.apply(this, items);
@@ -20,18 +21,17 @@ class PagedArray extends Array {
      * Gets total number of items.
      */
     get total() {
-        return this['_total'];
+        return this._total;
     }
     /**
      * Returns a serializable object.
      */
     asObject() {
         return {
-            total: this['_total'],
+            total: this._total,
             data: this.slice(0)
         };
     }
 }
 exports.PagedArray = PagedArray;
-
 //# sourceMappingURL=PagedArray.js.map

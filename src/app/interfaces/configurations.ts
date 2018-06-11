@@ -1,9 +1,10 @@
+import { Maybe } from '../models/Maybe';
 import { SettingItemDataType } from '../models/settings/SettingItem';
 
 /**
  * Stores a database connection detail.
  */
-export interface IDbConnectionDetail {
+export type DbConnectionDetail = {
 	/**
 	 * Database driver name, should use constants in class DbClient. 
 	 * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
@@ -41,9 +42,9 @@ export interface IDbConnectionDetail {
 		 */
 		database: string
 	};
-}
+};
 
-export interface ICacheConnectionDetail {
+export type CacheConnectionDetail = {
 	/**
 		 * Address of remote cache service.
 		 */
@@ -53,7 +54,7 @@ export interface ICacheConnectionDetail {
 	 * Port of remote cache service.
 	 */
 	port?: number;
-}
+};
 
 export interface IConfigurationProvider extends IServiceAddOn {
 	/**
@@ -62,13 +63,13 @@ export interface IConfigurationProvider extends IServiceAddOn {
 	enableRemote: boolean;
 
 	/**
-	 * Attempts to get settings from cached Configuration Service, environmetal variable,
+	 * Attempts to get settings from remote Configuration Service, environmental variables,
 	 * and `appconfig.json` file, respectedly.
 	 * @param {string} key Setting key
 	 * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
 	 * 		Has no effect with remote settings.
 	 */
-	get(key: string, dataType?: SettingItemDataType): number & boolean & string;
+	get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string>;
 
 	/**
 	 * Attempts to fetch settings from remote Configuration Service.

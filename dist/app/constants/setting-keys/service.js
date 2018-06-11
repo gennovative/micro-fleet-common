@@ -28,5 +28,4 @@ var SvcSettingKeys;
      */
     SvcSettingKeys["SERVICE_SLUG"] = "service_slug";
 })(SvcSettingKeys = exports.SvcSettingKeys || (exports.SvcSettingKeys = {}));
-
 //# sourceMappingURL=service.js.map

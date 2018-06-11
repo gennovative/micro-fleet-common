@@ -114,5 +114,4 @@ class ModelAutoMapper {
     }
 }
 exports.ModelAutoMapper = ModelAutoMapper;
-
 //# sourceMappingURL=ModelAutoMapper.js.map

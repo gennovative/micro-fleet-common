@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
-const common_util_1 = require("@micro-fleet/common-util");
+const Guard_1 = require("../Guard");
 const ValidationError_1 = require("./ValidationError");
 class JoiModelValidator {
     /**
@@ -70,7 +70,7 @@ class JoiModelValidator {
      * Validates model PK.
      */
     pk(pk) {
-        common_util_1.Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!');
+        Guard_1.Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!');
         let { error, value } = this._compiledPk.validate(pk);
         return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
     }
@@ -126,7 +126,7 @@ class JoiModelValidator {
         this._compiledPartial = this._compiledPartial.keys(this._schemaMapPk);
     }
     validate(schema, target, options = {}) {
-        common_util_1.Guard.assertIsDefined(schema, 'Must call `compile` before using this function!');
+        Guard_1.Guard.assertIsDefined(schema, 'Must call `compile` before using this function!');
         let opts = Object.assign({
             abortEarly: false,
             allowUnknown: true,
@@ -137,5 +137,4 @@ class JoiModelValidator {
     }
 }
 exports.JoiModelValidator = JoiModelValidator;
-
 //# sourceMappingURL=JoiModelValidator.js.map

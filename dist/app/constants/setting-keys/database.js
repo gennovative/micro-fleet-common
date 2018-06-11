@@ -3,11 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var DbSettingKeys;
 (function (DbSettingKeys) {
     /**
-     * Number of database connections.
-     * Data type: number
-     */
-    DbSettingKeys["DB_NUM_CONN"] = "db_num_conn";
-    /**
      * Name of database engine.
      * Data type: enum `DbClient` in `back-lib-persistence`
      */
@@ -17,7 +12,7 @@ var DbSettingKeys;
      * Must use with connection index: DB_HOST + '0', DB_HOST + '1'
      * Data type: string
      */
-    DbSettingKeys["DB_HOST"] = "db_host_";
+    DbSettingKeys["DB_ADDRESS"] = "db_host_";
     /**
      * Username to log into database.
      * Must use with connection index: DB_USER + '0', DB_USER + '1'
@@ -49,5 +44,4 @@ var DbSettingKeys;
      */
     DbSettingKeys["DB_CONN_STRING"] = "db_connStr_";
 })(DbSettingKeys = exports.DbSettingKeys || (exports.DbSettingKeys = {}));
-
 //# sourceMappingURL=database.js.map

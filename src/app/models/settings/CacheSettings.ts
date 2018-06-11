@@ -1,26 +1,33 @@
 import { CacheSettingKeys as S } from '../../constants/setting-keys/cache';
-import { IConfigurationProvider, ICacheConnectionDetail } from '../../interfaces/configurations';
+import { /*IConfigurationProvider,*/ CacheConnectionDetail } from '../../interfaces/configurations';
+// import { Maybe } from '../Maybe';
 import { SettingItem, SettingItemDataType } from './SettingItem';
 
 /**
- * Wraps an array of database settings.
+ * Represents an array of cache settings.
  */
 export class CacheSettings
 	extends Array<SettingItem> {
 
-	public static fromProvider(provider: IConfigurationProvider): ICacheConnectionDetail[] {
-		let nConn = <number>provider.get(S.CACHE_NUM_CONN),
-			details: ICacheConnectionDetail[] = [],
-			d;
+	/*
+	public static fromProvider(provider: IConfigurationProvider): Maybe<CacheConnectionDetail[]> {
+		let nConn = provider.get(S.CACHE_NUM_CONN) as Maybe<number>,
+			details: CacheConnectionDetail[] = [];
 
-		for (let i = 0; i < nConn; ++i) {
+		if (!nConn.hasValue) { return new Maybe; }
+		for (let i = 0; i < nConn.value; ++i) {
+			let host = provider.get(S.CACHE_HOST + i) as Maybe<string>,
+				port = provider.get(S.CACHE_PORT + i) as Maybe<number>;
+
+			if (!host.hasValue || !port.hasValue) { continue; }
 			details.push({
-				host: provider.get(S.CACHE_HOST + i),
-				port: provider.get(S.CACHE_PORT + i)
+				host: host.value,
+				port: port.value
 			});
 		}
-		return details.length ? details : null;
+		return details.length ? new Maybe(details) : new Maybe;
 	}
+	//*/
 
 
 	private _numSetting: SettingItem;
@@ -45,9 +52,9 @@ export class CacheSettings
 	}
 
 	/**
-	 * Parses then adds connection detail to setting item array.
+	 * Parses then adds a server detail to setting item array.
 	 */
-	public pushConnection(detail: ICacheConnectionDetail) {
+	public pushServer(detail: CacheConnectionDetail) {
 		let newIdx = parseInt(this._numSetting.value);
 
 		this.push(SettingItem.translator.whole({

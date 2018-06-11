@@ -1,12 +1,11 @@
 import { expect } from 'chai';
-import { NotImplementedException } from '@micro-fleet/common-util';
 
-import { SettingItem, SettingItemDataType, IConfigurationProvider, IDbConnectionDetail,
-	DatabaseSettings, constants } from '../../app/';
+import { /*SettingItemDataType, IConfigurationProvider,*/ DbConnectionDetail,
+	DatabaseSettings, Maybe, constants } from '../../app/';
 
 const { DbSettingKeys: S, DbClient } = constants;
 
-
+/*
 class MockConfigurationProvider implements IConfigurationProvider {
 	public enableRemote: boolean = false;
 
@@ -18,19 +17,20 @@ class MockConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve();
 	}
 
-	public get(key: string, dataType?: SettingItemDataType): number & boolean & string {
+	public get(key: string): Maybe<number | boolean | string> {
+		let val: any;
 		switch (key) {
-			case S.DB_NUM_CONN: return <any>4; // Plus 1 missed connection (due to bug when inserting)
-			case S.DB_ENGINE + '0': return <any>DbClient.POSTGRESQL;
-			case S.DB_HOST + '0': return <any>'localhost';
-			case S.DB_USER + '0': return <any>'postgre';
-			case S.DB_PASSWORD + '0': return <any>'postgre';
-			case S.DB_NAME + '0': return <any>'postgre';
-			case S.DB_ENGINE + '1': return <any>DbClient.SQLITE3;
-			case S.DB_FILE + '1': return <any>'/var/data/storage.sqlite3';
-			case S.DB_ENGINE + '2': return <any>DbClient.MYSQL;
-			case S.DB_CONN_STRING + '2': return <any>'mysql://user@pass';
+			case S.DB_ENGINE + '0': val = DbClient.POSTGRESQL; break;
+			case S.DB_ADDRESS + '0': val = 'localhost'; break;
+			case S.DB_USER + '0': val = 'postgres'; break;
+			case S.DB_PASSWORD + '0': val = 'postgres'; break;
+			case S.DB_NAME + '0': val = 'postgres'; break;
+			case S.DB_ENGINE + '1': val = DbClient.SQLITE3; break;
+			case S.DB_FILE + '1': val = '/var/data/storage.sqlite3'; break;
+			case S.DB_ENGINE + '2': val = DbClient.MYSQL; break;
+			case S.DB_CONN_STRING + '2': val = 'mysql://user@pass'; break;
 		}
+		return (val ? new Maybe(val) : new Maybe);
 	}
 
 	deadLetter(): Promise<void> {
@@ -42,7 +42,7 @@ class MockConfigurationProvider implements IConfigurationProvider {
 	}
 
 	onUpdate(listener: (changedKeys: string[]) => void): void {
-		return;
+		listener([]);
 	}
 }
 
@@ -57,8 +57,8 @@ class EmptyConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve();
 	}
 
-	public get(key: string, dataType?: SettingItemDataType): number & boolean & string {
-		return null;
+	public get(): Maybe<number | boolean | string> {
+		return new Maybe;
 	}
 
 	deadLetter(): Promise<void> {
@@ -70,65 +70,128 @@ class EmptyConfigurationProvider implements IConfigurationProvider {
 	}
 
 	onUpdate(listener: (changedKeys: string[]) => void): void {
-		return;
+		listener([]);
 	}
 }
+//*/
 
 describe('DatabaseSettings', () => {
 	describe('constructor', () => {
-		it('Should create an instance with one setting', () => {
+		it('Should create an instance with no setting', () => {
 			// Act
 			let target = new DatabaseSettings();
 
 			// Assert
-			expect(Number.isInteger(target.total)).to.be.true;
-			expect(target.total).to.equal(0);
-			expect(target[0].name).to.equal(S.DB_NUM_CONN);
-			expect(target[0].value).to.equal('0');
+			expect(Number.isInteger(target.length)).to.be.true;
+			expect(target.length).to.equal(0);
 		});
 	});
 
-	describe('pushConnection', () => {
-		it('Should add setting items', () => {
+	describe('fromConnectionDetail', () => {
+		it('Should parse host details', () => {
 			// Arrange
-			let connOne: IDbConnectionDetail = {
+			const detail: DbConnectionDetail = {
 					clientName: DbClient.POSTGRESQL,
 					host: {
-						address: 'localhost',
-						user: 'postgre',
-						password: 'postgre',
-						database: 'postgre'
+						address: 'remotehost',
+						user: 'root',
+						password: 'secret',
+						database: 'northwind'
 					}
-				},
-				connTwo: IDbConnectionDetail = {
-					clientName: DbClient.SQLITE3,
-					filePath: '/var/data/storage.sqlite3'
-				},
-				connThree: IDbConnectionDetail = {
+				};
+
+			// Act
+			const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail);
+
+			// Assert
+			expect(parseResult.hasValue).to.be.true;
+
+			const settings: DatabaseSettings = parseResult.value;
+			expect(settings.length).to.equal(5);
+			expect(settings[0].name).to.equal(S.DB_ENGINE);
+			expect(settings[0].value).to.equal(detail.clientName);
+			expect(settings[1].name).to.equal(S.DB_ADDRESS);
+			expect(settings[1].value).to.equal(detail.host.address);
+			expect(settings[2].name).to.equal(S.DB_USER);
+			expect(settings[2].value).to.equal(detail.host.user);
+			expect(settings[3].name).to.equal(S.DB_PASSWORD);
+			expect(settings[3].value).to.equal(detail.host.password);
+			expect(settings[4].name).to.equal(S.DB_NAME);
+			expect(settings[4].value).to.equal(detail.host.database);
+		});
+
+		it('Should parse file path', () => {
+			// Arrange
+			let detail: DbConnectionDetail = {
+				clientName: DbClient.SQLITE3,
+				filePath: '/var/data/storage.sqlite3'
+			};
+
+			// Act
+			const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail);
+
+			// Assert
+			expect(parseResult.hasValue).to.be.true;
+
+			const settings: DatabaseSettings = parseResult.value;
+			expect(settings.length).to.equal(2);
+			expect(settings[0].name).to.equal(S.DB_ENGINE);
+			expect(settings[0].value).to.equal(detail.clientName);
+			expect(settings[1].name).to.equal(S.DB_FILE);
+			expect(settings[1].value).to.equal(detail.filePath);
+		});
+
+		it('Should parse connection string', () => {
+			// Arrange
+			let detail: DbConnectionDetail = {
 					clientName: DbClient.MYSQL,
 					connectionString: 'mysql://user@pass'
 				};
 
 			// Act
-			let target = new DatabaseSettings();
-			target.pushConnection(connOne);
-			target.pushConnection(connTwo);
-			target.pushConnection(connThree);
+			const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail);
 
 			// Assert
-			expect(Number.isInteger(target.total)).to.be.true;
-			expect(target.total).to.equal(3);
-			expect(target[0].name).to.equal(S.DB_NUM_CONN);
-			expect(target[0].value).to.equal('3');
-			expect(target[1].name).to.equal(S.DB_ENGINE + '0');
-			expect(target[1].value).to.equal(DbClient.POSTGRESQL);
-			expect(target[6].name).to.equal(S.DB_ENGINE + '1');
-			expect(target[6].value).to.equal(DbClient.SQLITE3);
-			expect(target[8].name).to.equal(S.DB_ENGINE + '2');
-			expect(target[8].value).to.equal(DbClient.MYSQL);
-		});
-	}); // END describe 'pushConnection'
+			expect(parseResult.hasValue).to.be.true;
 
+			const settings: DatabaseSettings = parseResult.value;
+			expect(settings.length).to.equal(2);
+			expect(settings[0].name).to.equal(S.DB_ENGINE);
+			expect(settings[0].value).to.equal(detail.clientName);
+			expect(settings[1].name).to.equal(S.DB_CONN_STRING);
+			expect(settings[1].value).to.equal(detail.connectionString);
+		});
+
+		it('Should return empty result if engine name is not specified', () => {
+			// Arrange
+			let detail: DbConnectionDetail = {
+					clientName: DbClient.MYSQL,
+					connectionString: 'mysql://user@pass'
+				};
+			delete detail.clientName;
+
+			// Act
+			const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail);
+
+			// Assert
+			expect(parseResult.hasValue).to.be.false;
+		});
+
+		it('Should return empty result if no connection option is specified', () => {
+			// Arrange
+			let detail: DbConnectionDetail = {
+					clientName: DbClient.MYSQL,
+				};
+
+			// Act
+			const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail);
+
+			// Assert
+			expect(parseResult.hasValue).to.be.false;
+		});
+	}); // END describe 'fromConnectionDetail'
+
+	/*
 	describe('fromProvider', () => {
 		it('Should return an array of connection details', () => {
 			// Arrange
@@ -156,4 +219,5 @@ describe('DatabaseSettings', () => {
 			expect(details).to.be.null;
 		});
 	}); // END describe 'fromProvider'
+	//*/
 });

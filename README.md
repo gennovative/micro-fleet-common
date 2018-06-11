@@ -23,6 +23,9 @@ Belongs to Micro Fleet framework, contains interfaces, models and constants whic
 
 ## VERSIONS
 
+### 1.2.2
+- Moved repository interfaces to `@micro-fleet/persistence`.
+
 ### 1.2.1
 - Merged with deprecated `common-constants` package.
 

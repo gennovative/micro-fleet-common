@@ -224,7 +224,7 @@ describe('JoiModelValidator', () => {
 				},
 				targetThree = {
 					name: 'too long name w!th inv@lid ch@racters',
-					address: null,
+					address: <any>null,
 					age: 10,
 					gender: 'homo'
 				};
@@ -250,13 +250,13 @@ describe('JoiModelValidator', () => {
 			let targetOne = {
 				},
 				targetTwo = {
-					name: null,
+					name: <any>null,
 					address: '',
 					age: '10'
 				},
 				targetThree = {
 					name: 'too long name w!th inv@lid ch@racters',
-					address: null,
+					address: <any>null,
 					age: 10,
 					gender: 'homo'
 				};
@@ -337,8 +337,8 @@ describe('JoiModelValidator', () => {
 			let targetOne = {
 				},
 				targetTwo = {
-					name: null,
-					age: null
+					name: <any>null,
+					age: <any>null
 				};
 
 			// Act

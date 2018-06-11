@@ -1,132 +1,117 @@
 import { DbSettingKeys as S } from '../../constants/setting-keys/database';
-import { IConfigurationProvider, IDbConnectionDetail } from '../../interfaces/configurations';
+// import { DbClient } from '../../constants/DbClient';
+import { /*IConfigurationProvider,*/ DbConnectionDetail } from '../../interfaces/configurations';
+import { Maybe } from '../Maybe';
 import { SettingItem, SettingItemDataType } from './SettingItem';
 
 
 /**
- * Wraps an array of database settings.
+ * Represents an array of database settings.
  */
 export class DatabaseSettings
 	extends Array<SettingItem> {
 
-	public static fromProvider(provider: IConfigurationProvider): IDbConnectionDetail[] {
-		let nConn = <number>provider.get(S.DB_NUM_CONN),
-			details = [],
-			d;
+	/**
+	 * Parses from configuration provider.
+	 * @param {IConfigurationProvider} provider.
+	 */
+	/*
+	public static fromProvider(provider: IConfigurationProvider): Maybe<DbConnectionDetail> {
+		const clientName = provider.get(S.DB_ENGINE) as Maybe<DbClient>; // Must belong to `DbClient`
+		if (!clientName.hasValue) { return new Maybe; }
 
-		for (let i = 0; i < nConn; ++i) {
-			d = this.buildConnDetails(i, provider);
-			if (!d) { continue; }
-			details.push(d);
-		}
-		return details.length ? details : null;
-	}
-
-	private static buildConnDetails(connIdx: number, provider: IConfigurationProvider): IDbConnectionDetail {
-		let cnnDetail: IDbConnectionDetail = {
-				clientName: provider.get(S.DB_ENGINE + connIdx) // Must belong to `DbClient`
-			},
-			value: string;
+		const cnnDetail: DbConnectionDetail = {
+				clientName: clientName.value
+			};
+		let setting: Maybe<string>;
 
 		// 1st priority: connect to a local file.
-		value = provider.get(S.DB_FILE + connIdx);
-		if (value) {
-			cnnDetail.filePath = value;
-			return cnnDetail;
+		setting = provider.get(S.DB_FILE) as Maybe<string>;
+		if (setting.hasValue) {
+			cnnDetail.filePath = setting.value;
+			return new Maybe(cnnDetail);
 		}
 
 		// 2nd priority: connect with a connection string.
-		value = provider.get(S.DB_CONN_STRING + connIdx);
-		if (value) {
-			cnnDetail.connectionString = value;
-			return cnnDetail;
+		setting = provider.get(S.DB_CONN_STRING) as Maybe<string>;
+		if (setting.hasValue) {
+			cnnDetail.connectionString = setting.value;
+			return new Maybe(cnnDetail);
 		}
 
 		// Last priority: connect with host credentials.
-		value = provider.get(S.DB_HOST + connIdx);
-		if (value) {
+		setting = provider.get(S.DB_NAME) as Maybe<string>;
+		if (setting.hasValue) {
 			cnnDetail.host = {
-				address: provider.get(S.DB_HOST + connIdx),
-				user: provider.get(S.DB_USER + connIdx),
-				password: provider.get(S.DB_PASSWORD + connIdx),
-				database: provider.get(S.DB_NAME + connIdx),
+				address: provider.get(S.DB_ADDRESS).TryGetValue('localhost') as string,
+				user: provider.get(S.DB_USER).TryGetValue('') as string,
+				password: provider.get(S.DB_PASSWORD).TryGetValue('') as string,
+				database: provider.get(S.DB_NAME).TryGetValue('') as string,
 			};
-			return cnnDetail;
+			return new Maybe(cnnDetail);
 		}
-		return null;
+		return new Maybe;
 	}
-
-
-	private _countSetting: SettingItem;
-
-	constructor() {
-		super();
-		this._countSetting = SettingItem.translator.whole({
-			name: S.DB_NUM_CONN,
-			dataType: SettingItemDataType.Number,
-			value: '0'
-		});
-
-		this.push(this._countSetting);
-	}
-
+	//*/
 
 	/**
-	 * Gets number of connection settings.
+	 * Parses from connection detail.
+	 * @param {DbConnectionDetail} detail Connection detail loaded from JSON data source.
 	 */
-	public get total(): number {
-		return parseInt(this._countSetting.value);
-	}
-
-	/**
-	 * Parses then adds connection detail to setting item array.
-	 */
-	public pushConnection(detail: IDbConnectionDetail) {
-		let newIdx = parseInt(this._countSetting.value);
-
-		this.push(SettingItem.translator.whole({
-				name: S.DB_ENGINE + newIdx,
+	public static fromConnectionDetail(detail: DbConnectionDetail): Maybe<DatabaseSettings> {
+		const settings = new DatabaseSettings;
+		
+		if (detail.clientName) {
+			settings.push(SettingItem.translator.whole({
+				name: S.DB_ENGINE,
 				dataType: SettingItemDataType.String,
 				value: detail.clientName
 			}));
-
-		if (detail.host) {
-			this.push(SettingItem.translator.whole({
-					name: S.DB_HOST + newIdx,
-					dataType: SettingItemDataType.String,
-					value: detail.host.address
-				}));
-			this.push(SettingItem.translator.whole({
-					name: S.DB_USER + newIdx,
-					dataType: SettingItemDataType.String,
-					value: detail.host.user
-				}));
-			this.push(SettingItem.translator.whole({
-					name: S.DB_PASSWORD + newIdx,
-					dataType: SettingItemDataType.String,
-					value: detail.host.password
-				}));
-			this.push(SettingItem.translator.whole({
-					name: S.DB_NAME + newIdx,
-					dataType: SettingItemDataType.String,
-					value: detail.host.database
-				}));
-		} else if (detail.filePath) {
-			this.push(SettingItem.translator.whole({
-					name: S.DB_FILE + newIdx,
-					dataType: SettingItemDataType.String,
-					value: detail.filePath
-				}));
 		} else {
-			this.push(SettingItem.translator.whole(
+			return new Maybe;
+		}
+
+		if (detail.filePath) {
+			settings.push(SettingItem.translator.whole({
+				name: S.DB_FILE,
+				dataType: SettingItemDataType.String,
+				value: detail.filePath
+			}));
+		} else if (detail.connectionString) {
+			settings.push(SettingItem.translator.whole(
 				{
-					name: S.DB_CONN_STRING + newIdx,
+					name: S.DB_CONN_STRING,
 					dataType: SettingItemDataType.String,
 					value: detail.connectionString
 				}));
+		} else if (detail.host) {
+			settings.push(SettingItem.translator.whole({
+				name: S.DB_ADDRESS,
+				dataType: SettingItemDataType.String,
+				value: detail.host.address
+			}));
+			settings.push(SettingItem.translator.whole({
+				name: S.DB_USER,
+				dataType: SettingItemDataType.String,
+				value: detail.host.user
+			}));
+			settings.push(SettingItem.translator.whole({
+				name: S.DB_PASSWORD,
+				dataType: SettingItemDataType.String,
+				value: detail.host.password
+			}));
+			settings.push(SettingItem.translator.whole({
+				name: S.DB_NAME,
+				dataType: SettingItemDataType.String,
+				value: detail.host.database
+			}));
+		} else {
+			return new Maybe;
 		}
+		return settings.length ? new Maybe(settings) : new Maybe;
+	}
 
-		let setting: any = this._countSetting;
-		setting.value = (newIdx + 1) + '';
+	constructor() {
+		super();
 	}
 }

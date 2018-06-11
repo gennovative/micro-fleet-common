@@ -1,12 +1,13 @@
 import * as joi from 'joi';
-import { Exception, MinorException } from '@micro-fleet/common-util';
+
+import { MinorException } from '../models/Exceptions';
 
 
 /**
  * Represents a validation error for a property.
  * UI Form should use this information to highlight the particular input.
  */
-export interface IValidationErrorItem {
+export type ValidationErrorItem = {
 	/**
 	 * Error message for this item.
 	 */
@@ -21,27 +22,29 @@ export interface IValidationErrorItem {
 	 * The invalid property value.
 	 */
 	value: any;
-}
+};
 
 /**
  * Represents an error when a model does not pass validation.
  */
 export class ValidationError extends MinorException {
 	
-	public readonly details: IValidationErrorItem[];
+	public readonly details: ValidationErrorItem[];
 
 
 	constructor(joiDetails: joi.ValidationErrorItem[]) {
-		super(null);
+		super();
 		this.name = 'ValidationError';
 		this.details = this.parseDetails(joiDetails);
 		Error.captureStackTrace(this, ValidationError);
 	}
 
-	private parseDetails(joiDetails: joi.ValidationErrorItem[]): IValidationErrorItem[] {
-		let details = [];
+	private parseDetails(joiDetails: joi.ValidationErrorItem[]): ValidationErrorItem[] {
+		let details: ValidationErrorItem[] = [];
 		/* istanbul ignore next */
-		if (!joiDetails || !joiDetails.length) { return details; }
+		if (!joiDetails || !joiDetails.length) { 
+			return details; 
+		}
 
 		joiDetails.forEach(d => {
 			details.push({

@@ -13,5 +13,4 @@ var RpcSettingKeys;
      */
     RpcSettingKeys["RPC_HANDLER_PORT"] = "rpc_handler_port";
 })(RpcSettingKeys = exports.RpcSettingKeys || (exports.RpcSettingKeys = {}));
-
 //# sourceMappingURL=rpc.js.map

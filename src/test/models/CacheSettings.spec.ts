@@ -1,11 +1,11 @@
 import { expect } from 'chai';
-import { NotImplementedException } from '@micro-fleet/common-util';
 
-import { SettingItem, SettingItemDataType, IConfigurationProvider, ICacheConnectionDetail,
-	CacheSettings, constants } from '../../app/';
+import { /*SettingItemDataType, IConfigurationProvider,*/ CacheConnectionDetail,
+	CacheSettings, /*Maybe,*/ constants } from '../../app/';
 
 const { CacheSettingKeys: S } = constants;
 
+/*
 class MockConfigurationProvider implements IConfigurationProvider {
 	public enableRemote: boolean = false;
 
@@ -17,16 +17,18 @@ class MockConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve();
 	}
 
-	public get(key: string, dataType?: SettingItemDataType): number & boolean & string {
+	public get(key: string): Maybe<number | boolean | string> {
+		let val: any;
 		switch (key) {
-			case S.CACHE_NUM_CONN: return <any>2;
+			case S.CACHE_NUM_CONN: val = 2; break;
 
-			case S.CACHE_HOST + '0': return <any>'localhost';
-			case S.CACHE_PORT + '0': return <any>'6379';
+			case S.CACHE_HOST + '0': val = 'localhost'; break;
+			case S.CACHE_PORT + '0': val = '6379'; break;
 
-			case S.CACHE_HOST + '1': return <any>'firstidea.vn';
-			case S.CACHE_PORT + '1': return <any>'6380';
+			case S.CACHE_HOST + '1': val = 'firstidea.vn'; break;
+			case S.CACHE_PORT + '1': val = '6380'; break;
 		}
+		return (val ? new Maybe(val) : new Maybe());
 	}
 
 	deadLetter(): Promise<void> {
@@ -37,7 +39,7 @@ class MockConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve(true);
 	}
 
-	onUpdate(listener: (changedKeys: string[]) => void): void {
+	onUpdate(): void {
 		return;
 	}
 }
@@ -53,8 +55,8 @@ class EmptyConfigurationProvider implements IConfigurationProvider {
 		return Promise.resolve();
 	}
 
-	public get(key: string, dataType?: SettingItemDataType): number & boolean & string {
-		return null;
+	public get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string> {
+		return new Maybe();
 	}
 
 	deadLetter(): Promise<void> {
@@ -69,6 +71,7 @@ class EmptyConfigurationProvider implements IConfigurationProvider {
 		return;
 	}
 }
+//*/
 
 describe('CacheSettings', () => {
 	describe('constructor', () => {
@@ -87,19 +90,19 @@ describe('CacheSettings', () => {
 	describe('pushConnection', () => {
 		it('Should add setting items', () => {
 			// Arrange
-			let connOne: ICacheConnectionDetail = {
+			let connOne: CacheConnectionDetail = {
 					host: 'localhost',
 					port: 6379
 				},
-				connTwo: ICacheConnectionDetail = {
+				connTwo: CacheConnectionDetail = {
 					host: 'firstidea.vn',
 					port: 6380
 				};
 
 			// Act
 			let target = new CacheSettings();
-			target.pushConnection(connOne);
-			target.pushConnection(connTwo);
+			target.pushServer(connOne);
+			target.pushServer(connTwo);
 
 			// Assert
 			expect(Number.isInteger(target.total)).to.be.true;
@@ -117,6 +120,7 @@ describe('CacheSettings', () => {
 		});
 	}); // END describe 'pushConnection'
 
+	/*
 	describe('fromProvider', () => {
 		it('Should return an array of connection details', () => {
 			// Arrange
@@ -144,4 +148,5 @@ describe('CacheSettings', () => {
 			expect(details).to.be.null;
 		});
 	}); // END describe 'fromProvider'
+	//*/
 });

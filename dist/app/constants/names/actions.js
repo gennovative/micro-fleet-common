@@ -115,5 +115,4 @@ var ActionNames;
      */
     ActionNames["UPDATE"] = "update";
 })(ActionNames = exports.ActionNames || (exports.ActionNames = {}));
-
 //# sourceMappingURL=actions.js.map

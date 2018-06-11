@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const common_util_1 = require("@micro-fleet/common-util");
+const Exceptions_1 = require("../models/Exceptions");
 /**
  * Represents an error when a model does not pass validation.
  */
-class ValidationError extends common_util_1.MinorException {
+class ValidationError extends Exceptions_1.MinorException {
     constructor(joiDetails) {
-        super(null);
+        super();
         this.name = 'ValidationError';
         this.details = this.parseDetails(joiDetails);
         Error.captureStackTrace(this, ValidationError);
@@ -28,5 +28,4 @@ class ValidationError extends common_util_1.MinorException {
     }
 }
 exports.ValidationError = ValidationError;
-
 //# sourceMappingURL=ValidationError.js.map

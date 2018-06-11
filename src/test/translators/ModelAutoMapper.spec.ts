@@ -13,8 +13,8 @@ class NestingTranslator extends ModelAutoMapper<SampleModel> {
 	 */
 	protected createMap(): void {
 		// Validates and translates item array
-		let transformation = (opts) => {
-			let output = opts.sourceObject.items.map(it => {
+		let transformation = (opts: AutoMapperJs.ISourceMemberConfigurationOptions) => {
+			let output = opts.sourceObject.items.map((it: any) => {
 				let [err, val] = itemValidator.whole(it);
 				if (err) { throw err; }
 				return val;
@@ -50,8 +50,8 @@ describe('ModelAutoMapper', () => {
 					address: '^!@',
 					unknown: 'I am a spy!'
 				};
-			let copied,
-				error;
+			let copied: any,
+				error: any;
 
 			// Act
 			try {
@@ -93,8 +93,8 @@ describe('ModelAutoMapper', () => {
 					address: 'Earth',
 					age: 99
 				};
-			let copied,
-				error;
+			let copied: any,
+				error: any;
 
 			// Act
 			try {

@@ -3,11 +3,13 @@
  */
 export class PagedArray<T> extends Array<T> {
 
+	private _total: number = 0;
+
 	/**
 	 * Gets total number of items.
 	 */
 	public get total(): number {
-		return this['_total'];
+		return this._total;
 	}
 
 	constructor(total: number = 0, ...items: T[]) {
@@ -29,7 +31,7 @@ export class PagedArray<T> extends Array<T> {
 	 */
 	public asObject(): { total: number, data: any[] } {
 		return {
-			total: this['_total'],
+			total: this._total,
 			data: this.slice(0)
 		};
 	}

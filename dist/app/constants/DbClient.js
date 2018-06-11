@@ -22,5 +22,4 @@ var DbClient;
      */
     DbClient["SQLITE3"] = "sqlite3";
 })(DbClient = exports.DbClient || (exports.DbClient = {}));
-
 //# sourceMappingURL=DbClient.js.map

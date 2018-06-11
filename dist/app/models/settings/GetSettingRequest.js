@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
-const common_util_1 = require("@micro-fleet/common-util");
 const ModelAutoMapper_1 = require("../../translators/ModelAutoMapper");
 const JoiModelValidator_1 = require("../../validators/JoiModelValidator");
+const Exceptions_1 = require("../Exceptions");
 /**
  * Represents the request contract for GetSetting endpoint.
  */
@@ -25,8 +25,7 @@ let validator = GetSettingRequest.validator = JoiModelValidator_1.JoiModelValida
     ipAddress: joi.string().ip().required().example('127.0.0.1').example('192.168.10.23')
 }, false, false);
 validator.partial = function () {
-    throw new common_util_1.NotImplementedException('This method is not supported. Use `whole` instead.');
+    throw new Exceptions_1.NotImplementedException('This method is not supported. Use `whole` instead.');
 };
 GetSettingRequest.translator = new ModelAutoMapper_1.ModelAutoMapper(GetSettingRequest, validator);
-
 //# sourceMappingURL=GetSettingRequest.js.map
