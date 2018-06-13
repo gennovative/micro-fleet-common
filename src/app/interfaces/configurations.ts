@@ -69,7 +69,7 @@ export interface IConfigurationProvider extends IServiceAddOn {
 	 * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
 	 * 		Has no effect with remote settings.
 	 */
-	get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string>;
+	get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string | any[]>;
 
 	/**
 	 * Attempts to fetch settings from remote Configuration Service.

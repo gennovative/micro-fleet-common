@@ -834,7 +834,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
 	 */
 	export class ModelAutoMapper<T extends Object> {
-	    protected ModelClass: new () => any;
+	    protected ModelClass: Newable;
 	    protected _validator?: JoiModelValidator<T>;
 	    /**
 	     * Turns on or off model validation before translating.
@@ -845,7 +845,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     * @param {class} ModelClass The model class
 	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
 	     */
-	    constructor(ModelClass: new () => any, _validator?: JoiModelValidator<T>);
+	    constructor(ModelClass: Newable, _validator?: JoiModelValidator<T>);
 	    /**
 	     * Gets validator.
 	     */
@@ -868,7 +868,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
-	    partial(source: any | any[], options?: MappingOptions): Partial<T> & Partial<T>[];
+	    partial(source: any | any[], options?: MappingOptions): Partial<T> | Partial<T>[];
 	    /**
 	     * Validates then converts an object to type <T>.
 	     * ALL properties are validated and copied regardless with or without value.
@@ -876,7 +876,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
-	    whole(source: any | any[], options?: MappingOptions): T & T[];
+	    whole(source: any | any[], options?: MappingOptions): T | T[];
 	    /**
 	     * Initializes the model mapping engine.
 	     */
@@ -999,7 +999,7 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	     * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
 	     * 		Has no effect with remote settings.
 	     */
-	    get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string>;
+	    get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string | any[]>;
 	    /**
 	     * Attempts to fetch settings from remote Configuration Service.
 	     */
@@ -1072,6 +1072,16 @@ declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' 
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/models/DtoBase' {
+	import { ModelAutoMapper } from '@micro-fleet/common';
+	export class DtoBase implements IModelDTO {
+	    /**
+	     * @abstract
+	     */
+	    static readonly translator: ModelAutoMapper<DtoBase>;
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	/**
 	 * A wrapper array that contains paged items.
@@ -1101,6 +1111,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/settings/DatabaseSettings';
 	export * from '@micro-fleet/common/dist/app/models/settings/GetSettingRequest';
 	export * from '@micro-fleet/common/dist/app/models/settings/SettingItem';
+	export * from '@micro-fleet/common/dist/app/models/DtoBase';
 	export * from '@micro-fleet/common/dist/app/models/Exceptions';
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';

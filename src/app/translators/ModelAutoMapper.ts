@@ -38,7 +38,7 @@ export class ModelAutoMapper<T extends Object> {
 	 * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
 	 */
 	constructor(
-		protected ModelClass: new() => any,
+		protected ModelClass: Newable,
 		protected _validator?: JoiModelValidator<T>
 	) {
 		this.enableValidation = (_validator != null);
@@ -65,7 +65,7 @@ export class ModelAutoMapper<T extends Object> {
 	public merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T> {
 		if (dest == null || typeof dest !== 'object') { return dest; }
 		dest = Object.assign.apply(null, Array.isArray(sources) ? [dest, ...sources] : [dest, sources]);
-		return this.partial(dest, options);
+		return this.partial(dest, options) as Partial<T>;
 	}
 
 	/**
@@ -76,7 +76,7 @@ export class ModelAutoMapper<T extends Object> {
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
-	public partial(source: any | any[], options?: MappingOptions): Partial<T> & Partial<T>[] {
+	public partial(source: any | any[], options?: MappingOptions): Partial<T> | Partial<T>[] {
 		return this.tryTranslate('partial', source, options);
 	}
 
@@ -87,7 +87,7 @@ export class ModelAutoMapper<T extends Object> {
 	 * 
 	 * @throws {ValidationError} If no `errorCallback` is provided.
 	 */
-	public whole(source: any | any[], options?: MappingOptions): T & T[] {
+	public whole(source: any | any[], options?: MappingOptions): T | T[] {
 		return this.tryTranslate('whole', source, options);
 	}
 
@@ -107,7 +107,7 @@ export class ModelAutoMapper<T extends Object> {
 	}
 
 
-	private tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T & T[] {
+	private tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[] {
 		if (source == null || typeof source !== 'object') { return source; }
 
 		options = Object.assign(<MappingOptions>{
@@ -116,9 +116,9 @@ export class ModelAutoMapper<T extends Object> {
 
 		// Translate an array or single item
 		if (Array.isArray(source)) {
-			return <any>source.map(s => this.translate(fn, s, options));
+			return source.map(s => this.translate(fn, s, options));
 		}
-		return <any>this.translate(fn, source, options);
+		return this.translate(fn, source, options);
 	}
 
 	private translate(fn: string, source: any, options: MappingOptions): T {

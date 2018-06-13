@@ -10,6 +10,7 @@ __export(require("./models/settings/CacheSettings"));
 __export(require("./models/settings/DatabaseSettings"));
 __export(require("./models/settings/GetSettingRequest"));
 __export(require("./models/settings/SettingItem"));
+__export(require("./models/DtoBase"));
 __export(require("./models/Exceptions"));
 __export(require("./models/Maybe"));
 __export(require("./models/PagedArray"));

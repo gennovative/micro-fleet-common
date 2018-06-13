@@ -185,13 +185,13 @@ describe('ModelAutoMapper', () => {
 
 			// Act
 			try {
-				convertedOne = translator.whole(sourceOne);
+				convertedOne = translator.whole(sourceOne) as SampleModel;
 			} catch (err) {
 				errorOne = err;
 			}
 
 			try {
-				convertedTwo = translator.whole(sourceTwo);
+				convertedTwo = translator.whole(sourceTwo) as SampleModel;
 			} catch (err) {
 				errorTwo = err;
 			}
@@ -240,7 +240,7 @@ describe('ModelAutoMapper', () => {
 
 			// Act
 			try {
-				convertedArr = translator.whole(sourceArray);
+				convertedArr = translator.whole(sourceArray) as SampleModel[];
 			} catch (err) {
 				error = err;
 			}
@@ -332,7 +332,7 @@ describe('ModelAutoMapper', () => {
 
 			// Act
 			try {
-				converted = translator.whole(source);
+				converted = translator.whole(source) as SampleModel;
 			} catch (err) {
 				error = err;
 			}
@@ -470,7 +470,7 @@ describe('ModelAutoMapper', () => {
 				errorCallback: (err) => {
 					error = err;
 				}
-			});
+			}) as SampleModel;
 
 			// Assert
 			expect(error).not.to.exist;
@@ -496,7 +496,7 @@ describe('ModelAutoMapper', () => {
 				errorCallback: (err) => {
 					error = err;
 				}
-			});
+			}) as SampleModel;
 
 			// Assert
 			expect(error).not.to.exist;
@@ -520,7 +520,7 @@ describe('ModelAutoMapper', () => {
 
 			// Act
 			try {
-				converted = translator.partial(source);
+				converted = translator.partial(source) as SampleModel;
 			} catch (err) {
 				error = err;
 			}

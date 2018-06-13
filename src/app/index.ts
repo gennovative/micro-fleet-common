@@ -8,6 +8,7 @@ export * from './models/settings/CacheSettings';
 export * from './models/settings/DatabaseSettings';
 export * from './models/settings/GetSettingRequest';
 export * from './models/settings/SettingItem';
+export * from './models/DtoBase';
 export * from './models/Exceptions';
 export * from './models/Maybe';
 export * from './models/PagedArray';

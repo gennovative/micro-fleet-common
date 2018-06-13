@@ -28,7 +28,7 @@ declare type PromiseRejectFn = (reason?: any) => void;
 /**
  * A data type representing a class.
  */
-declare type Newable = (new () => any);
+declare type Newable<T=any> = (new () => T);
 /**
  * Basically a string, but presents a 64-bit big integer value.
  */

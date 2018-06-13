@@ -38,7 +38,7 @@ export class CacheSettings
 			name: S.CACHE_NUM_CONN,
 			dataType: SettingItemDataType.Number,
 			value: '0'
-		});
+		}) as SettingItem;
 
 		this.push(this._numSetting);
 	}
@@ -61,12 +61,12 @@ export class CacheSettings
 				name: S.CACHE_HOST + newIdx,
 				dataType: SettingItemDataType.String,
 				value: detail.host
-			}));
+			}) as SettingItem);
 		this.push(SettingItem.translator.whole({
 				name: S.CACHE_PORT + newIdx,
 				dataType: SettingItemDataType.Number,
 				value: detail.port + ''
-			}));
+			}) as SettingItem);
 
 		let setting: any = this._numSetting;
 		setting.value = (newIdx + 1) + '';

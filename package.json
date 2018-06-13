@@ -35,5 +35,6 @@
 	"license": "MIT",
 	"private": false,
 	"main": "./dist/app/index.js",
-	"types": "./typings/app.d.ts"
+	"types": "./typings/app.d.ts",
+	"repository": "git@github.com:gennovative/micro-fleet-common.git"
 }
