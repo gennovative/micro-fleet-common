@@ -1077,8 +1077,10 @@ declare module '@micro-fleet/common/dist/app/models/DtoBase' {
 	export class DtoBase implements IModelDTO {
 	    /**
 	     * @abstract
+	     * Function to convert other object to this class type.
+	     * This method must be implemented by derived class!
 	     */
-	    static readonly translator: ModelAutoMapper<DtoBase>;
+	    static readonly translator: ModelAutoMapper<any>;
 	}
 
 }
