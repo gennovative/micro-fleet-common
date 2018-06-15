@@ -8,8 +8,8 @@
 
 declare namespace NodeJS {
 	export interface Global {
-        gennova: any;
-    }
+		gennova: any;
+	}
 }
 
 /**
@@ -29,15 +29,28 @@ declare type PromiseRejectFn = (reason?: any) => void;
  * A data type representing a class.
  */
 declare type Newable<T=any> = (new () => T);
+
+/**
+ * A data type representing Javascript primitive types.
+ */
+declare type PrimitiveType = string | number | boolean;
+
+/**
+ * A data type representing a single-leveled Json-like object.
+ */
+declare type PrimitiveFlatJson = {
+	[x: string]: PrimitiveType
+};
+
 /**
  * Basically a string, but presents a 64-bit big integer value.
  */
-type BigInt = string;
+declare type BigInt = string;
 
 /**
  * A datatype that presents composite primary key.
  */
-type TenantPk = {
+declare type TenantPk = {
 	id: BigInt,
 	tenantId: BigInt
 };
@@ -45,12 +58,11 @@ type TenantPk = {
 /**
  * A datatype that presents non-primary unique properties.
  */
-type NameUk = {
+declare type NameUk = {
 	name: string
 }
 
-
-type PkType = BigInt | TenantPk;
+declare type PkType = BigInt | TenantPk;
 
 /**
  * Represents a data transfer object, aka: business model.

@@ -1,6 +1,5 @@
 import { CacheSettingKeys as S } from '../../constants/setting-keys/cache';
-import { /*IConfigurationProvider,*/ CacheConnectionDetail } from '../../interfaces/configurations';
-// import { Maybe } from '../Maybe';
+import { CacheConnectionDetail } from '../../interfaces/configurations';
 import { SettingItem, SettingItemDataType } from './SettingItem';
 
 /**
@@ -8,27 +7,6 @@ import { SettingItem, SettingItemDataType } from './SettingItem';
  */
 export class CacheSettings
 	extends Array<SettingItem> {
-
-	/*
-	public static fromProvider(provider: IConfigurationProvider): Maybe<CacheConnectionDetail[]> {
-		let nConn = provider.get(S.CACHE_NUM_CONN) as Maybe<number>,
-			details: CacheConnectionDetail[] = [];
-
-		if (!nConn.hasValue) { return new Maybe; }
-		for (let i = 0; i < nConn.value; ++i) {
-			let host = provider.get(S.CACHE_HOST + i) as Maybe<string>,
-				port = provider.get(S.CACHE_PORT + i) as Maybe<number>;
-
-			if (!host.hasValue || !port.hasValue) { continue; }
-			details.push({
-				host: host.value,
-				port: port.value
-			});
-		}
-		return details.length ? new Maybe(details) : new Maybe;
-	}
-	//*/
-
 
 	private _numSetting: SettingItem;
 

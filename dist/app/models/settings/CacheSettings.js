@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const cache_1 = require("../../constants/setting-keys/cache");
-// import { Maybe } from '../Maybe';
 const SettingItem_1 = require("./SettingItem");
 /**
  * Represents an array of cache settings.
