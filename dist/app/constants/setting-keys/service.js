@@ -8,15 +8,15 @@ var SvcSettingKeys;
      */
     SvcSettingKeys["ADDONS_DEADLETTER_TIMEOUT"] = "addons_deadletter_timeout";
     /**
-     * Array of addresses to SettingService.
-     * Data type: string[]
-     */
-    SvcSettingKeys["SETTINGS_SERVICE_ADDRESSES"] = "settings_service_addresses";
-    /**
      * Array of addresses to IdGeneratorService.
      * Data type: string[]
      */
     SvcSettingKeys["ID_SERVICE_ADDRESSES"] = "id_service_addresses";
+    /**
+     * Array of addresses to SettingService.
+     * Data type: string[]
+     */
+    SvcSettingKeys["SETTINGS_SERVICE_ADDRESSES"] = "settings_service_addresses";
     /**
      * Number of milliseconds between refetchings.
      * Date type: number

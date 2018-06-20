@@ -12,6 +12,7 @@ export * from './models/DtoBase';
 export * from './models/Exceptions';
 export * from './models/Maybe';
 export * from './models/PagedArray';
+export * from './models/ServiceContext';
 export * from './translators/ModelAutoMapper';
 export * from './validators/JoiModelValidator';
 export * from './validators/ValidationError';

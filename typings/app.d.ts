@@ -150,8 +150,6 @@ declare module '@micro-fleet/common/dist/app/DependencyContainer' {
 	    asTransient(): void;
 	}
 	export { injectable, inject, decorate, unmanaged };
-	export interface INewable<T> extends interfaces.Newable<T> {
-	}
 	export interface IDependencyContainer {
 	    /**
 	     * Registers `constructor` as resolvable with key `identifier`.
@@ -160,7 +158,7 @@ declare module '@micro-fleet/common/dist/app/DependencyContainer' {
 	     *
 	     * @return {BindingScope} - A BindingScope instance that allows settings dependency as singleton or transient.
 	     */
-	    bind<TInterface>(identifier: string | symbol, constructor: INewable<TInterface>): BindingScope<TInterface>;
+	    bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
 	    /**
 	     * Registers a constant value with key `identifier`.
 	     * @param {string | symbol} identifier - The key used to resolve this dependency.
@@ -192,7 +190,7 @@ declare module '@micro-fleet/common/dist/app/DependencyContainer' {
 	    /**
 	     * @see IDependencyContainer.bind
 	     */
-	    bind<TInterface>(identifier: string | symbol, constructor: INewable<TInterface>): BindingScope<TInterface>;
+	    bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
 	    /**
 	     * @see IDependencyContainer.bindConstant
 	     */
@@ -535,7 +533,7 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/cache' {
 	     * Port number.
 	     * Data type: number
 	     */
-	    CACHE_PORT = "db_port_"
+	    CACHE_PORT = "cache_port_"
 	}
 
 }
@@ -545,43 +543,43 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/database' {
 	     * Name of database engine.
 	     * Data type: enum `DbClient` in `back-lib-persistence`
 	     */
-	    DB_ENGINE = "db_engine_",
+	    DB_ENGINE = "db_engine",
 	    /**
 	     * IP or host name of database.
 	     * Must use with connection index: DB_HOST + '0', DB_HOST + '1'
 	     * Data type: string
 	     */
-	    DB_ADDRESS = "db_host_",
+	    DB_ADDRESS = "db_host",
 	    /**
 	     * Username to log into database.
 	     * Must use with connection index: DB_USER + '0', DB_USER + '1'
 	     * Data type: string
 	     */
-	    DB_USER = "db_user_",
+	    DB_USER = "db_user",
 	    /**
 	     * Password to log into database.
 	     * Must use with connection index: DB_PASSWORD + '0', DB_PASSWORD + '1'
 	     * Data type: string
 	     */
-	    DB_PASSWORD = "db_pass_",
+	    DB_PASSWORD = "db_pass",
 	    /**
 	     * Database name.
 	     * Must use with connection index: DB_NAME + '0', DB_NAME + '1'
 	     * Data type: string
 	     */
-	    DB_NAME = "db_name_",
+	    DB_NAME = "db_name",
 	    /**
 	     * Path to database file.
 	     * Must use with connection index: DB_FILE + '0', DB_FILE + '1'
 	     * Data type: string
 	     */
-	    DB_FILE = "db_file_",
+	    DB_FILE = "db_file",
 	    /**
 	     * Database connection string.
 	     * Must use with connection index: DB_CONN_STRING + '0', DB_CONN_STRING + '1'
 	     * Data type: string
 	     */
-	    DB_CONN_STRING = "db_connStr_"
+	    DB_CONN_STRING = "db_connStr"
 	}
 
 }
@@ -648,15 +646,15 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/service' {
 	     */
 	    ADDONS_DEADLETTER_TIMEOUT = "addons_deadletter_timeout",
 	    /**
-	     * Array of addresses to SettingService.
-	     * Data type: string[]
-	     */
-	    SETTINGS_SERVICE_ADDRESSES = "settings_service_addresses",
-	    /**
 	     * Array of addresses to IdGeneratorService.
 	     * Data type: string[]
 	     */
 	    ID_SERVICE_ADDRESSES = "id_service_addresses",
+	    /**
+	     * Array of addresses to SettingService.
+	     * Data type: string[]
+	     */
+	    SETTINGS_SERVICE_ADDRESSES = "settings_service_addresses",
 	    /**
 	     * Number of milliseconds between refetchings.
 	     * Date type: number
@@ -1013,7 +1011,7 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 
 }
 declare module '@micro-fleet/common/dist/app/models/settings/CacheSettings' {
-	import { /*IConfigurationProvider,*/ CacheConnectionDetail } from '@micro-fleet/common/dist/app/interfaces/configurations';
+	import { CacheConnectionDetail } from '@micro-fleet/common/dist/app/interfaces/configurations';
 	import { SettingItem } from '@micro-fleet/common/dist/app/models/settings/SettingItem';
 	/**
 	 * Represents an array of cache settings.
@@ -1104,6 +1102,24 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/models/ServiceContext' {
+	import { IDependencyContainer } from '@micro-fleet/common';
+	/**
+	 * Serves as a global variables container.
+	 */
+	export class ServiceContext {
+	    	    /**
+	     * Gets dependency container.
+	     */
+	    readonly dependencyContainer: IDependencyContainer;
+	    /**
+	     * Sets dependency container. Must be set before add-ons initialization phase.
+	     */
+	    setDependencyContainer(container: IDependencyContainer): void;
+	}
+	export const serviceContext: ServiceContext;
+
+}
 declare module '@micro-fleet/common' {
 	import 'bluebird-global';
 	import constantObj = require('@micro-fleet/common/dist/app/constants/index');
@@ -1117,6 +1133,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/Exceptions';
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';
+	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/ValidationError';

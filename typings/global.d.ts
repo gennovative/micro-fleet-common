@@ -28,7 +28,7 @@ declare type PromiseRejectFn = (reason?: any) => void;
 /**
  * A data type representing a class.
  */
-declare type Newable<T=any> = (new () => T);
+declare type Newable<T=any> = (new (...args: any[]) => T);
 
 /**
  * A data type representing Javascript primitive types.
@@ -41,6 +41,8 @@ declare type PrimitiveType = string | number | boolean;
 declare type PrimitiveFlatJson = {
 	[x: string]: PrimitiveType
 };
+
+declare type FunctionType<T=void> = (...args: any[]) => T;
 
 /**
  * Basically a string, but presents a 64-bit big integer value.
@@ -136,9 +138,9 @@ declare interface IVersionControlled extends IModelDTO {
  */
 declare interface IServiceAddOn {
 	/**
-	 * Gets or sets add-on name.
+	 * Gets add-on name.
 	 */
-	name?: string;
+	readonly name: string;
 
 	/**
 	 * Initializes this add-on.

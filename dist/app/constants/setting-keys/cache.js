@@ -17,6 +17,6 @@ var CacheSettingKeys;
      * Port number.
      * Data type: number
      */
-    CacheSettingKeys["CACHE_PORT"] = "db_port_";
+    CacheSettingKeys["CACHE_PORT"] = "cache_port_";
 })(CacheSettingKeys = exports.CacheSettingKeys || (exports.CacheSettingKeys = {}));
 //# sourceMappingURL=cache.js.map

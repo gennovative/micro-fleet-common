@@ -25,8 +25,6 @@ export class BindingScope<T> {
 
 export { injectable, inject, decorate, unmanaged };
 
-export interface INewable<T> extends interfaces.Newable<T> { }
-
 export interface IDependencyContainer { 
 	/**
 	 * Registers `constructor` as resolvable with key `identifier`.
@@ -35,7 +33,7 @@ export interface IDependencyContainer {
 	 * 
 	 * @return {BindingScope} - A BindingScope instance that allows settings dependency as singleton or transient.
 	 */
-	bind<TInterface>(identifier: string | symbol, constructor: INewable<TInterface>): BindingScope<TInterface>;
+	bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
 	
 	/**
 	 * Registers a constant value with key `identifier`.
@@ -79,7 +77,7 @@ export class DependencyContainer {
 	/**
 	 * @see IDependencyContainer.bind 
 	 */
-	public bind<TInterface>(identifier: string | symbol, constructor: INewable<TInterface>): BindingScope<TInterface> {
+	public bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface> {
 		this.assertNotDisposed();
 		Guard.assertArgDefined('constructor', constructor);
 
