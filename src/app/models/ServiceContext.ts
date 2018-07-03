@@ -1,4 +1,4 @@
-import { IDependencyContainer } from '@micro-fleet/common';
+import { IDependencyContainer } from '../DependencyContainer';
 
 
 /**

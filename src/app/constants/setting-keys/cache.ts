@@ -16,5 +16,5 @@ export enum CacheSettingKeys {
 	 * Port number.
 	 * Data type: number
 	 */
-	CACHE_PORT = 'cache_port_'
+	CACHE_PORT = 'cache_port_',
 }

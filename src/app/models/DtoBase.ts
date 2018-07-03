@@ -1,4 +1,4 @@
-import { ModelAutoMapper } from '@micro-fleet/common';
+import { ModelAutoMapper } from '../translators/ModelAutoMapper';
 
 export class DtoBase implements IModelDTO {
 

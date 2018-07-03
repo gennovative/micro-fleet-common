@@ -516,6 +516,27 @@ declare module '@micro-fleet/common/dist/app/constants/names/modules' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/constants/setting-keys/auth' {
+	export enum AuthSettingKeys {
+	    /**
+	     * Secret key to encrypt auth tokens.
+	     * Data type: string
+	     */
+	    AUTH_SECRET = "auth_secret",
+	    /**
+	     * Issuer of auth tokens.
+	     * Data type: string
+	     */
+	    AUTH_ISSUER = "auth_issuer",
+	    /**
+	     * Expiration duration in seconds.
+	     * Data type: number
+	     */
+	    AUTH_EXPIRE_ACCESS = "auth_expire_access",
+	    AUTH_EXPIRE_REFRESH = "auth_expire_refresh",
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/constants/setting-keys/cache' {
 	export enum CacheSettingKeys {
 	    /**
@@ -668,26 +689,50 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/service' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/constants/setting-keys/web' {
+	export enum WebSettingKeys {
+	    /**
+	     * Configuration for Cross-Origin Resource Sharing.
+	     * Type: string | string[]
+	     */
+	    WEB_CORS = "web_cors",
+	    /**
+	     * HTTP port listened by webserver.
+	     * Type: number
+	     */
+	    WEB_PORT = "web_port",
+	    /**
+	     * Prefix to route url.
+	     * Type: string
+	     */
+	    WEB_URL_PREFIX = "web_url_prefix"
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/constants/index' {
 	import { DbClient } from '@micro-fleet/common/dist/app/constants/DbClient';
 	import { ServicePorts } from '@micro-fleet/common/dist/app/constants/ports';
 	import { ActionNames } from '@micro-fleet/common/dist/app/constants/names/actions';
 	import { ModuleNames } from '@micro-fleet/common/dist/app/constants/names/modules';
+	import { AuthSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/auth';
 	import { CacheSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/cache';
 	import { DbSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/database';
 	import { MbSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/message-broker';
 	import { RpcSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/rpc';
 	import { SvcSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/service';
+	import { WebSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/web';
 	export type Constants = {
 	    DbClient: typeof DbClient;
 	    ServicePorts: typeof ServicePorts;
 	    ActionNames: typeof ActionNames;
 	    ModuleNames: typeof ModuleNames;
+	    AuthSettingKeys: typeof AuthSettingKeys;
 	    CacheSettingKeys: typeof CacheSettingKeys;
 	    DbSettingKeys: typeof DbSettingKeys;
 	    MbSettingKeys: typeof MbSettingKeys;
 	    RpcSettingKeys: typeof RpcSettingKeys;
 	    SvcSettingKeys: typeof SvcSettingKeys;
+	    WebSettingKeys: typeof WebSettingKeys;
 	};
 	export const constants: Constants;
 
@@ -1071,7 +1116,7 @@ declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' 
 
 }
 declare module '@micro-fleet/common/dist/app/models/DtoBase' {
-	import { ModelAutoMapper } from '@micro-fleet/common';
+	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
 	export class DtoBase implements IModelDTO {
 	    /**
 	     * @abstract
@@ -1103,7 +1148,7 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 
 }
 declare module '@micro-fleet/common/dist/app/models/ServiceContext' {
-	import { IDependencyContainer } from '@micro-fleet/common';
+	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
 	/**
 	 * Serves as a global variables container.
 	 */
