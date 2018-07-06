@@ -10,7 +10,7 @@ const expect = chai.expect;
 
 const NAME = 'gennova',
 	AGE = 18,
-	IDENTIFIER = Symbol('abc');
+	IDENTIFIER = 'abcXYZ';
 
 interface IDummy {
 	echoName(name: string): string;
@@ -58,7 +58,7 @@ describe('HandlerContainer', () => {
 				echoSpy = chai.spy.on(dummy, 'echoName');
 
 			// Act
-			let proxyFn = HandlerContainer.instance.register('echoName', IDENTIFIER);
+			let proxyFn = HandlerContainer.instance.register('echoName', IDENTIFIER) as Function;
 
 			// Assert
 			let result = proxyFn(NAME);
@@ -73,7 +73,7 @@ describe('HandlerContainer', () => {
 				ageSpy = chai.spy.on(dummy, 'echoAge');
 
 			// Act
-			let [proxyNameFn, proxyAgeFn] = HandlerContainer.instance.register(['echoName', 'echoAge'], IDENTIFIER);
+			let [proxyNameFn, proxyAgeFn] = HandlerContainer.instance.register(['echoName', 'echoAge'], IDENTIFIER) as Function[];
 
 			// Assert
 			let name = proxyNameFn(NAME),
@@ -91,7 +91,7 @@ describe('HandlerContainer', () => {
 			HandlerContainer.instance.register('echoName', IDENTIFIER);
 
 			// Act
-			let func = HandlerContainer.instance.resolve('echoName');
+			let func = HandlerContainer.instance.resolve('echoName', IDENTIFIER);
 
 			// Assert
 			let result = func(NAME);
@@ -104,7 +104,7 @@ describe('HandlerContainer', () => {
 				obj => obj.doubleName);
 
 			// Act
-			let func = HandlerContainer.instance.resolve('callMyName');
+			let func = HandlerContainer.instance.resolve('callMyName', IDENTIFIER);
 
 			// Assert
 			let result = func(NAME);
@@ -114,7 +114,7 @@ describe('HandlerContainer', () => {
 		it('Should throw exception if attempting to resolve an unregistered action', () => {
 			// Act
 			try {
-				let func: Function = HandlerContainer.instance.resolve('echoName');
+				let func: Function = HandlerContainer.instance.resolve('echoName', IDENTIFIER);
 				expect(func).not.to.exist;
 			} catch (err) {
 				console.error(err);
@@ -130,7 +130,7 @@ describe('HandlerContainer', () => {
 
 			// Act
 			try {
-				let func: Function = HandlerContainer.instance.resolve('nonexistFunc');
+				let func: Function = HandlerContainer.instance.resolve('nonexistFunc', IDENTIFIER);
 				expect(func).not.to.exist;
 			} catch (err) {
 				console.error(err);

@@ -218,7 +218,7 @@ declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
 	export type ActionFactory = (obj: any, action: string) => Function;
 	export type HandlerDetails = {
-	    dependencyIdentifier: string | symbol;
+	    dependencyIdentifier: string;
 	    actionFactory?: ActionFactory;
 	};
 	export class HandlerContainer {
@@ -232,16 +232,22 @@ declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 	     * Binds an action or some actions to a `dependencyIdentifier`, which is resolved to an object instance.
 	     * Returns a/some proxy function(s) which when called, will delegates to the actual resolved function.
 	     *
-	     * @param {string} actions Function name of the resolved object.
-	     * @param {string | symbol} dependencyIdentifier Key to look up and resolve from dependency container.
+	     * @param {string | string[]} actions Function name of the resolved object.
+	     * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
 	     * @param {ActionFactory} actionFactory A function that use `actions` name to produce the actual function to be executed.
+	     *  	If factory returns falsy value, the function is resolved from specified action name.
+	     * 		Note: No need to bind returned function to any context, as it is done internally.
+	     * @param {number} paramCount Number of expected parameters (aka Function.length) of the returned proxy function.
+	     * 		In some cases, Function.length is important, eg: Express error handler middleware expects Function.length == 4.
 	     */
-	    register(actions: string | string[], dependencyIdentifier: string | symbol, actionFactory?: ActionFactory): Function & Function[];
+	    register(actions: string | string[], dependencyIdentifier: string, actionFactory?: ActionFactory, paramCount?: number): Function | Function[];
 	    /**
 	     * Looks up and returns a function that was registered to bind with `action`.
 	     * @param action Key to look up.
+	     *
+	     * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
 	     */
-	    resolve(action: string): Function;
+	    resolve(action: string, dependencyIdentifier: string): Function;
 	    	}
 
 }
@@ -529,11 +535,15 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/auth' {
 	     */
 	    AUTH_ISSUER = "auth_issuer",
 	    /**
-	     * Expiration duration in seconds.
+	     * Access token expiration duration in seconds.
 	     * Data type: number
 	     */
 	    AUTH_EXPIRE_ACCESS = "auth_expire_access",
-	    AUTH_EXPIRE_REFRESH = "auth_expire_refresh",
+	    /**
+	     * Refresh token expiration duration in seconds.
+	     * Data type: number
+	     */
+	    AUTH_EXPIRE_REFRESH = "auth_expire_refresh"
 	}
 
 }

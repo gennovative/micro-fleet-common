@@ -1,6 +1,6 @@
 {
 	"name": "@micro-fleet/common",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"description": "Contains stuff used by other packages and micro services.",
 	"scripts": {
 		"build": "npm run compile && npm run test",

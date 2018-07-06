@@ -13,9 +13,14 @@ var AuthSettingKeys;
      */
     AuthSettingKeys["AUTH_ISSUER"] = "auth_issuer";
     /**
-     * Expiration duration in seconds.
+     * Access token expiration duration in seconds.
      * Data type: number
      */
-    AuthSettingKeys["AUTH_EXPIRE"] = "auth_expire";
+    AuthSettingKeys["AUTH_EXPIRE_ACCESS"] = "auth_expire_access";
+    /**
+     * Refresh token expiration duration in seconds.
+     * Data type: number
+     */
+    AuthSettingKeys["AUTH_EXPIRE_REFRESH"] = "auth_expire_refresh";
 })(AuthSettingKeys = exports.AuthSettingKeys || (exports.AuthSettingKeys = {}));
 //# sourceMappingURL=auth.js.map

@@ -28,36 +28,44 @@ class HandlerContainer {
      * Binds an action or some actions to a `dependencyIdentifier`, which is resolved to an object instance.
      * Returns a/some proxy function(s) which when called, will delegates to the actual resolved function.
      *
-     * @param {string} actions Function name of the resolved object.
-     * @param {string | symbol} dependencyIdentifier Key to look up and resolve from dependency container.
+     * @param {string | string[]} actions Function name of the resolved object.
+     * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
      * @param {ActionFactory} actionFactory A function that use `actions` name to produce the actual function to be executed.
+     *  	If factory returns falsy value, the function is resolved from specified action name.
+     * 		Note: No need to bind returned function to any context, as it is done internally.
+     * @param {number} paramCount Number of expected parameters (aka Function.length) of the returned proxy function.
+     * 		In some cases, Function.length is important, eg: Express error handler middleware expects Function.length == 4.
      */
-    register(actions, dependencyIdentifier, actionFactory) {
+    register(actions, dependencyIdentifier, actionFactory, paramCount = 0) {
         Guard_1.Guard.assertArgDefined('action', actions);
         Guard_1.Guard.assertArgDefined('dependencyIdentifier', dependencyIdentifier);
-        let fn = function (act) {
-            this._handlers[act] = { dependencyIdentifier, actionFactory };
-            let proxy = (function (action, context) {
-                return function () {
-                    return context.resolve(action).apply(null, arguments);
+        const fn = function (act, depId) {
+            this._handlers[`${dependencyIdentifier}::${act}`] = { dependencyIdentifier, actionFactory };
+            const proxy = (function (pxAction, pxDepId, context) {
+                const fn = function () {
+                    return context.resolve(pxAction, pxDepId).apply(this, arguments);
                 };
-            })(act, this);
+                Object.defineProperty(fn, 'length', { value: paramCount });
+                return fn;
+            })(act, depId, this);
             return proxy;
         }.bind(this);
         if (Array.isArray(actions)) {
-            return actions.map(fn);
+            return actions.map(act => fn(act, dependencyIdentifier));
         }
         else {
-            return fn(actions);
+            return fn(actions, dependencyIdentifier);
         }
     }
     /**
      * Looks up and returns a function that was registered to bind with `action`.
      * @param action Key to look up.
+     *
+     * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
      */
-    resolve(action) {
+    resolve(action, dependencyIdentifier) {
         Guard_1.Guard.assertIsDefined(this._depContainer, `Dependency container is not set!`);
-        let detail = this._handlers[action];
+        let detail = this._handlers[`${dependencyIdentifier}::${action}`];
         Guard_1.Guard.assertIsDefined(detail, `Action "${action}" was not registered!`);
         return this.resolveActionFunc(action, detail.dependencyIdentifier, detail.actionFactory);
     }
@@ -65,11 +73,10 @@ class HandlerContainer {
         // Attempt to resolve object instance
         let instance = this.dependencyContainer.resolve(depId);
         Guard_1.Guard.assertIsDefined(instance, `Cannot resolve dependency "${depId.toString()}"!`);
-        let actionFn = instance[action];
-        // If default action is not available, attempt to get action from factory.
-        if (!actionFn) {
-            actionFn = (actFactory ? actFactory(instance, action) : null);
-        }
+        // If function factory is specified, then get action from it.
+        const actionFnFromFactory = (actFactory ? actFactory(instance, action) : null);
+        // If factory returns falsy value, fall back to default function
+        const actionFn = actionFnFromFactory || instance[action];
         Guard_1.Guard.assertIsDefined(actionFn, `Action "${action}" does not exist in object "${depId.toString()}"!`);
         return actionFn.bind(instance);
     }
