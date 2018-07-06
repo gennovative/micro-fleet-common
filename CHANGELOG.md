@@ -1,5 +1,5 @@
-
 ## VERSIONS
+
 ### 1.2.3
 - `HandlerContainer.register` accepts `paramCount` as last parameter.
 - Fixed a bug where `HandlerContainer.register` overrides action with same name, but different dependency identifier.
