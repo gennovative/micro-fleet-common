@@ -2,6 +2,7 @@
 
 ### 1.2.3
 - `HandlerContainer.register` accepts `paramCount` as last parameter.
+- `HandlerContainer` uses `ServiceContext` internally, no need to set dependency container for it anymore.
 - Fixed a bug where `HandlerContainer.register` overrides action with same name, but different dependency identifier.
 - Added auth setting keys.
 - Added `ServiceContext` class.

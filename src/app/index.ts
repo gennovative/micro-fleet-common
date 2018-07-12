@@ -19,4 +19,5 @@ export * from './validators/ValidationError';
 export * from './DependencyContainer';
 export * from './HandlerContainer';
 export * from './Guard';
+export * from './lazyInject';
 export * from './Types';

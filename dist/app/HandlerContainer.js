@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const ServiceContext_1 = require("./models/ServiceContext");
 const Guard_1 = require("./Guard");
 class HandlerContainer {
     static get instance() {
@@ -11,12 +12,8 @@ class HandlerContainer {
     constructor() {
         this._handlers = [];
     }
-    set dependencyContainer(container) {
-        Guard_1.Guard.assertArgDefined('container', container);
-        this._depContainer = container;
-    }
     get dependencyContainer() {
-        return this._depContainer;
+        return ServiceContext_1.serviceContext.dependencyContainer;
     }
     /**
      * Removes all registered handlers
@@ -64,7 +61,7 @@ class HandlerContainer {
      * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
      */
     resolve(action, dependencyIdentifier) {
-        Guard_1.Guard.assertIsDefined(this._depContainer, `Dependency container is not set!`);
+        Guard_1.Guard.assertIsDefined(this.dependencyContainer, `Dependency container is not set in serviceContext!`);
         let detail = this._handlers[`${dependencyIdentifier}::${action}`];
         Guard_1.Guard.assertIsDefined(detail, `Action "${action}" was not registered!`);
         return this.resolveActionFunc(action, detail.dependencyIdentifier, detail.actionFactory);

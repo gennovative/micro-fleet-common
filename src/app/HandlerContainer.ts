@@ -1,3 +1,4 @@
+import { serviceContext } from './models/ServiceContext';
 import { IDependencyContainer } from './DependencyContainer';
 import { Guard } from './Guard';
 
@@ -21,21 +22,14 @@ export class HandlerContainer {
 
 
 	private _handlers: HandlerDetails[];
-	private _depContainer: IDependencyContainer;
 	
 
 	private constructor() {
 		this._handlers = [];
 	}
 
-
-	public set dependencyContainer(container: IDependencyContainer) {
-		Guard.assertArgDefined('container', container);
-		this._depContainer = container;
-	}
-	
 	public get dependencyContainer(): IDependencyContainer {
-		return this._depContainer;
+		return serviceContext.dependencyContainer;
 	}
 
 	/**
@@ -87,7 +81,7 @@ export class HandlerContainer {
 	 * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
 	 */
 	public resolve(action: string, dependencyIdentifier: string): Function {
-		Guard.assertIsDefined(this._depContainer, `Dependency container is not set!`);
+		Guard.assertIsDefined(this.dependencyContainer, `Dependency container is not set in serviceContext!`);
 		let detail: HandlerDetails = this._handlers[`${dependencyIdentifier}::${action}`];
 		Guard.assertIsDefined(detail, `Action "${action}" was not registered!`);
 		return this.resolveActionFunc(action, detail.dependencyIdentifier, detail.actionFactory);

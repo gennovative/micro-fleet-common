@@ -4,6 +4,8 @@ if (!Reflect || typeof Reflect['hasOwnMetadata'] !== 'function') {
 }
 
 import { injectable, inject, decorate, Container, interfaces, unmanaged } from 'inversify';
+
+import { MinorException } from './models/Exceptions';
 import { Guard } from './Guard';
 
 
@@ -137,7 +139,7 @@ export class DependencyContainer {
 
 	private assertNotDisposed() {
 		if (!this._container) {
-			throw 'Container has been disposed!';
+			throw new MinorException('Container has been disposed!');
 		}
 	}
 

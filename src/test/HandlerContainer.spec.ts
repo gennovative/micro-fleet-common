@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import * as spies from 'chai-spies';
 
 import { injectable, IDependencyContainer, DependencyContainer,
-	HandlerContainer, CriticalException } from '../app';
+	HandlerContainer, CriticalException, serviceContext } from '../app';
 
 chai.use(spies);
 const expect = chai.expect;
@@ -41,12 +41,13 @@ describe('HandlerContainer', () => {
 
 	beforeEach(() => {
 		container = new DependencyContainer();
-		HandlerContainer.instance.dependencyContainer = container;
+		serviceContext.setDependencyContainer(container);
 		container.bind<IDummy>(IDENTIFIER, Dummy).asSingleton();
 	});
 
 	afterEach(() => {
 		HandlerContainer.instance.clear();
+		serviceContext.setDependencyContainer(null);
 		container.dispose();
 		container = null;
 	});

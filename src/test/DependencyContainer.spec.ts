@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { Container } from 'inversify';
 
-import { injectable, IDependencyContainer, DependencyContainer } from '../app';
+import { injectable, IDependencyContainer, DependencyContainer, MinorException } from '../app';
 
 const NAME = 'gennova',
 	IDENTIFIER = Symbol('abc');
@@ -174,8 +174,8 @@ describe('DependencyContainer', () => {
 				exception = ex;
 			}
 			
-			expect(exception).to.be.not.null;
-			expect(exception).to.equal('Container has been disposed!');
+			expect(exception).to.be.instanceOf(MinorException);
+			expect(exception.message).to.equal('Container has been disposed!');
 		});
 	}); // describe 'dispose'
 

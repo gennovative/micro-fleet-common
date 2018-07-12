@@ -214,6 +214,24 @@ declare module '@micro-fleet/common/dist/app/DependencyContainer' {
 	    	    	}
 
 }
+declare module '@micro-fleet/common/dist/app/models/ServiceContext' {
+	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
+	/**
+	 * Serves as a global variables container.
+	 */
+	export class ServiceContext {
+	    	    /**
+	     * Gets dependency container.
+	     */
+	    readonly dependencyContainer: IDependencyContainer;
+	    /**
+	     * Sets dependency container. Must be set before add-ons initialization phase.
+	     */
+	    setDependencyContainer(container: IDependencyContainer): void;
+	}
+	export const serviceContext: ServiceContext;
+
+}
 declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
 	export type ActionFactory = (obj: any, action: string) => Function;
@@ -223,7 +241,7 @@ declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 	};
 	export class HandlerContainer {
 	    	    static readonly instance: HandlerContainer;
-	    	    	    	    dependencyContainer: IDependencyContainer;
+	    	    	    readonly dependencyContainer: IDependencyContainer;
 	    /**
 	     * Removes all registered handlers
 	     */
@@ -1157,22 +1175,12 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/models/ServiceContext' {
-	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
+declare module '@micro-fleet/common/dist/app/lazyInject' {
 	/**
-	 * Serves as a global variables container.
+	 * Injects value to the decorated property.
+	 * Used to decorate properties of a class that's cannot be resolved by dependency container.
 	 */
-	export class ServiceContext {
-	    	    /**
-	     * Gets dependency container.
-	     */
-	    readonly dependencyContainer: IDependencyContainer;
-	    /**
-	     * Sets dependency container. Must be set before add-ons initialization phase.
-	     */
-	    setDependencyContainer(container: IDependencyContainer): void;
-	}
-	export const serviceContext: ServiceContext;
+	export function lazyInject(depIdentifier: symbol | string): Function;
 
 }
 declare module '@micro-fleet/common' {
@@ -1195,6 +1203,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/DependencyContainer';
 	export * from '@micro-fleet/common/dist/app/HandlerContainer';
 	export * from '@micro-fleet/common/dist/app/Guard';
+	export * from '@micro-fleet/common/dist/app/lazyInject';
 	export * from '@micro-fleet/common/dist/app/Types';
 
 }
