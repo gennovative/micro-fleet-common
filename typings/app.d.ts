@@ -143,13 +143,13 @@ declare module '@micro-fleet/common/dist/app/Guard' {
 
 }
 declare module '@micro-fleet/common/dist/app/DependencyContainer' {
-	import { injectable, inject, decorate, interfaces, unmanaged } from 'inversify';
+	import { injectable, inject, decorate, interfaces, unmanaged, optional } from 'inversify';
 	export class BindingScope<T> {
 	    	    constructor(_binding: interfaces.BindingInWhenOnSyntax<T>);
 	    asSingleton(): void;
 	    asTransient(): void;
 	}
-	export { injectable, inject, decorate, unmanaged };
+	export { injectable, inject, decorate, unmanaged, optional };
 	export interface IDependencyContainer {
 	    /**
 	     * Registers `constructor` as resolvable with key `identifier`.
