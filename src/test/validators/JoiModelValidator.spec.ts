@@ -39,10 +39,10 @@ describe('JoiModelValidator', () => {
 	describe('pk', () => {
 		it('Should return the validated single PK if valid', () => {
 			// Arrange
-			let theID = 999;
+			const theID = 999;
 
 			// Act
-			let [error, pk] = validator.pk(theID);
+			const [error, pk] = validator.pk(theID);
 
 			// Assert
 			if (error) { console.error(error); }
@@ -53,7 +53,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should return the validated compound PK if valid', () => {
 			// Arrange
-			let validator = JoiModelValidator.create<SampleModel>(
+			const validator = JoiModelValidator.create<SampleModel>(
 					{ name: joi.string() },
 					true,
 					true,
@@ -68,7 +68,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, pk] = validator.pk(target);
+			const [error, pk] = validator.pk(target);
 
 			// Assert
 			if (error) { console.error(error); }
@@ -80,10 +80,10 @@ describe('JoiModelValidator', () => {
 
 		it('Should return an error object if invalid', () => {
 			// Arrange
-			let theID = 0;
+			const theID = 0;
 
 			// Act
-			let [error, pk] = validator.pk(theID);
+			const [error, pk] = validator.pk(theID);
 
 			// Assert
 			expect(pk).not.to.exist;
@@ -96,7 +96,7 @@ describe('JoiModelValidator', () => {
 	describe('whole', () => {
 		it('Should return the validated object if valid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					age: 18,
@@ -108,7 +108,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.whole(targetOne),
+			const [errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo);
 
 			// Assert
@@ -135,7 +135,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should remove unknown properties if valid', () => {
 			// Arrange
-			let target = {
+			const target = {
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
 					hobbies: ['sport', 'books'],
@@ -143,7 +143,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, value] = validator.whole(target);
+			const [error, value] = validator.whole(target);
 
 			// Assert
 			if (error) {
@@ -159,7 +159,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should validate model ID if required', () => {
 			// Arrange
-			let validator = JoiModelValidator.create<SampleModel>(
+			const validator = JoiModelValidator.create<SampleModel>(
 					{
 						name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
 						address: joi.string().required(),
@@ -177,7 +177,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, validated] = validator.whole(target);
+			const [error, validated] = validator.whole(target);
 
 			// Assert
 			expect(validated).not.to.exist;
@@ -189,7 +189,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should validate compound PK if required', () => {
 			// Arrange
-			let validator = JoiModelValidator.create<SampleModel>(
+			const validator = JoiModelValidator.create<SampleModel>(
 					{ name: joi.string() },
 					true,
 					true
@@ -199,7 +199,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [error, validated] = validator.whole(target);
+			const [error, validated] = validator.whole(target);
 
 			// Assert
 			expect(validated).not.to.exist;
@@ -215,7 +215,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should return an error object if invalid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 				},
 				targetTwo = {
 					name: 'ab',
@@ -230,7 +230,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.whole(targetOne),
+			const [errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo),
 				[errorThree, validatedThree] = validator.whole(targetThree);
 
@@ -247,7 +247,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should return error details if invalid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 				},
 				targetTwo = {
 					name: <any>null,
@@ -262,7 +262,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.whole(targetOne),
+			const [errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo),
 				[errorThree, validatedThree] = validator.whole(targetThree);
 
@@ -314,14 +314,14 @@ describe('JoiModelValidator', () => {
 	describe('partial', () => {
 		it('Should only validate existing properties', () => {
 			// Arrange
-			let target = {
+			const target = {
 					theID: 1,
 					name: 'Long invalid name',
 					// address: '^!@' => address is not specified
 				};
 
 			// Act
-			let [error, validated] = validator.partial(target);
+			const [error, validated] = validator.partial(target);
 
 			// Assert
 			expect(validated).not.to.exist;
@@ -334,7 +334,7 @@ describe('JoiModelValidator', () => {
 
 		it('Should ignore `required` validation, but not allow `null` value', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 				},
 				targetTwo = {
 					name: <any>null,
@@ -342,7 +342,7 @@ describe('JoiModelValidator', () => {
 				};
 
 			// Act
-			let [errorOne, validatedOne] = validator.partial(targetOne),
+			const [errorOne, validatedOne] = validator.partial(targetOne),
 				[errorTwo, validatedTwo] = validator.partial(targetTwo);
 
 			// Assert: `required` validation is ignored.

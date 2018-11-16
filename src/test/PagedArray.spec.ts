@@ -6,7 +6,7 @@ import { PagedArray } from '../app';
 describe('PagedArray', () => {
 	it('Should create an empty array', () => {
 		// Act
-		let arr = new PagedArray();
+		const arr = new PagedArray();
 		
 		expect(Array.isArray(arr)).to.be.true;
 		expect(arr.length).to.equal(0);
@@ -15,7 +15,7 @@ describe('PagedArray', () => {
 
 	it('Should initialize with one value', () => {
 		// Act
-		let arr = new PagedArray(100, 'a');
+		const arr = new PagedArray(100, 'a');
 		
 		// Assert
 		expect(Array.isArray(arr)).to.be.true;
@@ -25,7 +25,7 @@ describe('PagedArray', () => {
 
 	it('Should initialize with multiple values', () => {
 		// Act
-		let arr = new PagedArray(100, 'a', 'b', 'c');
+		const arr = new PagedArray(100, 'a', 'b', 'c');
 		
 		// Assert
 		expect(Array.isArray(arr)).to.be.true;
@@ -35,9 +35,9 @@ describe('PagedArray', () => {
 
 	it('Should support normal array functions', () => {
 		// Act
-		let arr = new PagedArray(100, 'a', 'b', 'c');
+		const arr = new PagedArray(100, 'a', 'b', 'c');
 		
-		let pagedStr = arr.concat(['d', 'e']).join(','),
+		const pagedStr = arr.concat(['d', 'e']).join(','),
 			normalStr = ['a', 'b', 'c', 'd', 'e'].join(',');
 
 		// Assert
@@ -46,9 +46,9 @@ describe('PagedArray', () => {
 
 	it('Should support normal array functions', () => {
 		// Act
-		let arr = new PagedArray(100, 'a', 'b', 'c');
+		const arr = new PagedArray(100, 'a', 'b', 'c');
 		
-		let pagedStr = arr.concat(['d', 'e']).join(','),
+		const pagedStr = arr.concat(['d', 'e']).join(','),
 			normalStr = ['a', 'b', 'c', 'd', 'e'].join(',');
 
 		// Assert
@@ -58,11 +58,11 @@ describe('PagedArray', () => {
 	describe('asObject', () => {
 		it('Should return a serializable object.', () => {
 			// Arrange
-			let pagedArr = new PagedArray(100, 'a', 'b', 'c'),
+			const pagedArr = new PagedArray(100, 'a', 'b', 'c'),
 				normalArr = ['a', 'b', 'c'];
 
 			// Act
-			let obj = pagedArr.asObject();
+			const obj = pagedArr.asObject();
 
 			// Assert
 			expect(obj.total).to.equal(pagedArr.total);

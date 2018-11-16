@@ -126,7 +126,7 @@ export class ModelAutoMapper<T extends Object> {
 			return this.map(source);
 		}
 
-		let [error, model] = this.validator[fn](source),
+		const [error, model] = this.validator[fn](source),
 			handleError = function (err: ValidationError, callback: Function) {
 				if (!err) { return false; }
 				if (!callback) {

@@ -1184,7 +1184,6 @@ declare module '@micro-fleet/common/dist/app/lazyInject' {
 
 }
 declare module '@micro-fleet/common' {
-	import 'bluebird-global';
 	import constantObj = require('@micro-fleet/common/dist/app/constants/index');
 	export const constants: constantObj.Constants;
 	export * from '@micro-fleet/common/dist/app/interfaces/configurations';

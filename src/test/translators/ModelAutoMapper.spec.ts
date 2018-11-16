@@ -13,9 +13,9 @@ class NestingTranslator extends ModelAutoMapper<SampleModel> {
 	 */
 	protected createMap(): void {
 		// Validates and translates item array
-		let transformation = (opts: AutoMapperJs.ISourceMemberConfigurationOptions) => {
-			let output = opts.sourceObject.items.map((it: any) => {
-				let [err, val] = itemValidator.whole(it);
+		const transformation = (opts: AutoMapperJs.ISourceMemberConfigurationOptions) => {
+			const output = opts.sourceObject.items.map((it: any) => {
+				const [err, val] = itemValidator.whole(it);
 				if (err) { throw err; }
 				return val;
 			});
@@ -39,7 +39,7 @@ describe('ModelAutoMapper', () => {
 	describe('merge', () => {
 		it('Should copy properties from one source then validate', () => {
 			// Arrange
-			let origin: Partial<SampleModel> = {
+			const origin: Partial<SampleModel> = {
 					name: 'Gennova123',
 					age: 18,
 					gender: 'male'
@@ -78,7 +78,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should copy properties from multiple sources then validate', () => {
 			// Arrange
-			let origin: Partial<SampleModel> = {
+			const origin: Partial<SampleModel> = {
 					name: 'Gennova123',
 					age: 18,
 					gender: 'male'
@@ -121,7 +121,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should throw an error object if VALIDATION fails', () => {
 			// Arrange
-			let origin: Partial<SampleModel> = {
+			const origin: Partial<SampleModel> = {
 					name: 'Gennova123',
 					age: 18,
 					gender: 'male'
@@ -151,8 +151,8 @@ describe('ModelAutoMapper', () => {
 
 		it('Should return the input if it is not an object', () => {
 			// Act
-			let input: any = 'not-an-object { }',
-				error, converted;
+			const input: any = 'not-an-object { }';
+			let error, converted;
 
 			try {
 				converted = translator.merge(input, {});
@@ -169,7 +169,7 @@ describe('ModelAutoMapper', () => {
 	describe('whole', () => {
 		it('Should return an object of target type if success', () => {
 			// Arrange
-			let sourceOne = {
+			const sourceOne = {
 					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
@@ -222,7 +222,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should return an array if success', () => {
 			// Arrange
-			let sourceArray = [
+			const sourceArray = [
 				{
 					theID: 1,
 					name: 'Gennova123',
@@ -265,11 +265,11 @@ describe('ModelAutoMapper', () => {
 
 		it('Should return the input if it is not an object', () => {
 			// Arrange
-			let error, converted,
-				inputOne = null,
-				inputTwo = undefined,
+			const inputOne: any = null,
+				inputTwo: any = undefined,
 				inputThree = 'abc',
 				inputFour = 999;
+			let error, converted;
 
 			// Act 1
 			try {
@@ -321,7 +321,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should not map unknown properties', () => {
 			// Arrange
-			let source = {
+			const source = {
 					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
@@ -349,7 +349,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should throw an error object if VALIDATION fails and no error callback is given', () => {
 			// Arrange
-			let source = {
+			const source = {
 				};
 
 			// Act
@@ -368,7 +368,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should pass an error object to callback if VALIDATION fails', () => {
 			// Arrange
-			let source = {
+			const source = {
 				};
 
 			// Act
@@ -387,7 +387,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should throw an error object if TRANSLATION fails and no error callback is given', () => {
 			// Arrange
-			let source = {
+			const source = {
 					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
@@ -422,7 +422,7 @@ describe('ModelAutoMapper', () => {
 
 		it('Should pass an error object to callback if TRANSLATION fails', () => {
 			// Arrange
-			let source = {
+			const source = {
 					theID: 1,
 					name: 'Gennova123',
 					address: 'Unlimited length street name',
@@ -456,7 +456,7 @@ describe('ModelAutoMapper', () => {
 	
 		it('Should blindly convert object if validation is disabled', () => {
 			// Arrange
-			let source = {
+			const source = {
 					name: 'ab',
 					address: '',
 					age: '10'
@@ -482,7 +482,7 @@ describe('ModelAutoMapper', () => {
 	
 		it('Should blindly convert object if validation is temporarily disabled in mapping options', () => {
 			// Arrange
-			let source = {
+			const source = {
 					name: 'ab',
 					address: '',
 					age: '10'
@@ -511,7 +511,7 @@ describe('ModelAutoMapper', () => {
 	describe('partial', () => {
 		it('Should copy properties with value', () => {
 			// Arrange
-			let source = {
+			const source = {
 					theID: 1,
 					name: 'gen-no-va',
 					// address: '^!@' => not specified, although this property is required

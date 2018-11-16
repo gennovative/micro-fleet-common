@@ -40,7 +40,7 @@ export class ValidationError extends MinorException {
 	}
 
 	private parseDetails(joiDetails: joi.ValidationErrorItem[]): ValidationErrorItem[] {
-		let details: ValidationErrorItem[] = [];
+		const details: ValidationErrorItem[] = [];
 		/* istanbul ignore next */
 		if (!joiDetails || !joiDetails.length) { 
 			return details; 

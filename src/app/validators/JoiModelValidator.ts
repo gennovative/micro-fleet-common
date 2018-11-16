@@ -20,7 +20,7 @@ export class JoiModelValidator<T> {
 	 * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	 */
 	public static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk: boolean = false, requirePk: boolean = false, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T> {
-		let validator = new JoiModelValidator<T>(schemaMapModel, isCompoundPk, requirePk, schemaMapPk);
+		const validator = new JoiModelValidator<T>(schemaMapModel, isCompoundPk, requirePk, schemaMapPk);
 		validator.compile();
 		return validator;
 	}
@@ -102,7 +102,7 @@ export class JoiModelValidator<T> {
 	 */
 	public pk(pk: any): [ValidationError, any] {
 		Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!');
-		let { error, value } = this._compiledPk.validate<any>(pk);
+		const { error, value } = this._compiledPk.validate<any>(pk);
 		return (error) ? [new ValidationError(error.details), null] : [null, value];
 	}
 
@@ -131,7 +131,7 @@ export class JoiModelValidator<T> {
 				this._compiledPk = joi.object(this._schemaMapPk);
 			} else {
 				// Compile rule for simple PK with only one property
-				let idMap = this.schemaMapPk;
+				const idMap = this.schemaMapPk;
 				for (let key in idMap) {
 					/* istanbul ignore else */
 					if (idMap.hasOwnProperty(key)) {
@@ -142,15 +142,15 @@ export class JoiModelValidator<T> {
 			}
 		}
 
-		let wholeSchema = this._schemaMap;
+		const wholeSchema = this._schemaMap;
 		this._compiledWhole = joi.object(wholeSchema);
 
 		// Make all rules optional for partial schema.
-		let partialSchema: joi.SchemaMap = {};
+		const partialSchema: joi.SchemaMap = {};
 		for (let key in wholeSchema) {
 			/* istanbul ignore else */
 			if (wholeSchema.hasOwnProperty(key)) {
-				let rule = wholeSchema[key] as joi.Schema;
+				const rule = wholeSchema[key] as joi.Schema;
 				/* istanbul ignore else */
 				if (typeof rule.optional === 'function') {
 					partialSchema[key] = rule.optional();
@@ -166,13 +166,13 @@ export class JoiModelValidator<T> {
 	protected validate(schema: joi.ObjectSchema, target: any, options: ValidationOptions = {}): [ValidationError, T] {
 		Guard.assertIsDefined(schema, 'Must call `compile` before using this function!');
 
-		let opts = Object.assign({
+		const opts = Object.assign({
 				abortEarly: false,
 				allowUnknown: true,
 				stripUnknown: true
 			}, options);
 
-		let { error, value } = schema.validate<T>(target, opts);
+		const { error, value } = schema.validate<T>(target, opts);
 
 		return (error) ? [new ValidationError(error.details), null] : [null, value];
 	}

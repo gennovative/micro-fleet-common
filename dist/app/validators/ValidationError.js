@@ -12,7 +12,7 @@ class ValidationError extends Exceptions_1.MinorException {
         Error.captureStackTrace(this, ValidationError);
     }
     parseDetails(joiDetails) {
-        let details = [];
+        const details = [];
         /* istanbul ignore next */
         if (!joiDetails || !joiDetails.length) {
             return details;

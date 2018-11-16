@@ -55,29 +55,29 @@ describe('HandlerContainer', () => {
 	describe('register', () => {
 		it('Should handle one action', () => {
 			// Arrage
-			let dummy = container.resolve<IDummy>(IDENTIFIER),
+			const dummy = container.resolve<IDummy>(IDENTIFIER),
 				echoSpy = chai.spy.on(dummy, 'echoName');
 
 			// Act
-			let proxyFn = HandlerContainer.instance.register('echoName', IDENTIFIER) as Function;
+			const proxyFn = HandlerContainer.instance.register('echoName', IDENTIFIER) as Function;
 
 			// Assert
-			let result = proxyFn(NAME);
+			const result = proxyFn(NAME);
 			expect(result).to.equal(NAME);
 			expect(echoSpy).to.be.called.once;
 		});
 
 		it('Should handle multiple actions', () => {
 			// Arrage
-			let dummy = container.resolve<IDummy>(IDENTIFIER),
+			const dummy = container.resolve<IDummy>(IDENTIFIER),
 				nameSpy = chai.spy.on(dummy, 'echoName'),
 				ageSpy = chai.spy.on(dummy, 'echoAge');
 
 			// Act
-			let [proxyNameFn, proxyAgeFn] = HandlerContainer.instance.register(['echoName', 'echoAge'], IDENTIFIER) as Function[];
+			const [proxyNameFn, proxyAgeFn] = HandlerContainer.instance.register(['echoName', 'echoAge'], IDENTIFIER) as Function[];
 
 			// Assert
-			let name = proxyNameFn(NAME),
+			const name = proxyNameFn(NAME),
 				age = proxyAgeFn(AGE);
 			expect(name).to.equal(NAME);
 			expect(age).to.equal(AGE);
@@ -92,10 +92,10 @@ describe('HandlerContainer', () => {
 			HandlerContainer.instance.register('echoName', IDENTIFIER);
 
 			// Act
-			let func = HandlerContainer.instance.resolve('echoName', IDENTIFIER);
+			const func = HandlerContainer.instance.resolve('echoName', IDENTIFIER);
 
 			// Assert
-			let result = func(NAME);
+			const result = func(NAME);
 			expect(result).to.equal(NAME);
 		});
 
@@ -105,17 +105,17 @@ describe('HandlerContainer', () => {
 				obj => obj.doubleName);
 
 			// Act
-			let func = HandlerContainer.instance.resolve('callMyName', IDENTIFIER);
+			const func = HandlerContainer.instance.resolve('callMyName', IDENTIFIER);
 
 			// Assert
-			let result = func(NAME);
+			const result = func(NAME);
 			expect(result).to.equal(NAME + NAME);
 		});
 
 		it('Should throw exception if attempting to resolve an unregistered action', () => {
 			// Act
 			try {
-				let func: Function = HandlerContainer.instance.resolve('echoName', IDENTIFIER);
+				const func: Function = HandlerContainer.instance.resolve('echoName', IDENTIFIER);
 				expect(func).not.to.exist;
 			} catch (err) {
 				console.error(err);
@@ -131,7 +131,7 @@ describe('HandlerContainer', () => {
 
 			// Act
 			try {
-				let func: Function = HandlerContainer.instance.resolve('nonexistFunc', IDENTIFIER);
+				const func: Function = HandlerContainer.instance.resolve('nonexistFunc', IDENTIFIER);
 				expect(func).not.to.exist;
 			} catch (err) {
 				console.error(err);

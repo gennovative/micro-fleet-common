@@ -6,10 +6,10 @@ describe('Guard', () => {
 	describe('assertArgDefined', () => {
 		it('should do nothing if argument is defined', () => {
 			// Arrange
-			let arg_1st = 0,
+			const arg_1st = 0,
 				arg_2nd = {},
-				arg_3rd = [] as any[],
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = [] as any[];
+			let ex_1st, ex_2nd, ex_3rd;
 			
 			// Act
 			try {
@@ -38,9 +38,9 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is null or undefined', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
-				arg_3rd, ex_1st, ex_2nd, ex_3rd;
+			const arg_1st: any = null,
+				arg_2nd: any = undefined;
+			let arg_3rd, ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -71,12 +71,12 @@ describe('Guard', () => {
 	describe('assertArgNotEmpty', () => {
 		it('should do nothing if argument is not empty', () => {
 			// Arrange
-			let arg_1st = 'fee',
+			const arg_1st = 'fee',
 				arg_2nd = {
 					prop: 'blah'
 				},
-				arg_3rd = [1, 'foo', 3],
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = [1, 'foo', 3];
+			let ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -105,13 +105,13 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is empty', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
+			const arg_1st: any = null,
+				arg_2nd: any = undefined,
 				arg_3rd = {},
 				arg_4th = [] as any[],
 				arg_5th = '',
-				arg_6th = 99,
-				arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
+				arg_6th = 99;
+			let arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
 
 			// Act
 			try {
@@ -170,10 +170,10 @@ describe('Guard', () => {
 	describe('assertArgFunction', () => {
 		it('should do nothing if argument is a function', () => {
 			// Arrange
-			let arg_1st = () => {},
+			const arg_1st = () => {},
 				arg_2nd = new Function(''),
-				arg_3rd = function() { },
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = function() { };
+			let ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -202,13 +202,13 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is not a function', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
+			const arg_1st: any = null,
+				arg_2nd: any = undefined,
 				arg_3rd = {},
 				arg_4th = [] as any[],
 				arg_5th = '',
-				arg_6th = 99,
-				arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
+				arg_6th = 99;
+			let arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
 
 			// Act
 			try {
@@ -268,8 +268,8 @@ describe('Guard', () => {
 		it('should do nothing if argument matches rule', () => {
 			// Arrange
 			const rule = /^ab[a-z]+de$/;
-			let arg_1st = 'abcde',
-				ex_1st;
+			const arg_1st = 'abcde';
+			let ex_1st;
 
 			// Act
 			try {
@@ -285,11 +285,11 @@ describe('Guard', () => {
 		it('should throw exception if argument does not match rule', () => {
 			// Arrange
 			const rule = /^ab[a-z]+de$/;
-			let arg_1st = '',
+			const arg_1st = '',
 				arg_2nd = 'abde',
 				arg_3rd = 'ab9de',
-				arg_4th = 'ab-de',
-				ex_1st, ex_2nd, ex_3rd, ex_4th;
+				arg_4th = 'ab-de';
+			let ex_1st, ex_2nd, ex_3rd, ex_4th;
 
 			// Act
 			try {
@@ -327,10 +327,10 @@ describe('Guard', () => {
 	describe('assertIsDefined', () => {
 		it('should do nothing if argument is defined', () => {
 			// Arrange
-			let arg_1st = 0,
+			const arg_1st = 0,
 				arg_2nd = {},
-				arg_3rd = [] as any[],
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = [] as any[];
+			let ex_1st, ex_2nd, ex_3rd;
 			
 			// Act
 			try {
@@ -359,9 +359,9 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is null or undefined', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
-				arg_3rd, ex_1st, ex_2nd, ex_3rd;
+			const arg_1st: any = null,
+				arg_2nd: any = undefined;
+			let arg_3rd, ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -392,12 +392,12 @@ describe('Guard', () => {
 	describe('assertIsNotEmpty', () => {
 		it('should do nothing if argument is not empty', () => {
 			// Arrange
-			let arg_1st = 'fee',
+			const arg_1st = 'fee',
 				arg_2nd = {
 					prop: 'blah'
 				},
-				arg_3rd = [1, 'foo', 3],
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = [1, 'foo', 3];
+			let ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -426,13 +426,13 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is empty', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
+			const arg_1st: any = null,
+				arg_2nd: any = undefined,
 				arg_3rd = {},
 				arg_4th = [] as any[],
 				arg_5th = '',
-				arg_6th = 99,
-				arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
+				arg_6th = 99;
+			let arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
 
 			// Act
 			try {
@@ -491,10 +491,10 @@ describe('Guard', () => {
 	describe('assertIsFunction', () => {
 		it('should do nothing if argument is a function', () => {
 			// Arrange
-			let arg_1st = () => {},
+			const arg_1st = () => {},
 				arg_2nd = new Function(''),
-				arg_3rd = function() { },
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = function() { };
+			let ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -523,13 +523,13 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is not a function', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
+			const arg_1st: any = null,
+				arg_2nd: any = undefined,
 				arg_3rd = {},
 				arg_4th = [] as any[],
 				arg_5th = '',
-				arg_6th = 99,
-				arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
+				arg_6th = 99;
+			let arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
 
 			// Act
 			try {
@@ -589,8 +589,8 @@ describe('Guard', () => {
 		it('should do nothing if argument matches rule', () => {
 			// Arrange
 			const rule = /^ab[a-z]+de$/;
-			let arg_1st = 'abcde',
-				ex_1st;
+			const arg_1st = 'abcde';
+			let ex_1st;
 
 			// Act
 			try {
@@ -606,11 +606,11 @@ describe('Guard', () => {
 		it('should throw exception if argument does not match rule', () => {
 			// Arrange
 			const rule = /^ab[a-z]+de$/;
-			let arg_1st = '',
+			const arg_1st = '',
 				arg_2nd = 'abde',
 				arg_3rd = 'ab9de',
-				arg_4th = 'ab-de',
-				ex_1st, ex_2nd, ex_3rd, ex_4th;
+				arg_4th = 'ab-de';
+			let ex_1st, ex_2nd, ex_3rd, ex_4th;
 
 			// Act
 			try {
@@ -648,10 +648,10 @@ describe('Guard', () => {
 	describe('assertIsTruthy', () => {
 		it('should do nothing if argument is truthy', () => {
 			// Arrange
-			let arg_1st = true,
+			const arg_1st = true,
 				arg_2nd = {},
-				arg_3rd = 'a',
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = 'a';
+			let ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {
@@ -680,13 +680,13 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is not truthy', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
+			const arg_1st: any = null,
+				arg_2nd: any = undefined,
 				arg_3rd = 0,
 				arg_4th = false,
 				arg_5th = NaN,
-				arg_6th = '',
-				arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
+				arg_6th = '';
+			let arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
 
 			// Act
 			try {
@@ -746,13 +746,13 @@ describe('Guard', () => {
 		
 		it('should do nothing if argument is falsey', () => {
 			// Arrange
-			let arg_1st = null,
-				arg_2nd = undefined,
+			const arg_1st: any = null,
+				arg_2nd: any = undefined,
 				arg_3rd = 0,
 				arg_4th = false,
 				arg_5th = NaN,
-				arg_6th = '',
-				arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
+				arg_6th = '';
+			let arg_7th, ex_1st, ex_2nd, ex_3rd, ex_4th, ex_5th, ex_6th, ex_7th;
 
 			// Act
 			try {
@@ -809,10 +809,10 @@ describe('Guard', () => {
 
 		it('should throw exception if argument is not falsey', () => {
 			// Arrange
-			let arg_1st = true,
+			const arg_1st = true,
 				arg_2nd = {},
-				arg_3rd = 'a',
-				ex_1st, ex_2nd, ex_3rd;
+				arg_3rd = 'a';
+			let ex_1st, ex_2nd, ex_3rd;
 
 			// Act
 			try {

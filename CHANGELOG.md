@@ -1,5 +1,10 @@
 ## VERSIONS
 
+### 1.2.4
+- Fixed node engine version in package.json
+- Refactor to replace `let` with `const`.
+- Removed "bluebird-global"
+
 ### 1.2.3
 - `HandlerContainer.register` accepts `paramCount` as last parameter.
 - `HandlerContainer` uses `ServiceContext` internally, no need to set dependency container for it anymore.

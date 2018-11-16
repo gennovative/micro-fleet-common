@@ -91,7 +91,7 @@ class ModelAutoMapper {
         if (!options.enableValidation) {
             return this.map(source);
         }
-        let [error, model] = this.validator[fn](source), handleError = function (err, callback) {
+        const [error, model] = this.validator[fn](source), handleError = function (err, callback) {
             if (!err) {
                 return false;
             }

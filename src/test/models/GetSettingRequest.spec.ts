@@ -7,7 +7,7 @@ describe('GetSettingRequest\'s validator', () => {
 	describe('whole', () => {
 		it('Should return the validated object if valid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 					slug: 'SettingSvc',
 					ipAddress: '127.0.0.1'
 				},
@@ -17,7 +17,7 @@ describe('GetSettingRequest\'s validator', () => {
 			targetTwo.ipAddress = '192.168.10.23';
 
 			// Act
-			let validator = GetSettingRequest.validator,
+			const validator = GetSettingRequest.validator,
 				[errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo);
 
@@ -35,7 +35,7 @@ describe('GetSettingRequest\'s validator', () => {
 
 		it('Should return an err object if invalid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 				},
 				targetTwo = {
 					slug: '',
@@ -47,7 +47,7 @@ describe('GetSettingRequest\'s validator', () => {
 				};
 
 			// Act
-			let validator = GetSettingRequest.validator,
+			const validator = GetSettingRequest.validator,
 				[errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo),
 				[errorThree, validatedThree] = validator.whole(targetThree);
@@ -67,8 +67,8 @@ describe('GetSettingRequest\'s validator', () => {
 	describe('partial', () => {
 		it('Should throw NotImplementedException', () => {
 			// Act
-			let validator = GetSettingRequest.validator,
-				result, exception;
+			const validator = GetSettingRequest.validator;
+			let result, exception;
 			try {
 				result = validator.partial({});
 			} catch (err) {

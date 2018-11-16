@@ -82,7 +82,7 @@ export class HandlerContainer {
 	 */
 	public resolve(action: string, dependencyIdentifier: string): Function {
 		Guard.assertIsDefined(this.dependencyContainer, `Dependency container is not set in serviceContext!`);
-		let detail: HandlerDetails = this._handlers[`${dependencyIdentifier}::${action}`];
+		const detail: HandlerDetails = this._handlers[`${dependencyIdentifier}::${action}`];
 		Guard.assertIsDefined(detail, `Action "${action}" was not registered!`);
 		return this.resolveActionFunc(action, detail.dependencyIdentifier, detail.actionFactory);
 	}
@@ -90,7 +90,7 @@ export class HandlerContainer {
 
 	private resolveActionFunc(action: string, depId: string, actFactory: ActionFactory): Function {
 		// Attempt to resolve object instance
-		let instance = this.dependencyContainer.resolve<any>(depId);
+		const instance = this.dependencyContainer.resolve<any>(depId);
 		Guard.assertIsDefined(instance, `Cannot resolve dependency "${depId.toString()}"!`);
 
 		// If function factory is specified, then get action from it.

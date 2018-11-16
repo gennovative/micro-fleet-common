@@ -1,5 +1,3 @@
-import 'bluebird-global';
-
 import constantObj = require('./constants/index');
 export const constants = constantObj.constants;
 

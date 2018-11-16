@@ -77,7 +77,7 @@ describe('CacheSettings', () => {
 	describe('constructor', () => {
 		it('Should create an instance with one setting', () => {
 			// Act
-			let target = new CacheSettings();
+			const target = new CacheSettings();
 
 			// Assert
 			expect(Number.isInteger(target.total)).to.be.true;
@@ -90,7 +90,7 @@ describe('CacheSettings', () => {
 	describe('pushConnection', () => {
 		it('Should add setting items', () => {
 			// Arrange
-			let connOne: CacheConnectionDetail = {
+			const connOne: CacheConnectionDetail = {
 					host: 'localhost',
 					port: 6379
 				},
@@ -100,7 +100,7 @@ describe('CacheSettings', () => {
 				};
 
 			// Act
-			let target = new CacheSettings();
+			const target = new CacheSettings();
 			target.pushServer(connOne);
 			target.pushServer(connTwo);
 
@@ -124,10 +124,10 @@ describe('CacheSettings', () => {
 	describe('fromProvider', () => {
 		it('Should return an array of connection details', () => {
 			// Arrange
-			let provider = new MockConfigurationProvider();
+			const provider = new MockConfigurationProvider();
 
 			// Act
-			let details = CacheSettings.fromProvider(provider);
+			const details = CacheSettings.fromProvider(provider);
 
 			// Assert
 			expect(details.length).to.equal(2);
@@ -139,10 +139,10 @@ describe('CacheSettings', () => {
 
 		it('Should return null if no connection details', () => {
 			// Arrange
-			let provider = new EmptyConfigurationProvider();
+			const provider = new EmptyConfigurationProvider();
 
 			// Act
-			let details = CacheSettings.fromProvider(provider);
+			const details = CacheSettings.fromProvider(provider);
 
 			// Assert
 			expect(details).to.be.null;

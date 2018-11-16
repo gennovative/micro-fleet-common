@@ -79,7 +79,7 @@ describe('DatabaseSettings', () => {
 	describe('constructor', () => {
 		it('Should create an instance with no setting', () => {
 			// Act
-			let target = new DatabaseSettings();
+			const target = new DatabaseSettings();
 
 			// Assert
 			expect(Number.isInteger(target.length)).to.be.true;
@@ -122,7 +122,7 @@ describe('DatabaseSettings', () => {
 
 		it('Should parse file path', () => {
 			// Arrange
-			let detail: DbConnectionDetail = {
+			const detail: DbConnectionDetail = {
 				clientName: DbClient.SQLITE3,
 				filePath: '/var/data/storage.sqlite3'
 			};
@@ -143,7 +143,7 @@ describe('DatabaseSettings', () => {
 
 		it('Should parse connection string', () => {
 			// Arrange
-			let detail: DbConnectionDetail = {
+			const detail: DbConnectionDetail = {
 					clientName: DbClient.MYSQL,
 					connectionString: 'mysql://user@pass'
 				};
@@ -164,7 +164,7 @@ describe('DatabaseSettings', () => {
 
 		it('Should return empty result if engine name is not specified', () => {
 			// Arrange
-			let detail: DbConnectionDetail = {
+			const detail: DbConnectionDetail = {
 					clientName: DbClient.MYSQL,
 					connectionString: 'mysql://user@pass'
 				};
@@ -179,7 +179,7 @@ describe('DatabaseSettings', () => {
 
 		it('Should return empty result if no connection option is specified', () => {
 			// Arrange
-			let detail: DbConnectionDetail = {
+			const detail: DbConnectionDetail = {
 					clientName: DbClient.MYSQL,
 				};
 
@@ -195,10 +195,10 @@ describe('DatabaseSettings', () => {
 	describe('fromProvider', () => {
 		it('Should return an array of connection details', () => {
 			// Arrange
-			let provider = new MockConfigurationProvider();
+			const provider = new MockConfigurationProvider();
 
 			// Act
-			let details = DatabaseSettings.fromProvider(provider);
+			const details = DatabaseSettings.fromProvider(provider);
 
 			// Assert
 			expect(details.length).to.equal(3);
@@ -210,10 +210,10 @@ describe('DatabaseSettings', () => {
 
 		it('Should return null if no connection details', () => {
 			// Arrange
-			let provider = new EmptyConfigurationProvider();
+			const provider = new EmptyConfigurationProvider();
 
 			// Act
-			let details = DatabaseSettings.fromProvider(provider);
+			const details = DatabaseSettings.fromProvider(provider);
 
 			// Assert
 			expect(details).to.be.null;

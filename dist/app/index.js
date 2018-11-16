@@ -3,7 +3,6 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-require("bluebird-global");
 const constantObj = require("./constants/index");
 exports.constants = constantObj.constants;
 __export(require("./models/settings/CacheSettings"));

@@ -6,10 +6,10 @@ import * as app from '../app';
 describe('Exception', () => {
 	it('`stack` should have value right after exception is created.', () => {
 		// Arrange
-		let ex = new app.Exception();
+		const ex = new app.Exception();
 
 		// Act
-		let stack = ex.stack;
+		const stack = ex.stack;
 
 		// Assert
 		expect(stack).not.to.be.undefined;
@@ -18,10 +18,10 @@ describe('Exception', () => {
 	it('`toString` should work for critical exception.', () => {
 		// Arrange
 		const MSG = 'An error occurs';
-		let ex = new app.Exception(MSG, true);
+		const ex = new app.Exception(MSG, true);
 
 		// Act
-		let myString = ex.toString();
+		const myString = ex.toString();
 
 		// Assert
 		expect(myString).to.contain(`[Critical] ${MSG}`);
@@ -30,10 +30,10 @@ describe('Exception', () => {
 	it('`toString` should work for minor exception.', () => {
 		// Arrange
 		const MSG = 'An error occurs';
-		let ex = new app.Exception(MSG, false);
+		const ex = new app.Exception(MSG, false);
 
 		// Act
-		let myString = ex.toString();
+		const myString = ex.toString();
 
 		// Assert
 		expect(myString).to.contain(`[Minor] ${MSG}`);
@@ -41,10 +41,10 @@ describe('Exception', () => {
 
 	it('`toString` should work with empty message.', () => {
 		// Arrange
-		let ex = new app.Exception();
+		const ex = new app.Exception();
 
 		// Act
-		let myString = ex.toString();
+		const myString = ex.toString();
 
 		// Assert
 		expect(myString).to.contain(`[Critical] `);
@@ -57,7 +57,7 @@ describe('CriticalException', () => {
 		const MSG = 'An error occurs';
 
 		// Act
-		let ex = new app.CriticalException(MSG);
+		const ex = new app.CriticalException(MSG);
 
 		// Assert
 		expect(ex.message).to.equal(MSG);
@@ -70,7 +70,7 @@ describe('MinorException', () => {
 		const MSG = 'An error occurs';
 
 		// Act
-		let ex = new app.MinorException(MSG);
+		const ex = new app.MinorException(MSG);
 
 		// Assert
 		expect(ex.message).to.equal(MSG);
@@ -84,7 +84,7 @@ describe('InvalidArgumentException', () => {
 			ARG_NAME = 'age';
 
 		// Act
-		let ex = new app.InvalidArgumentException(ARG_NAME, MSG),
+		const ex = new app.InvalidArgumentException(ARG_NAME, MSG),
 			message = ex.message;
 
 		// Assert
@@ -96,7 +96,7 @@ describe('InvalidArgumentException', () => {
 		const ARG_NAME = 'age';
 
 		// Act
-		let ex = new app.InvalidArgumentException(ARG_NAME),
+		const ex = new app.InvalidArgumentException(ARG_NAME),
 			message = ex.message;
 
 		// Assert
@@ -110,7 +110,7 @@ describe('NotImplementedException', () => {
 		const MSG = 'This function is not supported (yet)!';
 
 		// Act
-		let ex = new app.NotImplementedException(MSG);
+		const ex = new app.NotImplementedException(MSG);
 
 		// Assert
 		expect(ex.message).to.equal(MSG);
@@ -123,7 +123,7 @@ describe('InternalErrorException', () => {
 		const MSG = 'An error occurs';
 
 		// Act
-		let ex = new app.InternalErrorException(MSG);
+		const ex = new app.InternalErrorException(MSG);
 
 		// Assert
 		expect(ex.message).to.equal(MSG);
@@ -131,7 +131,7 @@ describe('InternalErrorException', () => {
 	
 	it('new instance should work without specified message.', () => {
 		// Act
-		let ex = new app.InternalErrorException();
+		const ex = new app.InternalErrorException();
 
 		// Assert
 		expect(ex.message).to.equal('An error occured on the 3rd-party side');

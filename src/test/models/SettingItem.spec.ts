@@ -7,7 +7,7 @@ describe('SettingItem\'s validator', () => {
 	describe('whole', () => {
 		it('Should return the validated object if valid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 					name: 'database_host',
 					dataType: SettingItemDataType.String,
 					value: '127.0.0.1'
@@ -19,7 +19,7 @@ describe('SettingItem\'s validator', () => {
 			targetTwo.value = '199';
 
 			// Act
-			let validator = SettingItem.validator,
+			const validator = SettingItem.validator,
 				[errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo);
 
@@ -39,7 +39,7 @@ describe('SettingItem\'s validator', () => {
 
 		it('Should return an err object if invalid', () => {
 			// Arrange
-			let targetOne = {
+			const targetOne = {
 				},
 				targetTwo = {
 					name: '',
@@ -53,7 +53,7 @@ describe('SettingItem\'s validator', () => {
 				};
 
 			// Act
-			let validator = SettingItem.validator,
+			const validator = SettingItem.validator,
 				[errorOne, validatedOne] = validator.whole(targetOne),
 				[errorTwo, validatedTwo] = validator.whole(targetTwo),
 				[errorThree, validatedThree] = validator.whole(targetThree);
