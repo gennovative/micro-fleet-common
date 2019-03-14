@@ -28,30 +28,30 @@ class HandlerContainer {
      * @param {string | string[]} actions Function name of the resolved object.
      * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
      * @param {ActionFactory} actionFactory A function that use `actions` name to produce the actual function to be executed.
-     *  	If factory returns falsy value, the function is resolved from specified action name.
-     * 		Note: No need to bind returned function to any context, as it is done internally.
+     *      If factory returns falsy value, the function is resolved from specified action name.
+     *         Note: No need to bind returned function to any context, as it is done internally.
      * @param {number} paramCount Number of expected parameters (aka Function.length) of the returned proxy function.
-     * 		In some cases, Function.length is important, eg: Express error handler middleware expects Function.length == 4.
+     *         In some cases, Function.length is important, eg: Express error handler middleware expects Function.length == 4.
      */
     register(actions, dependencyIdentifier, actionFactory, paramCount = 0) {
         Guard_1.Guard.assertArgDefined('action', actions);
         Guard_1.Guard.assertArgDefined('dependencyIdentifier', dependencyIdentifier);
-        const fn = function (act, depId) {
+        const doRegister = function (act, depId) {
             this._handlers[`${dependencyIdentifier}::${act}`] = { dependencyIdentifier, actionFactory };
             const proxy = (function (pxAction, pxDepId, context) {
-                const fn = function () {
+                const resolve = function () {
                     return context.resolve(pxAction, pxDepId).apply(this, arguments);
                 };
-                Object.defineProperty(fn, 'length', { value: paramCount });
-                return fn;
+                Object.defineProperty(resolve, 'length', { value: paramCount });
+                return resolve;
             })(act, depId, this);
             return proxy;
         }.bind(this);
         if (Array.isArray(actions)) {
-            return actions.map(act => fn(act, dependencyIdentifier));
+            return actions.map(act => doRegister(act, dependencyIdentifier));
         }
         else {
-            return fn(actions, dependencyIdentifier);
+            return doRegister(actions, dependencyIdentifier);
         }
     }
     /**

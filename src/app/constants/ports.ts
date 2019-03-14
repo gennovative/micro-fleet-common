@@ -1,3 +1,3 @@
 export enum ServicePorts {
-	SETTINGS = 50100
+    SETTINGS = 50100,
 }

@@ -59,7 +59,7 @@ class DatabaseSettings extends Array {
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_ENGINE,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.clientName
+                value: detail.clientName,
             }));
         }
         else {
@@ -69,36 +69,36 @@ class DatabaseSettings extends Array {
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_FILE,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.filePath
+                value: detail.filePath,
             }));
         }
         else if (detail.connectionString) {
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_CONN_STRING,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.connectionString
+                value: detail.connectionString,
             }));
         }
         else if (detail.host) {
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_ADDRESS,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.host.address
+                value: detail.host.address,
             }));
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_USER,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.host.user
+                value: detail.host.user,
             }));
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_PASSWORD,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.host.password
+                value: detail.host.password,
             }));
             settings.push(SettingItem_1.SettingItem.translator.whole({
                 name: database_1.DbSettingKeys.DB_NAME,
                 dataType: SettingItem_1.SettingItemDataType.String,
-                value: detail.host.database
+                value: detail.host.database,
             }));
         }
         else {

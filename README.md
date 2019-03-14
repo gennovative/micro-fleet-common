@@ -1,6 +1,6 @@
 # Micro Fleet - Backend Common library
 
-Belongs to Micro Fleet framework, contains interfaces, models and constants which are shared between micro services.
+Belongs to Micro Fleet framework, contains helpers, models and constants used by other packages.
 
 ## INSTALLATION
 

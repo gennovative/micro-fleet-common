@@ -1,6 +1,6 @@
-import * as joi from 'joi';
+import * as joi from 'joi'
 
-import { MinorException } from '../models/Exceptions';
+import { MinorException } from '../models/Exceptions'
 
 
 /**
@@ -8,52 +8,52 @@ import { MinorException } from '../models/Exceptions';
  * UI Form should use this information to highlight the particular input.
  */
 export type ValidationErrorItem = {
-	/**
-	 * Error message for this item.
-	 */
-	message: string;
+    /**
+     * Error message for this item.
+     */
+    message: string;
 
-	/**
-	 * Path to the target property in validation schema.
-	 */
-	path: string[];
+    /**
+     * Path to the target property in validation schema.
+     */
+    path: string[];
 
-	/**
-	 * The invalid property value.
-	 */
-	value: any;
-};
+    /**
+     * The invalid property value.
+     */
+    value: any;
+}
 
 /**
  * Represents an error when a model does not pass validation.
  */
 export class ValidationError extends MinorException {
-	
-	public readonly details: ValidationErrorItem[];
+
+    public readonly details: ValidationErrorItem[]
 
 
-	constructor(joiDetails: joi.ValidationErrorItem[]) {
-		super();
-		this.name = 'ValidationError';
-		this.details = this.parseDetails(joiDetails);
-		Error.captureStackTrace(this, ValidationError);
-	}
+    constructor(joiDetails: joi.ValidationErrorItem[]) {
+        super()
+        this.name = 'ValidationError'
+        this.details = this.parseDetails(joiDetails)
+        Error.captureStackTrace(this, ValidationError)
+    }
 
-	private parseDetails(joiDetails: joi.ValidationErrorItem[]): ValidationErrorItem[] {
-		const details: ValidationErrorItem[] = [];
-		/* istanbul ignore next */
-		if (!joiDetails || !joiDetails.length) { 
-			return details; 
-		}
+    private parseDetails(joiDetails: joi.ValidationErrorItem[]): ValidationErrorItem[] {
+        const details: ValidationErrorItem[] = []
+        /* istanbul ignore next */
+        if (!joiDetails || !joiDetails.length) {
+            return details
+        }
 
-		joiDetails.forEach(d => {
-			details.push({
-				message: d.message,
-				path: d.path,
-				value: d.context.value
-			});
-		});
+        joiDetails.forEach(d => {
+            details.push({
+                message: d.message,
+                path: d.path,
+                value: d.context.value,
+            })
+        })
 
-		return details;
-	}
+        return details
+    }
 }

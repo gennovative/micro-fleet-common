@@ -7,9 +7,9 @@ class JoiModelValidator {
     /**
      * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
      * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
-     * 	This param is IGNORED if param `schemaMapPk` has value.
+     *     This param is IGNORED if param `schemaMapPk` has value.
      * @param {boolean} requirePk Whether to validate ID.
-     * 	This param is IGNORED if param `schemaMapPk` has value.
+     *     This param is IGNORED if param `schemaMapPk` has value.
      * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
      */
     constructor(_schemaMap, _isCompositePk = false, requirePk, _schemaMapPk) {
@@ -28,13 +28,13 @@ class JoiModelValidator {
         }
         else if (_isCompositePk) {
             // this._compiledPk = joi.object({
-            // 		id: idSchema,
-            // 		tenantId: idSchema
-            // 	})
-            // 	.required();
+            //         id: idSchema,
+            //         tenantId: idSchema
+            //     })
+            //     .required();
             this._schemaMapPk = {
                 id: idSchema,
-                tenantId: idSchema
+                tenantId: idSchema,
             };
         }
         else {
@@ -46,10 +46,10 @@ class JoiModelValidator {
      * Builds a new instance of ModelValidatorBase.
      * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
      * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
-     * 	This param is IGNORED if param `schemaMapPk` has value.
+     *     This param is IGNORED if param `schemaMapPk` has value.
      * @param {boolean} requirePk Whether to validate PK.
-     * 	This param is IGNORED if param `schemaMapPk` has value.
-     * 	Default to be `false`.
+     *     This param is IGNORED if param `schemaMapPk` has value.
+     *     Default to be `false`.
      * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
      */
     static create(schemaMapModel, isCompoundPk = false, requirePk = false, schemaMapPk) {
@@ -98,7 +98,7 @@ class JoiModelValidator {
             else {
                 // Compile rule for simple PK with only one property
                 const idMap = this.schemaMapPk;
-                for (let key in idMap) {
+                for (const key in idMap) {
                     /* istanbul ignore else */
                     if (idMap.hasOwnProperty(key)) {
                         this._compiledPk = idMap[key];
@@ -111,7 +111,7 @@ class JoiModelValidator {
         this._compiledWhole = joi.object(wholeSchema);
         // Make all rules optional for partial schema.
         const partialSchema = {};
-        for (let key in wholeSchema) {
+        for (const key in wholeSchema) {
             /* istanbul ignore else */
             if (wholeSchema.hasOwnProperty(key)) {
                 const rule = wholeSchema[key];
@@ -130,7 +130,7 @@ class JoiModelValidator {
         const opts = Object.assign({
             abortEarly: false,
             allowUnknown: true,
-            stripUnknown: true
+            stripUnknown: true,
         }, options);
         const { error, value } = schema.validate(target, opts);
         return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
