@@ -5,13 +5,13 @@
 	"scripts": {
 		"build": "npm run compile && npm run test",
 		"clean": "rimraf dist coverage .nyc_output",
-		"definition": "node ../../scripts/definition.js",
+		"definition": "node ../../../scripts/definition.js",
 		"dedup": "rimraf node_modules/**/node_modules/**/typings",
 		"compile": "npm run clean && npm run tslint && tsc --pretty",
 		"release": "npm run build && npm run definition",
 		"test": "nyc --reporter=json --reporter=html --include dist/app/**/*.js mocha --recursive dist/test",
 		"tslint": "tslint -c tslint.json 'src/**/*.ts'",
-		"prepublish": "npm run release",
+		"prepublishOnly": "npm run release",
 		"watch": "npm run clean && npm run tslint && tsc --watch --pretty"
 	},
 	"dependencies": {
@@ -20,6 +20,25 @@
 		"inversify": "~4.11",
 		"lodash": "~4.17",
 		"reflect-metadata": "~0.1"
+	},
+	"devDependencies": {
+		"@types/chai": "~4.1",
+		"@types/chai-spies": "~0.0.1",
+		"@types/debug": "~0.0.30",
+		"@types/joi": "~13.0",
+		"@types/lodash": "~4.14",
+		"@types/mocha": "~5.2",
+		"@types/node": "~8.10",
+		"automapper-ts": "~1.8",
+		"chai": "~4.1",
+		"chai-spies": "git://github.com/chaijs/chai-spies.git#b11aeebf",
+		"fs-extra": "~6.0",
+		"mocha": "~5.2",
+		"nyc": "~12.0",
+		"rimraf": "~2.6",
+		"ts-declarator": "~1.0",
+		"tslint": "~5.10",
+		"typescript": "~2.9"
 	},
 	"publishConfig": {
 		"access": "public"
