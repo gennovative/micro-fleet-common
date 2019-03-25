@@ -1,6 +1,7 @@
 import * as joi from 'joi'
-import { Guard } from '../Guard'
 
+import { extJoi } from './JoiExtended'
+import { Guard } from '../Guard'
 import { ValidationError } from './ValidationError'
 
 
@@ -59,10 +60,8 @@ export class JoiModelValidator<T> {
         requirePk: boolean,
         protected _schemaMapPk?: joi.SchemaMap,
     ) {
-        // As default, model ID is a string of 64-bit integer.
-        // JS cannot handle 64-bit integer, that's why we must use string.
-        // The database will convert to BigInt type when inserting.
-        let idSchema = joi.string().regex(/^\d+$/)
+        // As default, model ID is a 64-bit integer.
+        let idSchema = extJoi.genn().bigint()
         if (requirePk) {
             idSchema = idSchema.required()
         }

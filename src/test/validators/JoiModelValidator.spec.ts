@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import * as joi from 'joi'
 
-import { JoiModelValidator } from '../../app'
+import { JoiModelValidator, extJoi } from '../../app'
 import { SampleModel } from './SampleModel'
 
 
@@ -58,8 +58,8 @@ describe('JoiModelValidator', () => {
                     true,
                     true,
                     {
-                        id: joi.number().required(),
-                        tenantId: joi.number().required(),
+                        id: extJoi.genn().bigint().required(),
+                        tenantId: extJoi.genn().bigint().required(),
                     }
                 ),
                 target = <TenantPk>{

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
+const JoiExtended_1 = require("./JoiExtended");
 const Guard_1 = require("../Guard");
 const ValidationError_1 = require("./ValidationError");
 class JoiModelValidator {
@@ -16,10 +17,8 @@ class JoiModelValidator {
         this._schemaMap = _schemaMap;
         this._isCompositePk = _isCompositePk;
         this._schemaMapPk = _schemaMapPk;
-        // As default, model ID is a string of 64-bit integer.
-        // JS cannot handle 64-bit integer, that's why we must use string.
-        // The database will convert to BigInt type when inserting.
-        let idSchema = joi.string().regex(/^\d+$/);
+        // As default, model ID is a 64-bit integer.
+        let idSchema = JoiExtended_1.extJoi.genn().bigint();
         if (requirePk) {
             idSchema = idSchema.required();
         }

@@ -15,6 +15,7 @@ __export(require("./models/Maybe"));
 __export(require("./models/PagedArray"));
 __export(require("./models/ServiceContext"));
 __export(require("./translators/ModelAutoMapper"));
+__export(require("./validators/JoiExtended"));
 __export(require("./validators/JoiModelValidator"));
 __export(require("./validators/ValidationError"));
 __export(require("./DependencyContainer"));
