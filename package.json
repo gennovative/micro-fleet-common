@@ -50,7 +50,7 @@
         "url": "https://github.com/gennovative"
     },
     "engines": {
-        "node": ">=10.0.0"
+        "node": ">=10.4.0"
     },
     "license": "MIT",
     "private": false,

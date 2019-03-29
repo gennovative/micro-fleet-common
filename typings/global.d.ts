@@ -33,7 +33,7 @@ declare type Newable<T=any> = (new (...args: any[]) => T);
 /**
  * A data type representing Javascript primitive types.
  */
-declare type PrimitiveType = string | number | boolean;
+declare type PrimitiveType = string | number | boolean | bigint;
 
 /**
  * A data type representing a single-leveled Json-like object.
