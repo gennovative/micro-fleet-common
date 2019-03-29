@@ -21,7 +21,7 @@ class ValidationError extends Exceptions_1.MinorException {
             details.push({
                 message: d.message,
                 path: d.path,
-                value: d.context.value
+                value: d.context.value,
             });
         });
         return details;

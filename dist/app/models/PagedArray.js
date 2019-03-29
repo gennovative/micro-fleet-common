@@ -14,7 +14,7 @@ class PagedArray extends Array {
         Object.defineProperty(this, '_total', {
             enumerable: false,
             configurable: false,
-            value: total
+            value: total,
         });
     }
     /**
@@ -29,7 +29,7 @@ class PagedArray extends Array {
     asObject() {
         return {
             total: this._total,
-            data: this.slice(0)
+            data: this.slice(0),
         };
     }
 }

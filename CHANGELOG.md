@@ -1,5 +1,8 @@
 ## VERSIONS
 
+### 1.3.0
+- Replace TS type `BigInt` with JS native `BigInt`
+
 ### 1.2.4
 - Fixed node engine version in package.json
 - Refactor to replace `let` with `const`.
@@ -27,9 +30,9 @@
 ### 1.1.0
 
 * **IRepository**: 
-	- Added generic param for id data type, to support composite primary key.
-	- Supports write operations (update, path, delete) on multiple items.
-	- Differentiates read operations between active and soft-deleted records.
+    - Added generic param for id data type, to support composite primary key.
+    - Supports write operations (update, path, delete) on multiple items.
+    - Differentiates read operations between active and soft-deleted records.
 * **TenantPk**: Primary key data type that support multi-tenancy.
 * **IHardDelRepository**: Extends from `IRepository`, supports hard deletion.
 * **JoiModelValidator**: Added support for composite primary key.

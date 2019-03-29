@@ -253,10 +253,10 @@ declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 	     * @param {string | string[]} actions Function name of the resolved object.
 	     * @param {string} dependencyIdentifier Key to look up and resolve from dependency container.
 	     * @param {ActionFactory} actionFactory A function that use `actions` name to produce the actual function to be executed.
-	     *  	If factory returns falsy value, the function is resolved from specified action name.
-	     * 		Note: No need to bind returned function to any context, as it is done internally.
+	     *      If factory returns falsy value, the function is resolved from specified action name.
+	     *         Note: No need to bind returned function to any context, as it is done internally.
 	     * @param {number} paramCount Number of expected parameters (aka Function.length) of the returned proxy function.
-	     * 		In some cases, Function.length is important, eg: Express error handler middleware expects Function.length == 4.
+	     *         In some cases, Function.length is important, eg: Express error handler middleware expects Function.length == 4.
 	     */
 	    register(actions: string | string[], dependencyIdentifier: string, actionFactory?: ActionFactory, paramCount?: number): Function | Function[];
 	    /**
@@ -271,8 +271,8 @@ declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 }
 declare module '@micro-fleet/common/dist/app/Types' {
 	export class Types {
-	    static readonly CONFIG_PROVIDER: string;
-	    static readonly DEPENDENCY_CONTAINER: string;
+	    static readonly CONFIG_PROVIDER = "common.IConfigurationProvider";
+	    static readonly DEPENDENCY_CONTAINER = "common.IDependencyContainer";
 	}
 
 }
@@ -725,6 +725,31 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/web' {
 	     */
 	    WEB_CORS = "web_cors",
 	    /**
+	     * Whether to start HTTPS server.
+	     * Type: boolean
+	     */
+	    WEB_SSL_ENABLED = "web_ssl_enabled",
+	    /**
+	     * Whether to redirect all HTTP request to HTTPS endpoints.
+	     * Type: boolean
+	     */
+	    WEB_SSL_ONLY = "web_ssl_only",
+	    /**
+	     * Path to SSL key file.
+	     * Type: string
+	     */
+	    WEB_SSL_KEY_FILE = "web_ssl_key_file",
+	    /**
+	     * Path to SSL cert file.
+	     * Type: string
+	     */
+	    WEB_SSL_CERT_FILE = "web_ssl_cert_file",
+	    /**
+	     * HTTPS port listened by webserver.
+	     * Type: number
+	     */
+	    WEB_SSL_PORT = "web_ssl_port",
+	    /**
 	     * HTTP port listened by webserver.
 	     * Type: number
 	     */
@@ -791,6 +816,20 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
+	import * as joi from 'joi';
+	export type ExtendedJoi = joi.AnySchema & {
+	    genn: () => {
+	        bigint: () => joi.AnySchema;
+	    };
+	};
+	/**
+	 * @example extJoi.genn().bigint().validate('98765443123456');
+	 * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
+	 */
+	export const extJoi: ExtendedJoi;
+
+}
 declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
@@ -834,10 +873,10 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	     * Builds a new instance of ModelValidatorBase.
 	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
 	     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
-	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {boolean} requirePk Whether to validate PK.
-	     * 	This param is IGNORED if param `schemaMapPk` has value.
-	     * 	Default to be `false`.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     *     Default to be `false`.
 	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	     */
 	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, requirePk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
@@ -857,9 +896,9 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	    /**
 	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
 	     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
-	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {boolean} requirePk Whether to validate ID.
-	     * 	This param is IGNORED if param `schemaMapPk` has value.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
 	     */
 	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
@@ -1068,9 +1107,9 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	     * and `appconfig.json` file, respectedly.
 	     * @param {string} key Setting key
 	     * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
-	     * 		Has no effect with remote settings.
+	     *         Has no effect with remote settings.
 	     */
-	    get(key: string, dataType?: SettingItemDataType): Maybe<number | boolean | string | any[]>;
+	    get(key: string, dataType?: SettingItemDataType): Maybe<PrimitiveType | any[]>;
 	    /**
 	     * Attempts to fetch settings from remote Configuration Service.
 	     */
@@ -1197,6 +1236,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';
 	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
+	export * from '@micro-fleet/common/dist/app/validators/JoiExtended';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/ValidationError';
 	export * from '@micro-fleet/common/dist/app/DependencyContainer';

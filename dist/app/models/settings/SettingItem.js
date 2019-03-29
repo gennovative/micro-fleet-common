@@ -53,7 +53,7 @@ exports.SettingItem = SettingItem;
 SettingItem.validator = JoiModelValidator_1.JoiModelValidator.create({
     name: joi.string().token().required(),
     dataType: joi.string().required().only(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
-    value: joi.string().allow('').required()
+    value: joi.string().allow('').required(),
 }, false, false);
 SettingItem.translator = new ModelAutoMapper_1.ModelAutoMapper(SettingItem, SettingItem.validator);
 //# sourceMappingURL=SettingItem.js.map

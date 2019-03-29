@@ -1,142 +1,142 @@
 export enum ActionNames {
 
-	/**
-	 * Assign to group
-	 */
-	ASSIGN_TO_GROUP = 'assignToGroup',
+    /**
+     * Assign to group
+     */
+    ASSIGN_TO_GROUP = 'assignToGroup',
 
-	/**
-	 * Can deploy
-	 */
-	CAN_DEPLOY = 'canDeploy',
+    /**
+     * Can deploy
+     */
+    CAN_DEPLOY = 'canDeploy',
 
-	/**
-	 * Create
-	 */
-	CREATE = 'create',
+    /**
+     * Create
+     */
+    CREATE = 'create',
 
-	/**
-	 * Count all
-	 */
-	COUNT_ALL = 'countAll',
+    /**
+     * Count all
+     */
+    COUNT_ALL = 'countAll',
 
-	/**
-	 * Configure program
-	 */
-	CONFIGURE_PROGRAM = 'configureProgram',
+    /**
+     * Configure program
+     */
+    CONFIGURE_PROGRAM = 'configureProgram',
 
-	/**
-	 * Configure program group
-	 */
-	CONFIGURE_PROGRAM_GROUP = 'configureProgramGroup',
+    /**
+     * Configure program group
+     */
+    CONFIGURE_PROGRAM_GROUP = 'configureProgramGroup',
 
-	/**
-	 * Deploy
-	 */
-	DEPLOY = 'deploy',
+    /**
+     * Deploy
+     */
+    DEPLOY = 'deploy',
 
-	/**
-	 * Soft delete
-	 */
-	DELETE_SOFT = 'deleteSoft',
+    /**
+     * Soft delete
+     */
+    DELETE_SOFT = 'deleteSoft',
 
-	/**
-	 * Hard delete
-	 */
-	DELETE_HARD = 'deleteHard',
+    /**
+     * Hard delete
+     */
+    DELETE_HARD = 'deleteHard',
 
-	/**
-	 * Hard delete versions
-	 */
-	DELETE_HARD_VERSIONS = 'deleteHardVersions',
+    /**
+     * Hard delete versions
+     */
+    DELETE_HARD_VERSIONS = 'deleteHardVersions',
 
-	/**
-	 * Exists
-	 */
-	EXISTS = 'exists',
-	
-	/**
-	 * Find by PK
-	 */
-	FIND_BY_PK = 'findByPk',
+    /**
+     * Exists
+     */
+    EXISTS = 'exists',
 
-	/**
-	 * Get by host ID
-	 */
-	GET_BY_HOST_ID = 'getByHostId',
+    /**
+     * Find by PK
+     */
+    FIND_BY_PK = 'findByPk',
 
-	/**
-	 * Get by program slug
-	 */
-	GET_BY_PROGRAM_SLUG = 'getByProgramSlug',
+    /**
+     * Get by host ID
+     */
+    GET_BY_HOST_ID = 'getByHostId',
 
-	/**
-	 * Get by program ID
-	 */
-	GET_BY_PROGRAM_ID = 'getByProgramId',
+    /**
+     * Get by program slug
+     */
+    GET_BY_PROGRAM_SLUG = 'getByProgramSlug',
 
-	/**
-	 * Get settings
-	 */
-	GET_SETTINGS = 'getSettings',
+    /**
+     * Get by program ID
+     */
+    GET_BY_PROGRAM_ID = 'getByProgramId',
 
-	/**
-	 * Get programs
-	 */
-	GET_PROGRAMS = 'getPrograms',
+    /**
+     * Get settings
+     */
+    GET_SETTINGS = 'getSettings',
 
-	/**
-	 * Next big int
-	 */
-	NEXT_BIG_INT = 'nextBigInt',
+    /**
+     * Get programs
+     */
+    GET_PROGRAMS = 'getPrograms',
 
-	/**
-	 * Next short ID
-	 */
-	NEXT_SHORT_ID = 'nextShortId',
+    /**
+     * Next big int
+     */
+    NEXT_BIG_INT = 'nextBigInt',
 
-	/**
-	 * Next version-4 UUID
-	 */
-	NEXT_UUID_V4 = 'nextUuidv4',
+    /**
+     * Next short ID
+     */
+    NEXT_SHORT_ID = 'nextShortId',
 
-	/**
-	 * Page
-	 */
-	PAGE = 'page',
+    /**
+     * Next version-4 UUID
+     */
+    NEXT_UUID_V4 = 'nextUuidv4',
 
-	/**
-	 * Page
-	 */
-	PAGE_VERSIONS = 'pageVersions',
+    /**
+     * Page
+     */
+    PAGE = 'page',
 
-	/**
-	 * Patch
-	 */
-	PATCH = 'patch',
+    /**
+     * Page
+     */
+    PAGE_VERSIONS = 'pageVersions',
 
-	/**
-	 * Recover
-	 */
-	RECOVER = 'recover',
+    /**
+     * Patch
+     */
+    PATCH = 'patch',
 
-	/**
-	 * Restrict quantity
-	 */
-	RESTRICT_QUANTITY = 'restrictQuantity',
+    /**
+     * Recover
+     */
+    RECOVER = 'recover',
 
-	/**
-	 * Recover
-	 */
-	SET_AS_MAIN = 'setAsMain',
+    /**
+     * Restrict quantity
+     */
+    RESTRICT_QUANTITY = 'restrictQuantity',
 
-	/**
-	 * Upload
-	 */
-	UPLOAD = 'upload',
+    /**
+     * Recover
+     */
+    SET_AS_MAIN = 'setAsMain',
 
-	/**
-	 * Update
-	 */
-	UPDATE = 'update',
+    /**
+     * Upload
+     */
+    UPLOAD = 'upload',
+
+    /**
+     * Update
+     */
+    UPDATE = 'update',
 }

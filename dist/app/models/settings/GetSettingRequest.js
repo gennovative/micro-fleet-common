@@ -20,9 +20,9 @@ class GetSettingRequest {
     }
 }
 exports.GetSettingRequest = GetSettingRequest;
-let validator = GetSettingRequest.validator = JoiModelValidator_1.JoiModelValidator.create({
+const validator = GetSettingRequest.validator = JoiModelValidator_1.JoiModelValidator.create({
     slug: joi.string().regex(/^[0-9a-zA-z-]+$/).required().example('SettingSvc').example('setting-svc'),
-    ipAddress: joi.string().ip().required().example('127.0.0.1').example('192.168.10.23')
+    ipAddress: joi.string().ip().required().example('127.0.0.1').example('192.168.10.23'),
 }, false, false);
 validator.partial = function () {
     throw new Exceptions_1.NotImplementedException('This method is not supported. Use `whole` instead.');

@@ -15,10 +15,10 @@ class Exception {
     }
     toString() {
         // Ex 1: [Critical] A big mess has happened!
-        //		 <stacktrace here>
+        //         <stacktrace here>
         //
         // Ex 2: [Minor]
-        //		 <stacktrace here>
+        //         <stacktrace here>
         return `[${(this.isCritical ? 'Critical' : 'Minor')}] ${this.message ? this.message : ''} \n ${this.stack}`;
     }
 }

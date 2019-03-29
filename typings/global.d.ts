@@ -7,16 +7,16 @@
 //declare module '*';
 
 declare namespace NodeJS {
-	export interface Global {
-		gennova: any;
-	}
+    export interface Global {
+        gennova: any;
+    }
 }
 
 /**
  * A data type representing Json object.
  */
 interface Json {
-	[x: string]: string | number | boolean | Date | Json | JsonArray;
+    [x: string]: string | number | boolean | Date | Json | JsonArray;
 }
 
 interface JsonArray extends Array<string | number | boolean | Date | Json | JsonArray> { }
@@ -33,81 +33,77 @@ declare type Newable<T=any> = (new (...args: any[]) => T);
 /**
  * A data type representing Javascript primitive types.
  */
-declare type PrimitiveType = string | number | boolean;
+declare type PrimitiveType = string | number | boolean | bigint;
 
 /**
  * A data type representing a single-leveled Json-like object.
  */
 declare type PrimitiveFlatJson = {
-	[x: string]: PrimitiveType
+    [x: string]: PrimitiveType
 };
 
 declare type FunctionType<T=void> = (...args: any[]) => T;
 
-/**
- * Basically a string, but presents a 64-bit big integer value.
- */
-declare type BigInt = string;
 
 /**
  * A datatype that presents composite primary key.
  */
 declare type TenantPk = {
-	id: BigInt,
-	tenantId: BigInt
+    id: bigint,
+    tenantId: bigint,
 };
 
 /**
  * A datatype that presents non-primary unique properties.
  */
 declare type NameUk = {
-	name: string
+    name: string
 }
 
-declare type PkType = BigInt | TenantPk;
+declare type PkType = bigint | TenantPk;
 
 /**
  * Represents a data transfer object, aka: business model.
  */
 declare interface IModelDTO {
-	id?: BigInt;
-	tenantId?: BigInt;
+    id?: bigint;
+    tenantId?: bigint;
 }
 
 /**
  * Represents a model that is tracked when it is created and last updated.
  */
 declare interface IAuditable extends IModelDTO {
-	/**
-	 * The time when this model is created.
-	 */
-	createdAt?: Date;
+    /**
+     * The time when this model is created.
+     */
+    createdAt?: Date;
 
-	/**
-	 * The time when this model is last updated.
-	 */
-	updatedAt?: Date;
+    /**
+     * The time when this model is last updated.
+     */
+    updatedAt?: Date;
 }
 
 /**
  * Represents a model that is never really removed from database.
  */
 declare interface ISoftDeletable extends IModelDTO {
-	/**
-	 * If has value, this model is marked as deleted.
-	 * Otherwise, it is still active.
-	 */
-	deletedAt?: Date;
+    /**
+     * If has value, this model is marked as deleted.
+     * Otherwise, it is still active.
+     */
+    deletedAt?: Date;
 }
 
 /**
  * Represents a model that can be added more properties.
  */
 declare interface IExtensible extends IModelDTO {
-	/**
-	 * Contains additional properties.
-	 */
-	attributes?: any; // Should map to JSON type in PostreSQL.
+    /**
+     * Contains additional properties.
+     */
+    attributes?: any; // Should map to JSON type in PostreSQL.
 }
 
 
@@ -115,20 +111,20 @@ declare interface IExtensible extends IModelDTO {
  * Represents a model whose history is tracked.
  */
 declare interface IVersionControlled extends IModelDTO {
-	/**
-	 * The time when this version is created.
-	 */
-	createdAt: Date;
+    /**
+     * The time when this version is created.
+     */
+    createdAt: Date;
 
-	/**
-	 * Whether this is official version.
-	 */
-	isMain: boolean;
+    /**
+     * Whether this is official version.
+     */
+    isMain: boolean;
 
-	/**
-	 * The version of records with same Id.
-	 */
-	version: number;
+    /**
+     * The version of records with same Id.
+     */
+    version: number;
 }
 
 
@@ -137,25 +133,25 @@ declare interface IVersionControlled extends IModelDTO {
  * implements this interface to be able to add to add-on list.
  */
 declare interface IServiceAddOn {
-	/**
-	 * Gets add-on name.
-	 */
-	readonly name: string;
+    /**
+     * Gets add-on name.
+     */
+    readonly name: string;
 
-	/**
-	 * Initializes this add-on.
-	 * @returns A promise that resolves `true` if success, rejects if otherwise.
-	 */
-	init(): Promise<void>;
+    /**
+     * Initializes this add-on.
+     * @returns A promise that resolves `true` if success, rejects if otherwise.
+     */
+    init(): Promise<void>;
 
-	/**
-	 * Invoked before `dispose` is called.
-	 */
-	deadLetter(): Promise<void>;
+    /**
+     * Invoked before `dispose` is called.
+     */
+    deadLetter(): Promise<void>;
 
-	/**
-	 * Stops this add-on and cleans all resources.
-	 */
-	dispose(): Promise<void>;
+    /**
+     * Stops this add-on and cleans all resources.
+     */
+    dispose(): Promise<void>;
 
 }
