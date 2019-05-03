@@ -1,5 +1,8 @@
 ## VERSIONS
 
+### 1.3.1
+- Removed script "postinstall" from `package.json`.
+
 ### 1.3.0
 - Replace TS type `BigInt` with JS native `BigInt`
 
