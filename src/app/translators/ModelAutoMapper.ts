@@ -6,6 +6,7 @@ if (!global['automapper']) {
 
 import { JoiModelValidator } from '../validators/JoiModelValidator'
 import { ValidationError } from '../validators/ValidationError'
+import { ICreateMapFluentFunctions } from './automapper-interfaces'
 
 
 export interface MappingOptions {
@@ -33,6 +34,8 @@ export class ModelAutoMapper<T extends Object> {
     public enableValidation: boolean
 
 
+    protected _internalMapper: ICreateMapFluentFunctions
+
     /**
      * @param {class} ModelClass The model class
      * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
@@ -42,12 +45,19 @@ export class ModelAutoMapper<T extends Object> {
         protected _validator?: JoiModelValidator<T>
     ) {
         this.enableValidation = (_validator != null)
-        this.createMap()
+        this._internalMapper = this.createMap()
     }
 
 
     /**
-     * Gets validator.
+     * Gets the internal AutoMapper instance for advanced configuration.
+     */
+    public get internalMapper(): ICreateMapFluentFunctions {
+        return this._internalMapper
+    }
+
+    /**
+     * Gets the validator.
      */
     public get validator(): JoiModelValidator<T> {
         return this._validator
@@ -95,8 +105,8 @@ export class ModelAutoMapper<T extends Object> {
     /**
      * Initializes the model mapping engine.
      */
-    protected createMap(): void {
-        automapper.createMap('any', this.ModelClass)
+    protected createMap(): ICreateMapFluentFunctions {
+        return automapper.createMap('any', this.ModelClass)
     }
 
     /**
@@ -107,7 +117,7 @@ export class ModelAutoMapper<T extends Object> {
     }
 
 
-    private tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[] {
+    protected tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[] {
         if (source == null || typeof source !== 'object') { return source }
 
         options = Object.assign(<MappingOptions>{
@@ -121,7 +131,7 @@ export class ModelAutoMapper<T extends Object> {
         return this.translate(fn, source, options)
     }
 
-    private translate(fn: string, source: any, options: MappingOptions): T {
+    protected translate(fn: string, source: any, options: MappingOptions): T {
         if (!options.enableValidation) {
             return this.map(source)
         }

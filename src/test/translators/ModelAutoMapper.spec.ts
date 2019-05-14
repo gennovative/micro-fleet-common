@@ -3,37 +3,41 @@ import { expect } from 'chai'
 
 import { ModelAutoMapper, JoiModelValidator, ValidationError } from '../../app'
 import { SampleModel } from '../validators/SampleModel'
+import { ICreateMapFluentFunctions } from '../../app/translators/automapper-interfaces'
 
 
 const itemValidator = JoiModelValidator.create({ name: joi.string().required() }, false, false)
+
+
+/**
+ * Validates and translates item array.
+ * Should be traditional function, should not be arrow function.
+ * See: https://github.com/loedeman/AutoMapper/issues/33
+ */
+function transformation(opts: AutoMapperJs.ISourceMemberConfigurationOptions) {
+    const output = opts.sourceObject.items.map((it: any) => {
+        const [err, val] = itemValidator.whole(it)
+        if (err) { throw err }
+        return val
+    })
+    return output
+}
 
 class NestingTranslator extends ModelAutoMapper<SampleModel> {
     /**
      * @override
      */
-    protected createMap(): void {
-        // Validates and translates item array
-        const transformation = (opts: AutoMapperJs.ISourceMemberConfigurationOptions) => {
-            const output = opts.sourceObject.items.map((it: any) => {
-                const [err, val] = itemValidator.whole(it)
-                if (err) { throw err }
-                return val
-            })
-            return output
-        }
-        automapper.createMap('any', this.ModelClass)
-            .forSourceMember('items', (opts: AutoMapperJs.ISourceMemberConfigurationOptions) => {
-                // Work around for bug: https://github.com/loedeman/AutoMapper/issues/33
-                return transformation(opts)
-            })
+    protected createMap(): ICreateMapFluentFunctions {
+        return automapper.createMap('any', this.ModelClass)
+            .forSourceMember('items', transformation)
     }
 }
 
-let translator: ModelAutoMapper<SampleModel>
+let globalTranslator: ModelAutoMapper<SampleModel>
 
 describe('ModelAutoMapper', () => {
     beforeEach(() => {
-        translator = new ModelAutoMapper(SampleModel, SampleModel.validator)
+        globalTranslator = new ModelAutoMapper(SampleModel, SampleModel.validator)
     })
 
     describe('merge', () => {
@@ -55,15 +59,14 @@ describe('ModelAutoMapper', () => {
 
             // Act
             try {
-                copied = translator.merge(origin, [source])
+                copied = globalTranslator.merge(origin, [source])
             } catch (err) {
                 error = err
             }
 
             // Assert
-            if (error) {
-                console.error(error)
-            }
+            error && console.error(error)
+
             expect(error).not.to.exist
             expect(copied).to.exist
             expect(copied).is.instanceOf(SampleModel)
@@ -98,15 +101,14 @@ describe('ModelAutoMapper', () => {
 
             // Act
             try {
-                copied = translator.merge(origin, [sourceOne, sourceTwo])
+                copied = globalTranslator.merge(origin, [sourceOne, sourceTwo])
             } catch (err) {
                 error = err
             }
 
             // Assert
-            if (error) {
-                console.error(error)
-            }
+            error && console.error(error)
+
             expect(error).not.to.exist
             expect(copied).to.exist
             expect(copied).is.instanceOf(SampleModel)
@@ -136,7 +138,7 @@ describe('ModelAutoMapper', () => {
             let error, converted
 
             try {
-                converted = translator.merge(origin, source)
+                converted = globalTranslator.merge(origin, source)
             } catch (err) {
                 error = err
             }
@@ -155,7 +157,7 @@ describe('ModelAutoMapper', () => {
             let error, converted
 
             try {
-                converted = translator.merge(input, {})
+                converted = globalTranslator.merge(input, {})
             } catch (err) {
                 error = err
             }
@@ -185,21 +187,20 @@ describe('ModelAutoMapper', () => {
 
             // Act
             try {
-                convertedOne = translator.whole(sourceOne) as SampleModel
+                convertedOne = globalTranslator.whole(sourceOne) as SampleModel
             } catch (err) {
                 errorOne = err
             }
 
             try {
-                convertedTwo = translator.whole(sourceTwo) as SampleModel
+                convertedTwo = globalTranslator.whole(sourceTwo) as SampleModel
             } catch (err) {
                 errorTwo = err
             }
 
             // Assert
-            if (errorOne) {
-                console.error(errorOne)
-            }
+            errorOne && console.error(errorOne)
+
             expect(errorOne).not.to.exist
             expect(convertedOne).to.exist
             expect(convertedOne).is.instanceOf(SampleModel)
@@ -208,9 +209,8 @@ describe('ModelAutoMapper', () => {
             expect(convertedOne.age).to.equal(sourceOne.age)
             expect(convertedOne.gender).to.equal(sourceOne.gender)
 
-            if (errorTwo) {
-                console.error(errorOne)
-            }
+            errorTwo && console.error(errorTwo)
+
             expect(errorTwo).not.to.exist
             expect(convertedTwo).to.exist
             expect(convertedTwo).is.instanceOf(SampleModel)
@@ -240,15 +240,14 @@ describe('ModelAutoMapper', () => {
 
             // Act
             try {
-                convertedArr = translator.whole(sourceArray) as SampleModel[]
+                convertedArr = globalTranslator.whole(sourceArray) as SampleModel[]
             } catch (err) {
                 error = err
             }
 
             // Assert
-            if (error) {
-                console.error(error)
-            }
+            error && console.error(error)
+
             expect(error).not.to.exist
             expect(convertedArr).to.exist
             expect(convertedArr).to.be.instanceOf(Array)
@@ -263,6 +262,89 @@ describe('ModelAutoMapper', () => {
             })
         })
 
+        it('Should do nested map with derived translator class', () => {
+            // Arrange
+            const source = {
+                    theID: 1,
+                    name: 'Gennova123',
+                    address: 'Unlimited length street name',
+                    items: [
+                        { name: 'Item 1' },
+                        { name: 'Item 2' },
+                    ],
+                }
+
+            // Add 'items' key to model schema map, otherwise it will stripped.
+            SampleModel.validator.schemaMap['items'] = joi.array().length(2)
+            SampleModel.validator.compile()
+
+            const translator = new NestingTranslator(SampleModel, SampleModel.validator)
+
+            // Act
+            let error: ValidationError, converted: any
+
+            try {
+                converted = translator.whole(source)
+            } catch (err) {
+                error = err
+            }
+
+            // Assert
+            error && console.error(error)
+
+            expect(error).not.to.exist
+            expect(converted).to.exist
+            expect(converted).to.exist
+            expect(converted.theID).to.equal(source.theID)
+            expect(converted.name).to.equal(source.name)
+            expect(converted.address).to.equal(source.address)
+            expect(converted.items.length).to.equal(2)
+            expect(converted.items[0].name).to.equal(source.items[0].name)
+            expect(converted.items[1].name).to.equal(source.items[1].name)
+        })
+
+        it('Should do nested map by configuring internal mapper', () => {
+            // Arrange
+            const source = {
+                    theID: 1,
+                    name: 'Gennova123',
+                    address: 'Unlimited length street name',
+                    items: [
+                        { name: 'Item 1' },
+                        { name: 'Item 2' },
+                    ],
+                }
+
+            // Add 'items' key to model schema map, otherwise it will stripped.
+            SampleModel.validator.schemaMap['items'] = joi.array().length(2)
+            SampleModel.validator.compile()
+
+            const translator = new ModelAutoMapper(SampleModel, SampleModel.validator)
+            translator.internalMapper.forSourceMember('items', transformation)
+
+            // Act
+            let error: ValidationError, converted: any
+
+            try {
+                converted = translator.whole(source)
+            } catch (err) {
+                error = err
+            }
+
+            // Assert
+            error && console.error(error)
+
+            expect(error).not.to.exist
+            expect(converted).to.exist
+            expect(converted).to.exist
+            expect(converted.theID).to.equal(source.theID)
+            expect(converted.name).to.equal(source.name)
+            expect(converted.address).to.equal(source.address)
+            expect(converted.items.length).to.equal(2)
+            expect(converted.items[0].name).to.equal(source.items[0].name)
+            expect(converted.items[1].name).to.equal(source.items[1].name)
+        })
+
         it('Should return the input if it is not an object', () => {
             // Arrange
             const inputOne: any = null,
@@ -273,7 +355,7 @@ describe('ModelAutoMapper', () => {
 
             // Act 1
             try {
-                converted = translator.whole(inputOne)
+                converted = globalTranslator.whole(inputOne)
             } catch (err) {
                 error = err
             }
@@ -285,7 +367,7 @@ describe('ModelAutoMapper', () => {
 
             // Act 2
             try {
-                converted = translator.whole(inputTwo)
+                converted = globalTranslator.whole(inputTwo)
             } catch (err) {
                 error = err
             }
@@ -297,7 +379,7 @@ describe('ModelAutoMapper', () => {
 
             // Act 3
             try {
-                converted = translator.whole(inputThree)
+                converted = globalTranslator.whole(inputThree)
             } catch (err) {
                 error = err
             }
@@ -309,7 +391,7 @@ describe('ModelAutoMapper', () => {
 
             // Act 4
             try {
-                converted = translator.whole(inputFour)
+                converted = globalTranslator.whole(inputFour)
             } catch (err) {
                 error = err
             }
@@ -332,7 +414,7 @@ describe('ModelAutoMapper', () => {
 
             // Act
             try {
-                converted = translator.whole(source) as SampleModel
+                converted = globalTranslator.whole(source) as SampleModel
             } catch (err) {
                 error = err
             }
@@ -356,7 +438,7 @@ describe('ModelAutoMapper', () => {
             let error, converted
 
             try {
-                converted = translator.whole(source)
+                converted = globalTranslator.whole(source)
             } catch (err) {
                 error = err
             }
@@ -372,9 +454,9 @@ describe('ModelAutoMapper', () => {
                 }
 
             // Act
-            let error, converted
+            let error: ValidationError
 
-            converted = translator.whole(source, {
+            const converted = globalTranslator.whole(source, {
                 errorCallback: (err) => {
                     error = err
                 },
@@ -383,6 +465,7 @@ describe('ModelAutoMapper', () => {
             // Assert
             expect(converted).not.to.exist
             expect(error).to.exist
+            error && expect(error.name).to.equal('ValidationError')
         })
 
         it('Should throw an error object if TRANSLATION fails and no error callback is given', () => {
@@ -401,7 +484,7 @@ describe('ModelAutoMapper', () => {
             SampleModel.validator.schemaMap['items'] = joi.array().length(2)
             SampleModel.validator.compile()
 
-            translator = new NestingTranslator(SampleModel, SampleModel.validator)
+            const translator = new NestingTranslator(SampleModel, SampleModel.validator)
 
             // Act
             let error: ValidationError, converted
@@ -436,7 +519,7 @@ describe('ModelAutoMapper', () => {
             SampleModel.validator.schemaMap['items'] = joi.array().length(2)
             SampleModel.validator.compile()
 
-            translator = new NestingTranslator(SampleModel, SampleModel.validator)
+            const translator = new NestingTranslator(SampleModel, SampleModel.validator)
 
             // Act
             let error: ValidationError, converted
@@ -465,8 +548,8 @@ describe('ModelAutoMapper', () => {
             // Act
             let error, converted
 
-            translator.enableValidation = false
-            converted = translator.whole(source, {
+            globalTranslator.enableValidation = false
+            converted = globalTranslator.whole(source, {
                 errorCallback: (err) => {
                     error = err
                 },
@@ -487,11 +570,11 @@ describe('ModelAutoMapper', () => {
                     address: '',
                     age: '10',
                 }
-            translator.enableValidation = true // Enable to whole class
+            globalTranslator.enableValidation = true // Enable to whole class
 
             // Act
             let error, converted
-            converted = translator.whole(source, {
+            converted = globalTranslator.whole(source, {
                 enableValidation: false, // Temporarily disable
                 errorCallback: (err) => {
                     error = err
@@ -520,7 +603,7 @@ describe('ModelAutoMapper', () => {
 
             // Act
             try {
-                converted = translator.partial(source) as SampleModel
+                converted = globalTranslator.partial(source) as SampleModel
             } catch (err) {
                 error = err
             }

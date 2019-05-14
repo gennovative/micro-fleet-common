@@ -17,10 +17,16 @@ class ModelAutoMapper {
         this.ModelClass = ModelClass;
         this._validator = _validator;
         this.enableValidation = (_validator != null);
-        this.createMap();
+        this._internalMapper = this.createMap();
     }
     /**
-     * Gets validator.
+     * Gets the internal AutoMapper instance for advanced configuration.
+     */
+    get internalMapper() {
+        return this._internalMapper;
+    }
+    /**
+     * Gets the validator.
      */
     get validator() {
         return this._validator;
@@ -66,7 +72,7 @@ class ModelAutoMapper {
      * Initializes the model mapping engine.
      */
     createMap() {
-        automapper.createMap('any', this.ModelClass);
+        return automapper.createMap('any', this.ModelClass);
     }
     /**
      * Is invoked after source object is validated to map source object to target model.
