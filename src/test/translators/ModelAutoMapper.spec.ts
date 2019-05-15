@@ -3,7 +3,7 @@ import { expect } from 'chai'
 
 import { ModelAutoMapper, JoiModelValidator, ValidationError } from '../../app'
 import { SampleModel } from '../validators/SampleModel'
-import { ICreateMapFluentFunctions } from '../../app/translators/automapper-interfaces'
+import { ICreateMapFluentFunctions } from '../../app/interfaces/automapper'
 
 
 const itemValidator = JoiModelValidator.create({ name: joi.string().required() }, false, false)

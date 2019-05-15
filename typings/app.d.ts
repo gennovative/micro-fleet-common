@@ -790,143 +790,7 @@ declare module '@micro-fleet/common/dist/app/constants/index' {
 	export const constants: Constants;
 
 }
-declare module '@micro-fleet/common/dist/app/models/Maybe' {
-	/**
-	 * Represents an object which may or may not have a value.
-	 * Use this class to avoid assigning `null` to a variable.
-	 * Inspired by V8 Maybe: https://v8docs.nodesource.com/node-9.3/d9/d4b/classv8_1_1_maybe.html
-	 */
-	export class Maybe<T> {
-	    	    	    /**
-	     * Gets whether this object has value or not.
-	     */
-	    readonly hasValue: boolean;
-	    /**
-	     * Attempts to get the contained value, and throws exception if there is no value.
-	     * Use function `TryGetValue` to avoid exception.
-	     * @throws {MinorException} If there is no value.
-	     */
-	    readonly value: T;
-	    constructor(value?: T);
-	    /**
-	     * Attempts to get the contained value, if there is not, returns the given default value.
-	     * @param defaultVal Value to return in case there is no contained value.
-	     */
-	    TryGetValue(defaultVal: T): T;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
-	import * as joi from 'joi';
-	export type ExtendedJoi = joi.AnySchema & {
-	    genn: () => {
-	        bigint: () => joi.AnySchema;
-	    };
-	};
-	/**
-	 * @example extJoi.genn().bigint().validate('98765443123456');
-	 * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
-	 */
-	export const extJoi: ExtendedJoi;
-
-}
-declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
-	import * as joi from 'joi';
-	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
-	/**
-	 * Represents a validation error for a property.
-	 * UI Form should use this information to highlight the particular input.
-	 */
-	export type ValidationErrorItem = {
-	    /**
-	     * Error message for this item.
-	     */
-	    message: string;
-	    /**
-	     * Path to the target property in validation schema.
-	     */
-	    path: string[];
-	    /**
-	     * The invalid property value.
-	     */
-	    value: any;
-	};
-	/**
-	 * Represents an error when a model does not pass validation.
-	 */
-	export class ValidationError extends MinorException {
-	    readonly details: ValidationErrorItem[];
-	    constructor(joiDetails: joi.ValidationErrorItem[]);
-	    	}
-
-}
-declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
-	import * as joi from 'joi';
-	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
-	export interface ValidationOptions extends joi.ValidationOptions {
-	}
-	export class JoiModelValidator<T> {
-	    protected _schemaMap: joi.SchemaMap;
-	    protected _isCompositePk: boolean;
-	    protected _schemaMapPk?: joi.SchemaMap;
-	    /**
-	     * Builds a new instance of ModelValidatorBase.
-	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
-	     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {boolean} requirePk Whether to validate PK.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     *     Default to be `false`.
-	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
-	     */
-	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, requirePk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
-	    /**
-	     * Compiled rules for compound model primary key.
-	     */
-	    protected _compiledPk: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties.
-	     */
-	    protected _compiledWhole: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties, but all of them are OPTIONAL.
-	     * Used for patch operation.
-	     */
-	    protected _compiledPartial: joi.ObjectSchema;
-	    /**
-	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {boolean} requirePk Whether to validate ID.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
-	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
-	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapPk: joi.SchemaMap;
-	    readonly isCompoundPk: boolean;
-	    /**
-	     * Validates model PK.
-	     */
-	    pk(pk: any): [ValidationError, any];
-	    /**
-	     * Validates model for creation operation, which doesn't need `pk` property.
-	     */
-	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
-	    /**
-	     * Validates model for modification operation, which requires `pk` property.
-	     */
-	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-	    /**
-	     * Must call this method before using `whole` or `partial`,
-	     * or after `schemaMap` or `schemaMapId` is changed.
-	     */
-	    compile(): void;
-	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/translators/automapper-interfaces' {
+declare module '@micro-fleet/common/dist/app/interfaces/automapper' {
 	/**
 	 * Interface for returning an object with available 'sub' functions
 	 * to enable method chaining (e.g. automapper.createMap().forMember().forMember() ...)
@@ -1046,10 +910,172 @@ declare module '@micro-fleet/common/dist/app/translators/automapper-interfaces' 
 	export type IMapCallback = (result: any) => void;
 
 }
+declare module '@micro-fleet/common/dist/app/models/Maybe' {
+	/**
+	 * Represents an object which may or may not have a value.
+	 * Use this class to avoid assigning `null` to a variable.
+	 * Inspired by V8 Maybe: https://v8docs.nodesource.com/node-9.3/d9/d4b/classv8_1_1_maybe.html
+	 */
+	export class Maybe<T> {
+	    	    	    /**
+	     * Gets whether this object has value or not.
+	     */
+	    readonly hasValue: boolean;
+	    /**
+	     * Attempts to get the contained value, and throws exception if there is no value.
+	     * Use function `TryGetValue` to avoid exception.
+	     * @throws {MinorException} If there is no value.
+	     */
+	    readonly value: T;
+	    constructor(value?: T);
+	    /**
+	     * Attempts to get the contained value, if there is not, returns the given default value.
+	     * @param defaultVal Value to return in case there is no contained value.
+	     */
+	    TryGetValue(defaultVal: T): T;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
+	import * as joi from 'joi';
+	export type JoiDateStringOptions = {
+	    /**
+	     * Whether the input string is in UTC format.
+	     * Default: false.
+	     */
+	    isUTC?: boolean;
+	    /**
+	     * Function to convert input string to desired data type.
+	     * Default function returns native Date object.
+	     */
+	    translator?: any;
+	};
+	export type ExtendedJoi = joi.AnySchema & {
+	    genn: () => {
+	        /**
+	         * Makes sure input is native bigint type.
+	         *
+	         * @example extJoi.genn().bigint().validate('98765443123456');
+	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
+	         */
+	        bigint: () => joi.AnySchema;
+	        /**
+	         * Makes sure input is in W3C Date and Time Formats,
+	         * but must have at least year, month, and day.
+	         *
+	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
+	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
+	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
+	         */
+	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
+	    };
+	};
+	/**
+	 * Joi instance with "genn()" extension enabled, including some custom rules.
+	 */
+	export const extJoi: ExtendedJoi;
+
+}
+declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
+	import * as joi from 'joi';
+	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
+	/**
+	 * Represents a validation error for a property.
+	 * UI Form should use this information to highlight the particular input.
+	 */
+	export type ValidationErrorItem = {
+	    /**
+	     * Error message for this item.
+	     */
+	    message: string;
+	    /**
+	     * Path to the target property in validation schema.
+	     */
+	    path: string[];
+	    /**
+	     * The invalid property value.
+	     */
+	    value: any;
+	};
+	/**
+	 * Represents an error when a model does not pass validation.
+	 */
+	export class ValidationError extends MinorException {
+	    readonly details: ValidationErrorItem[];
+	    constructor(joiDetails: joi.ValidationErrorItem[]);
+	    	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
+	import * as joi from 'joi';
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	export interface ValidationOptions extends joi.ValidationOptions {
+	}
+	export class JoiModelValidator<T> {
+	    protected _schemaMap: joi.SchemaMap;
+	    protected _isCompositePk: boolean;
+	    protected _schemaMapPk?: joi.SchemaMap;
+	    /**
+	     * Builds a new instance of ModelValidatorBase.
+	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
+	     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {boolean} requirePk Whether to validate PK.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     *     Default to be `false`.
+	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
+	     */
+	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, requirePk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
+	    /**
+	     * Compiled rules for compound model primary key.
+	     */
+	    protected _compiledPk: joi.ObjectSchema;
+	    /**
+	     * Compiled rules for model properties.
+	     */
+	    protected _compiledWhole: joi.ObjectSchema;
+	    /**
+	     * Compiled rules for model properties, but all of them are OPTIONAL.
+	     * Used for patch operation.
+	     */
+	    protected _compiledPartial: joi.ObjectSchema;
+	    /**
+	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
+	     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {boolean} requirePk Whether to validate ID.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
+	     */
+	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
+	    readonly schemaMap: joi.SchemaMap;
+	    readonly schemaMapPk: joi.SchemaMap;
+	    readonly isCompoundPk: boolean;
+	    /**
+	     * Validates model PK.
+	     */
+	    pk(pk: any): [ValidationError, any];
+	    /**
+	     * Validates model for creation operation, which doesn't need `pk` property.
+	     */
+	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
+	    /**
+	     * Validates model for modification operation, which requires `pk` property.
+	     */
+	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
+	    /**
+	     * Must call this method before using `whole` or `partial`,
+	     * or after `schemaMap` or `schemaMapId` is changed.
+	     */
+	    compile(): void;
+	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
 	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
-	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/translators/automapper-interfaces';
+	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
 	export interface MappingOptions {
 	    /**
 	     * Temporarily turns on or off model validation.
@@ -1310,9 +1336,9 @@ declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' 
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/models/DtoBase' {
+declare module '@micro-fleet/common/dist/app/models/DomainModelBase' {
 	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
-	export class DtoBase implements IModelDTO {
+	export class DomainModelBase implements IDomainModel {
 	    /**
 	     * @abstract
 	     * Function to convert other object to this class type.
@@ -1353,12 +1379,13 @@ declare module '@micro-fleet/common/dist/app/lazyInject' {
 declare module '@micro-fleet/common' {
 	import constantObj = require('@micro-fleet/common/dist/app/constants/index');
 	export const constants: constantObj.Constants;
+	export * from '@micro-fleet/common/dist/app/interfaces/automapper';
 	export * from '@micro-fleet/common/dist/app/interfaces/configurations';
 	export * from '@micro-fleet/common/dist/app/models/settings/CacheSettings';
 	export * from '@micro-fleet/common/dist/app/models/settings/DatabaseSettings';
 	export * from '@micro-fleet/common/dist/app/models/settings/GetSettingRequest';
 	export * from '@micro-fleet/common/dist/app/models/settings/SettingItem';
-	export * from '@micro-fleet/common/dist/app/models/DtoBase';
+	export * from '@micro-fleet/common/dist/app/models/DomainModelBase';
 	export * from '@micro-fleet/common/dist/app/models/Exceptions';
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';

@@ -63,9 +63,9 @@ declare type NameUk = {
 declare type PkType = bigint | TenantPk;
 
 /**
- * Represents a data transfer object, aka: business model.
+ * Represents a domain model object, aka: business model.
  */
-declare interface IModelDTO {
+declare interface IDomainModel {
     id?: bigint;
     tenantId?: bigint;
 }
@@ -73,7 +73,7 @@ declare interface IModelDTO {
 /**
  * Represents a model that is tracked when it is created and last updated.
  */
-declare interface IAuditable extends IModelDTO {
+declare interface IAuditable extends IDomainModel {
     /**
      * The time when this model is created.
      */
@@ -88,7 +88,7 @@ declare interface IAuditable extends IModelDTO {
 /**
  * Represents a model that is never really removed from database.
  */
-declare interface ISoftDeletable extends IModelDTO {
+declare interface ISoftDeletable extends IDomainModel {
     /**
      * If has value, this model is marked as deleted.
      * Otherwise, it is still active.
@@ -99,7 +99,7 @@ declare interface ISoftDeletable extends IModelDTO {
 /**
  * Represents a model that can be added more properties.
  */
-declare interface IExtensible extends IModelDTO {
+declare interface IExtensible extends IDomainModel {
     /**
      * Contains additional properties.
      */
@@ -110,7 +110,7 @@ declare interface IExtensible extends IModelDTO {
 /**
  * Represents a model whose history is tracked.
  */
-declare interface IVersionControlled extends IModelDTO {
+declare interface IVersionControlled extends IDomainModel {
     /**
      * The time when this version is created.
      */

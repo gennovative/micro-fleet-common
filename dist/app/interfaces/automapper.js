@@ -4,4 +4,4 @@
  * because they are not exported in original file.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=automapper-interfaces.js.map
+//# sourceMappingURL=automapper.js.map

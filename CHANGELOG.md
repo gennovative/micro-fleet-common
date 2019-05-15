@@ -2,6 +2,8 @@
 
 ### 1.3.2
 - New getter `ModelAutoMapper.internalMapper` for advanced mapping configuration.
+- Replaced term "DTO" with "Domain model".
+- Added `JoiExtended.dateString` validation rule.
 
 ### 1.3.1
 - Removed script "postinstall" from `package.json`.

@@ -1,12 +1,13 @@
 import constantObj = require('./constants/index')
 export const constants = constantObj.constants
 
+export * from './interfaces/automapper'
 export * from './interfaces/configurations'
 export * from './models/settings/CacheSettings'
 export * from './models/settings/DatabaseSettings'
 export * from './models/settings/GetSettingRequest'
 export * from './models/settings/SettingItem'
-export * from './models/DtoBase'
+export * from './models/DomainModelBase'
 export * from './models/Exceptions'
 export * from './models/Maybe'
 export * from './models/PagedArray'

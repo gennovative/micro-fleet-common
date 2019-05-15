@@ -6,7 +6,7 @@ if (!global['automapper']) {
 
 import { JoiModelValidator } from '../validators/JoiModelValidator'
 import { ValidationError } from '../validators/ValidationError'
-import { ICreateMapFluentFunctions } from './automapper-interfaces'
+import { ICreateMapFluentFunctions } from '../interfaces/automapper'
 
 
 export interface MappingOptions {

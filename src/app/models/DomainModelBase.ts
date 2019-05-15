@@ -1,6 +1,6 @@
 import { ModelAutoMapper } from '../translators/ModelAutoMapper'
 
-export class DtoBase implements IModelDTO {
+export class DomainModelBase implements IDomainModel {
 
     /**
      * @abstract
