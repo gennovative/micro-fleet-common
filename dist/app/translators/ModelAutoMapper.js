@@ -51,7 +51,7 @@ class ModelAutoMapper {
      * Validates then converts an object to type <T>.
      * but ONLY properties with value are validated and copied.
      * Note that `required` validation is IGNORED.
-     * @param {any | any[]} source An object or array of objects to be translated.
+     * @param {object} source The object to be translated.
      *
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
@@ -59,14 +59,35 @@ class ModelAutoMapper {
         return this.tryTranslate('partial', source, options);
     }
     /**
+     * Validates then converts a list of objects to type <T>.
+     * but ONLY properties with value are validated and copied.
+     * Note that `required` validation is IGNORED.
+     * @param {object[]} sources A list of objects to be translated.
+     *
+     * @throws {ValidationError} If no `errorCallback` is provided.
+     */
+    partialMany(sources, options) {
+        return this.tryTranslate('partial', sources, options);
+    }
+    /**
      * Validates then converts an object to type <T>.
      * ALL properties are validated and copied regardless with or without value.
-     * @param {any | any[]} source An object or array of objects to be translated.
+     * @param {object} source The object to be translated.
      *
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     whole(source, options) {
         return this.tryTranslate('whole', source, options);
+    }
+    /**
+     * Validates then converts a list of objects to type <T>.
+     * ALL properties are validated and copied regardless with or without value.
+     * @param {object[]} sources The list of objects to be translated.
+     *
+     * @throws {ValidationError} If no `errorCallback` is provided.
+     */
+    wholeMany(sources, options) {
+        return this.tryTranslate('whole', sources, options);
     }
     /**
      * Initializes the model mapping engine.

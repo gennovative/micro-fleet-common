@@ -31,9 +31,6 @@ const dateStringRule = {
             translator: joi.any(),
         }).optional(),
     },
-    description(params) {
-        return 'Date should respect W3C Date and Time format';
-    },
     setup(params) {
         this['_flags'].dateString = true;
         params.options = params.options || { isUTC: false };

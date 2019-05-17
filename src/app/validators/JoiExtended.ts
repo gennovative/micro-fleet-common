@@ -36,10 +36,6 @@ const dateStringRule = {
         }).optional(),
     },
 
-    description(params: any) {
-        return 'Date should respect W3C Date and Time format'
-    },
-
     setup(this: joi.ExtensionBoundSchema, params: any) {
         this['_flags'].dateString = true
         params.options = params.options || { isUTC: false }

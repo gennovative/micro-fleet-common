@@ -1011,23 +1011,37 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
 	}
+	export type JoiModelValidatorCreateOptions = {
+	    /**
+	     * Rules to validate model properties.
+	     */
+	    schemaMapModel: joi.SchemaMap;
+	    /**
+	     * Whether the primary key is composite. Default to `false`.
+	     * This param is IGNORED if param `schemaMapPk` has value.
+	     */
+	    isCompositePk?: boolean;
+	    /**
+	     * Whether to validate PK.
+	     * This param is IGNORED if param `schemaMapPk` has value.
+	     * Default to be `false`.
+	     */
+	    requirePk?: boolean;
+	    /**
+	     * Rule to validate model PK.
+	     */
+	    schemaMapPk?: joi.SchemaMap;
+	};
 	export class JoiModelValidator<T> {
 	    protected _schemaMap: joi.SchemaMap;
 	    protected _isCompositePk: boolean;
 	    protected _schemaMapPk?: joi.SchemaMap;
 	    /**
 	     * Builds a new instance of ModelValidatorBase.
-	     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
-	     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {boolean} requirePk Whether to validate PK.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     *     Default to be `false`.
-	     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
 	     */
-	    static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk?: boolean, requirePk?: boolean, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T>;
+	    static create<T>({ schemaMapModel, isCompositePk, requirePk, schemaMapPk, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
 	    /**
-	     * Compiled rules for compound model primary key.
+	     * Compiled rules for model primary key.
 	     */
 	    protected _compiledPk: joi.ObjectSchema;
 	    /**
@@ -1041,7 +1055,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	    protected _compiledPartial: joi.ObjectSchema;
 	    /**
 	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
+	     * @param {boolean} _isCompositePk Whether the primary key is made of multiple properties. Default to `false`
 	     *     This param is IGNORED if param `schemaMapPk` has value.
 	     * @param {boolean} requirePk Whether to validate ID.
 	     *     This param is IGNORED if param `schemaMapPk` has value.
@@ -1050,7 +1064,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
 	    readonly schemaMap: joi.SchemaMap;
 	    readonly schemaMapPk: joi.SchemaMap;
-	    readonly isCompoundPk: boolean;
+	    readonly isCompositePk: boolean;
 	    /**
 	     * Validates model PK.
 	     */
@@ -1126,19 +1140,36 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     * Validates then converts an object to type <T>.
 	     * but ONLY properties with value are validated and copied.
 	     * Note that `required` validation is IGNORED.
-	     * @param {any | any[]} source An object or array of objects to be translated.
+	     * @param {object} source The object to be translated.
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
-	    partial(source: any | any[], options?: MappingOptions): Partial<T> | Partial<T>[];
+	    partial(source: object, options?: MappingOptions): Partial<T>;
+	    /**
+	     * Validates then converts a list of objects to type <T>.
+	     * but ONLY properties with value are validated and copied.
+	     * Note that `required` validation is IGNORED.
+	     * @param {object[]} sources A list of objects to be translated.
+	     *
+	     * @throws {ValidationError} If no `errorCallback` is provided.
+	     */
+	    partialMany(sources: object[], options?: MappingOptions): Partial<T>[];
 	    /**
 	     * Validates then converts an object to type <T>.
 	     * ALL properties are validated and copied regardless with or without value.
-	     * @param {any | any[]} source An object or array of objects to be translated.
+	     * @param {object} source The object to be translated.
 	     *
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
-	    whole(source: any | any[], options?: MappingOptions): T | T[];
+	    whole(source: object, options?: MappingOptions): T;
+	    /**
+	     * Validates then converts a list of objects to type <T>.
+	     * ALL properties are validated and copied regardless with or without value.
+	     * @param {object[]} sources The list of objects to be translated.
+	     *
+	     * @throws {ValidationError} If no `errorCallback` is provided.
+	     */
+	    wholeMany(sources: object[], options?: MappingOptions): T[];
 	    /**
 	     * Initializes the model mapping engine.
 	     */

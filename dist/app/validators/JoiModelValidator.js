@@ -7,7 +7,7 @@ const ValidationError_1 = require("./ValidationError");
 class JoiModelValidator {
     /**
      * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
+     * @param {boolean} _isCompositePk Whether the primary key is made of multiple properties. Default to `false`
      *     This param is IGNORED if param `schemaMapPk` has value.
      * @param {boolean} requirePk Whether to validate ID.
      *     This param is IGNORED if param `schemaMapPk` has value.
@@ -26,11 +26,6 @@ class JoiModelValidator {
             this._schemaMapPk = _schemaMapPk;
         }
         else if (_isCompositePk) {
-            // this._compiledPk = joi.object({
-            //         id: idSchema,
-            //         tenantId: idSchema
-            //     })
-            //     .required();
             this._schemaMapPk = {
                 id: idSchema,
                 tenantId: idSchema,
@@ -43,16 +38,9 @@ class JoiModelValidator {
     }
     /**
      * Builds a new instance of ModelValidatorBase.
-     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
-     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
-     *     This param is IGNORED if param `schemaMapPk` has value.
-     * @param {boolean} requirePk Whether to validate PK.
-     *     This param is IGNORED if param `schemaMapPk` has value.
-     *     Default to be `false`.
-     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
      */
-    static create(schemaMapModel, isCompoundPk = false, requirePk = false, schemaMapPk) {
-        const validator = new JoiModelValidator(schemaMapModel, isCompoundPk, requirePk, schemaMapPk);
+    static create({ schemaMapModel, isCompositePk = false, requirePk = false, schemaMapPk, }) {
+        const validator = new JoiModelValidator(schemaMapModel, isCompositePk, requirePk, schemaMapPk);
         validator.compile();
         return validator;
     }
@@ -62,7 +50,7 @@ class JoiModelValidator {
     get schemaMapPk() {
         return this._schemaMapPk;
     }
-    get isCompoundPk() {
+    get isCompositePk() {
         return this._isCompositePk;
     }
     /**

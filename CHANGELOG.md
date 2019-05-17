@@ -4,6 +4,8 @@
 - New getter `ModelAutoMapper.internalMapper` for advanced mapping configuration.
 - Replaced term "DTO" with "Domain model".
 - Added `JoiExtended.dateString` validation rule.
+- Split `ModelAutoMapper.whole` and `ModelAutoMapper.partial` to `whole`, `wholeMany`, `partial` and `partialMany`.
+- `JoiModelValidator.create` now accepts single param object.
 
 ### 1.3.1
 - Removed script "postinstall" from `package.json`.

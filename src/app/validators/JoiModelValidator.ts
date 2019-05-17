@@ -9,28 +9,47 @@ export interface ValidationOptions extends joi.ValidationOptions {
     // Re-brand this interface
 }
 
+export type JoiModelValidatorCreateOptions = {
+    /**
+     * Rules to validate model properties.
+     */
+    schemaMapModel: joi.SchemaMap,
+
+    /**
+     * Whether the primary key is composite. Default to `false`.
+     * This param is IGNORED if param `schemaMapPk` has value.
+     */
+    isCompositePk?: boolean,
+
+    /**
+     * Whether to validate PK.
+     * This param is IGNORED if param `schemaMapPk` has value.
+     * Default to be `false`.
+     */
+    requirePk?: boolean,
+
+    /**
+     * Rule to validate model PK.
+     */
+    schemaMapPk?: joi.SchemaMap,
+}
+
 export class JoiModelValidator<T> {
 
     /**
      * Builds a new instance of ModelValidatorBase.
-     * @param {joi.SchemaMap} schemaMapModel Rules to validate model properties.
-     * @param {boolean} isCompoundPk Whether the primary key is compound. Default to `false`.
-     *     This param is IGNORED if param `schemaMapPk` has value.
-     * @param {boolean} requirePk Whether to validate PK.
-     *     This param is IGNORED if param `schemaMapPk` has value.
-     *     Default to be `false`.
-     * @param {joi.SchemaMap} schemaMapPk Rule to validate model PK.
      */
-    public static create<T>(schemaMapModel: joi.SchemaMap, isCompoundPk: boolean = false,
-            requirePk: boolean = false, schemaMapPk?: joi.SchemaMap): JoiModelValidator<T> {
-        const validator = new JoiModelValidator<T>(schemaMapModel, isCompoundPk, requirePk, schemaMapPk)
-        validator.compile()
-        return validator
+    public static create<T>({
+            schemaMapModel, isCompositePk = false, requirePk = false, schemaMapPk,
+        }: JoiModelValidatorCreateOptions): JoiModelValidator<T> {
+            const validator = new JoiModelValidator<T>(schemaMapModel, isCompositePk, requirePk, schemaMapPk)
+            validator.compile()
+            return validator
     }
 
 
     /**
-     * Compiled rules for compound model primary key.
+     * Compiled rules for model primary key.
      */
     protected _compiledPk: joi.ObjectSchema
 
@@ -48,7 +67,7 @@ export class JoiModelValidator<T> {
 
     /**
      * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-     * @param {boolean} _isCompositePk Whether the primary key is compound. Default to `false`
+     * @param {boolean} _isCompositePk Whether the primary key is made of multiple properties. Default to `false`
      *     This param is IGNORED if param `schemaMapPk` has value.
      * @param {boolean} requirePk Whether to validate ID.
      *     This param is IGNORED if param `schemaMapPk` has value.
@@ -69,15 +88,10 @@ export class JoiModelValidator<T> {
         if (_schemaMapPk) {
             this._schemaMapPk = _schemaMapPk
         } else if (_isCompositePk) {
-            // this._compiledPk = joi.object({
-            //         id: idSchema,
-            //         tenantId: idSchema
-            //     })
-            //     .required();
             this._schemaMapPk = {
-                    id: idSchema,
-                    tenantId: idSchema,
-                }
+                id: idSchema,
+                tenantId: idSchema,
+            }
         } else {
             this._schemaMapPk = { id: idSchema }
             this._compiledPk = <any>idSchema
@@ -93,7 +107,7 @@ export class JoiModelValidator<T> {
         return this._schemaMapPk
     }
 
-    public get isCompoundPk(): boolean {
+    public get isCompositePk(): boolean {
         return this._isCompositePk
     }
 

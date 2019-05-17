@@ -6,7 +6,13 @@ import { SampleModel } from '../validators/SampleModel'
 import { ICreateMapFluentFunctions } from '../../app/interfaces/automapper'
 
 
-const itemValidator = JoiModelValidator.create({ name: joi.string().required() }, false, false)
+const itemValidator = JoiModelValidator.create({
+    schemaMapModel: {
+        name: joi.string().required(),
+    },
+    isCompositePk: false,
+    requirePk: false,
+})
 
 
 /**
@@ -163,8 +169,9 @@ describe('ModelAutoMapper', () => {
             }
 
             // Assert
-            expect(converted).to.equal(input)
+            error && console.error(error)
             expect(error).not.to.exist
+            expect(converted).to.equal(input)
         })
     })
 
@@ -218,48 +225,6 @@ describe('ModelAutoMapper', () => {
             expect(convertedTwo.address).to.equal(sourceTwo.address)
             expect(convertedTwo.age).not.to.exist
             expect(convertedTwo.gender).not.to.exist
-        })
-
-        it('Should return an array if success', () => {
-            // Arrange
-            const sourceArray = [
-                {
-                    theID: 1,
-                    name: 'Gennova123',
-                    address: 'Unlimited length street name',
-                    age: 18,
-                    gender: 'male',
-                },
-                {
-                    theID: 1,
-                    name: 'gen-no-va',
-                    address: '^!@',
-                },
-            ]
-            let error, convertedArr
-
-            // Act
-            try {
-                convertedArr = globalTranslator.whole(sourceArray) as SampleModel[]
-            } catch (err) {
-                error = err
-            }
-
-            // Assert
-            error && console.error(error)
-
-            expect(error).not.to.exist
-            expect(convertedArr).to.exist
-            expect(convertedArr).to.be.instanceOf(Array)
-            expect(convertedArr.length).to.equal(2)
-
-            convertedArr.forEach((model, i) => {
-                expect(model, `Assert model[${i}]`).is.instanceOf(SampleModel)
-                expect(model.name, `Assert model[${i}].name`).to.equal(sourceArray[i].name)
-                expect(model.address, `Assert model[${i}].address`).to.equal(sourceArray[i].address)
-                expect(model.age, `Assert model[${i}].age`).to.equal(sourceArray[i]['age'])
-                expect(model.gender, `Assert model[${i}].gender`).to.equal(sourceArray[i]['gender'])
-            })
         })
 
         it('Should do nested map with derived translator class', () => {
@@ -361,6 +326,7 @@ describe('ModelAutoMapper', () => {
             }
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.equal(inputOne)
 
@@ -373,30 +339,33 @@ describe('ModelAutoMapper', () => {
             }
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.equal(inputTwo)
 
 
             // Act 3
             try {
-                converted = globalTranslator.whole(inputThree)
+                converted = globalTranslator.whole(inputThree as any)
             } catch (err) {
                 error = err
             }
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.equal(inputThree)
 
 
             // Act 4
             try {
-                converted = globalTranslator.whole(inputFour)
+                converted = globalTranslator.whole(inputFour as any)
             } catch (err) {
                 error = err
             }
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.equal(inputFour)
         })
@@ -420,6 +389,7 @@ describe('ModelAutoMapper', () => {
             }
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.exist
             expect(converted).is.instanceOf(SampleModel)
@@ -556,6 +526,7 @@ describe('ModelAutoMapper', () => {
             }) as SampleModel
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.exist
             expect(converted.name).to.equal(source.name)
@@ -582,6 +553,7 @@ describe('ModelAutoMapper', () => {
             }) as SampleModel
 
             // Assert
+            error && console.error(error)
             expect(error).not.to.exist
             expect(converted).to.exist
             expect(converted.name).to.equal(source.name)
@@ -591,8 +563,54 @@ describe('ModelAutoMapper', () => {
 
     }) // END describe 'whole'
 
+    describe('wholeMany', () => {
+        it('Should return an array if success', () => {
+            // Arrange
+            const sourceArr = [
+                {
+                    theID: 1,
+                    name: 'Gennova123',
+                    address: 'Unlimited length street name',
+                    age: 18,
+                    gender: 'male',
+                },
+                {
+                    theID: 2,
+                    name: 'gen-no-va',
+                    address: '^!@',
+                },
+            ]
+            let error: ValidationError,
+                convertedArr: SampleModel[]
+
+            // Act
+            try {
+                convertedArr = globalTranslator.wholeMany(sourceArr)
+            } catch (err) {
+                error = err
+            }
+
+            // Assert
+            error && console.error(error)
+
+            expect(error).not.to.exist
+            expect(convertedArr).to.exist
+            expect(convertedArr).to.be.instanceOf(Array)
+            expect(convertedArr.length).to.equal(2)
+
+            convertedArr.forEach((model, i) => {
+                expect(model, `Assert model[${i}]`).is.instanceOf(SampleModel)
+                expect(model.name, `Assert model[${i}].name`).to.equal(sourceArr[i].name)
+                expect(model.address, `Assert model[${i}].address`).to.equal(sourceArr[i].address)
+                expect(model.age, `Assert model[${i}].age`).to.equal(sourceArr[i]['age'])
+                expect(model.gender, `Assert model[${i}].gender`).to.equal(sourceArr[i]['gender'])
+            })
+        })
+
+    }) // END describe 'wholeMany'
+
     describe('partial', () => {
-        it('Should copy properties with value', () => {
+        it('Should copy specified properties of an object', () => {
             // Arrange
             const source = {
                     theID: 1,
@@ -618,4 +636,51 @@ describe('ModelAutoMapper', () => {
             expect(converted.gender).not.to.exist
         })
     }) // END describe 'partial'
+
+    describe('partialMany', () => {
+        it('Should copy specified properties of an array', () => {
+            // Arrange
+            const sourceArr = [
+                {
+                    // theID: 1, // => not specified, although this property is required
+                    name: 'Gennova123',
+                    address: 'Unlimited length street name',
+                    age: 18,
+                    gender: 'male',
+                },
+                {
+                    theID: 2,
+                    // name: 'gen-no-va',
+                    address: '^!@',
+                },
+            ]
+            let error: ValidationError,
+                convertedArr: Partial<SampleModel>[]
+
+            // Act
+            try {
+                convertedArr = globalTranslator.partialMany(sourceArr)
+            } catch (err) {
+                error = err
+            }
+
+            // Assert
+
+            error && console.error(error)
+            expect(error).not.to.exist
+            expect(convertedArr).to.exist
+            expect(convertedArr).to.be.instanceOf(Array)
+            expect(convertedArr.length).to.equal(2)
+
+            expect(convertedArr[0]).is.instanceOf(SampleModel)
+            expect(convertedArr[0].name).to.equal(sourceArr[0].name)
+            expect(convertedArr[0].address).to.equal(sourceArr[0].address)
+            expect(convertedArr[0].age).to.equal(sourceArr[0].age)
+            expect(convertedArr[0].gender).to.equal(sourceArr[0].gender)
+
+            expect(convertedArr[1]).is.instanceOf(SampleModel)
+            expect(convertedArr[1].theID).to.equal(sourceArr[1].theID)
+            expect(convertedArr[1].address).to.equal(sourceArr[1].address)
+        })
+    }) // END describe 'partialMany'
 })

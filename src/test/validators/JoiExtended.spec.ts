@@ -221,7 +221,7 @@ describe('JoiExtended', () => {
             expect((<moment.Moment><any>value).isSame(momentOne)).to.be.true
         })
 
-        it('Should return an error object if invalid', () => {
+        it('Should return an error object if input string is invalid', () => {
             // Arrange
                 // Invalid date separator /
             const targetOne = '2019/05/15T09:06:02+07:00',
@@ -230,8 +230,8 @@ describe('JoiExtended', () => {
 
             // Act
             const schema = extJoi.genn().dateString()
-            const { error: errorOne } = schema.validate(targetOne, { convert: false })
-            const { error: errorTwo } = schema.validate(targetTwo, { convert: false })
+            const { error: errorOne } = schema.validate(targetOne)
+            const { error: errorTwo } = schema.validate(targetTwo)
 
             // Assert
             expect(errorOne).to.exist
@@ -240,6 +240,26 @@ describe('JoiExtended', () => {
 
             expect(errorTwo).to.exist
             expect(errorTwo.message).to.equal('"value" needs all components to have valid values')
+        })
+
+        it('Should return an error object if input is not string', () => {
+            // Arrange
+            const targetOne = {},
+                targetTwo = 201913300906020500
+
+            // Act
+            const schema = extJoi.genn().dateString({ isUTC: true })
+            const { error: errorOne } = schema.validate(targetOne)
+            const { error: errorTwo } = schema.validate(targetTwo)
+
+            // Assert
+            const ERR_MSG = '"value" needs to be a date string compliant' +
+                ' with W3C Date and Time Formats (YYYY-MM-DDThh:mm:ssZ)'
+            expect(errorOne).to.exist
+            expect(errorOne.message).to.equal(ERR_MSG)
+
+            expect(errorTwo).to.exist
+            expect(errorTwo.message).to.equal(ERR_MSG)
         })
 
     }) // END describe 'dateString'

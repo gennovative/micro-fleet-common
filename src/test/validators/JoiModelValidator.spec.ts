@@ -9,17 +9,19 @@ let globalValidator: JoiModelValidator<SampleModel>
 
 describe('JoiModelValidator', () => {
     beforeEach(() => {
-        globalValidator = JoiModelValidator.create<SampleModel>(
-            {
+        globalValidator = JoiModelValidator.create<SampleModel>({
+            schemaMapModel: {
                 name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
                 address: joi.string().required(),
                 age: joi.number().min(15).max(99).integer().optional(),
                 gender: joi.only('male', 'female').optional(),
             },
-            null,
-            false,
-            { theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER) }
-        )
+            isCompositePk: false,
+            requirePk: false,
+            schemaMapPk: {
+                theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER),
+            },
+        })
     })
 
     describe('getters', () => {
@@ -32,7 +34,7 @@ describe('JoiModelValidator', () => {
         })
 
         it('isCompoundPk', () => {
-            expect(globalValidator.isCompoundPk).to.equal(globalValidator['_isCompositePk'])
+            expect(globalValidator.isCompositePk).to.equal(globalValidator['_isCompositePk'])
         })
     }) // END describe 'getters'
 
@@ -53,15 +55,15 @@ describe('JoiModelValidator', () => {
 
         it('Should return the validated compound PK if valid', () => {
             // Arrange
-            const validator = JoiModelValidator.create<SampleModel>(
-                    { name: joi.string() },
-                    true,
-                    true,
-                    {
+            const validator = JoiModelValidator.create<SampleModel>({
+                    schemaMapModel: { name: joi.string() },
+                    isCompositePk: true,
+                    requirePk: true,
+                    schemaMapPk: {
                         id: extJoi.genn().bigint().required(),
                         tenantId: extJoi.genn().bigint().required(),
-                    }
-                ),
+                    },
+                }),
                 target = <TenantPk>{
                     id: 9007199254740991n + 999n, // Number.MAX_SAFE_INTEGER + 999n
                     tenantId: 9007199254740991n + 888n,
@@ -159,16 +161,16 @@ describe('JoiModelValidator', () => {
 
         it('Should validate model ID if required', () => {
             // Arrange
-            const validator = JoiModelValidator.create<SampleModel>(
-                    {
+            const validator = JoiModelValidator.create<SampleModel>({
+                    schemaMapModel: {
                         name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
                         address: joi.string().required(),
                         age: joi.number().min(15).max(99).integer().optional(),
                         gender: joi.only('male', 'female').optional(),
                     },
-                    null,
-                    true
-                ),
+                    isCompositePk: null,
+                    requirePk: true,
+                }),
                 target = {
                     name: 'Gennova123',
                     address: 'Unlimited length street name',
@@ -189,14 +191,14 @@ describe('JoiModelValidator', () => {
 
         it('Should validate compound PK if required', () => {
             // Arrange
-            const validator = JoiModelValidator.create<SampleModel>(
-                    { name: joi.string() },
-                    true,
-                    true
-                ),
-                target = {
-                    name: 'Gennova123',
-                }
+            const validator = JoiModelValidator.create<SampleModel>({
+                schemaMapModel: { name: joi.string() },
+                isCompositePk: true,
+                requirePk: true,
+            }),
+            target = {
+                name: 'Gennova123',
+            }
 
             // Act
             const [error, validated] = validator.whole(target)

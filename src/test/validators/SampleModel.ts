@@ -13,17 +13,17 @@ export class SampleModel {
     public readonly gender: 'male' | 'female' = undefined
 }
 
-SampleModel.validator = JoiModelValidator.create<SampleModel>(
-    {
+SampleModel.validator = JoiModelValidator.create<SampleModel>({
+    schemaMapModel: {
         name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
         address: joi.string().required(),
         age: joi.number().min(15).max(99).integer()
-            .allow(null).optional(), // This pair (allow, optional) must go together.
+            .allow(null).optional(),
         gender: joi.only('male', 'female').allow(null).optional(),
     },
-    null,
-    false,
-    {
-        theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required(),
-    }
-)
+    isCompositePk: null,
+    requirePk: false,
+    schemaMapPk: {
+        theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER),
+    },
+})
