@@ -29,31 +29,24 @@ export type ValidationErrorItem = {
  */
 export class ValidationError extends MinorException {
 
-    public readonly details: ValidationErrorItem[]
-
-
-    constructor(joiDetails: joi.ValidationErrorItem[]) {
-        super()
-        this.name = 'ValidationError'
-        this.details = this.parseDetails(joiDetails)
-        Error.captureStackTrace(this, ValidationError)
-    }
-
-    private parseDetails(joiDetails: joi.ValidationErrorItem[]): ValidationErrorItem[] {
-        const details: ValidationErrorItem[] = []
+    public static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError {
+        let details: ValidationErrorItem[]
         /* istanbul ignore next */
-        if (!joiDetails || !joiDetails.length) {
-            return details
-        }
-
-        joiDetails.forEach(d => {
-            details.push({
+        if (joiDetails && joiDetails.length) {
+            details = joiDetails.map(d => ({
                 message: d.message,
                 path: d.path,
-                value: d.context.value,
-            })
-        })
+                value: (d.context ? d.context.value : d['value']),
+            }))
+        }
+        return new ValidationError(details || [])
+    }
 
-        return details
+    constructor(
+        public readonly details: ValidationErrorItem[],
+    ) {
+        super()
+        this.name = 'ValidationError'
+        Error.captureStackTrace(this, ValidationError)
     }
 }

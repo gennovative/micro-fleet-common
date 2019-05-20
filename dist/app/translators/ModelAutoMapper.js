@@ -17,7 +17,7 @@ class ModelAutoMapper {
         this.ModelClass = ModelClass;
         this._validator = _validator;
         this.enableValidation = (_validator != null);
-        this._internalMapper = this.createMap();
+        this._internalMapper = this._createMap();
     }
     /**
      * Gets the internal AutoMapper instance for advanced configuration.
@@ -56,7 +56,7 @@ class ModelAutoMapper {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     partial(source, options) {
-        return this.tryTranslate('partial', source, options);
+        return this._tryTranslate('partial', source, options);
     }
     /**
      * Validates then converts a list of objects to type <T>.
@@ -67,7 +67,7 @@ class ModelAutoMapper {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     partialMany(sources, options) {
-        return this.tryTranslate('partial', sources, options);
+        return this._tryTranslate('partial', sources, options);
     }
     /**
      * Validates then converts an object to type <T>.
@@ -77,7 +77,7 @@ class ModelAutoMapper {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     whole(source, options) {
-        return this.tryTranslate('whole', source, options);
+        return this._tryTranslate('whole', source, options);
     }
     /**
      * Validates then converts a list of objects to type <T>.
@@ -87,21 +87,21 @@ class ModelAutoMapper {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     wholeMany(sources, options) {
-        return this.tryTranslate('whole', sources, options);
+        return this._tryTranslate('whole', sources, options);
     }
     /**
      * Initializes the model mapping engine.
      */
-    createMap() {
+    _createMap() {
         return automapper.createMap('any', this.ModelClass);
     }
     /**
      * Is invoked after source object is validated to map source object to target model.
      */
-    map(source) {
+    _map(source) {
         return automapper.map('any', this.ModelClass, source);
     }
-    tryTranslate(fn, source, options) {
+    _tryTranslate(fn, source, options) {
         if (source == null || typeof source !== 'object') {
             return source;
         }
@@ -110,13 +110,13 @@ class ModelAutoMapper {
         }, options);
         // Translate an array or single item
         if (Array.isArray(source)) {
-            return source.map(s => this.translate(fn, s, options));
+            return source.map(s => this._translate(fn, s, options));
         }
-        return this.translate(fn, source, options);
+        return this._translate(fn, source, options);
     }
-    translate(fn, source, options) {
+    _translate(fn, source, options) {
         if (!options.enableValidation) {
-            return this.map(source);
+            return this._map(source);
         }
         const [error, model] = this.validator[fn](source), handleError = function (err, callback) {
             if (!err) {
@@ -132,7 +132,7 @@ class ModelAutoMapper {
             return null;
         }
         try {
-            return this.map(model);
+            return this._map(model);
         }
         catch (ex) {
             handleError(ex, options.errorCallback); // Mapping error

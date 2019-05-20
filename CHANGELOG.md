@@ -6,6 +6,8 @@
 - Added `JoiExtended.dateString` validation rule.
 - Split `ModelAutoMapper.whole` and `ModelAutoMapper.partial` to `whole`, `wholeMany`, `partial` and `partialMany`.
 - `JoiModelValidator.create` now accepts single param object.
+- Implemented `AccessorSupportMapper` to fix [#2](https://github.com/gennovative/micro-fleet-common/issues/2) (ModelAutoMapper should support mapping getters and setters)
+- Added static method `ValidationError.fromJoi` to fix [#3](https://github.com/gennovative/micro-fleet-common/issues/3) (ValidationError constructor should not reference joi)
 
 ### 1.3.1
 - Removed script "postinstall" from `package.json`.

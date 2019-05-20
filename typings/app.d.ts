@@ -1002,8 +1002,9 @@ declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
 	 */
 	export class ValidationError extends MinorException {
 	    readonly details: ValidationErrorItem[];
-	    constructor(joiDetails: joi.ValidationErrorItem[]);
-	    	}
+	    static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError;
+	    constructor(details: ValidationErrorItem[]);
+	}
 
 }
 declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
@@ -1173,13 +1174,13 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	    /**
 	     * Initializes the model mapping engine.
 	     */
-	    protected createMap(): ICreateMapFluentFunctions;
+	    protected _createMap(): ICreateMapFluentFunctions;
 	    /**
 	     * Is invoked after source object is validated to map source object to target model.
 	     */
-	    protected map(source: any): T;
-	    protected tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
-	    protected translate(fn: string, source: any, options: MappingOptions): T;
+	    protected _map(source: any): T;
+	    protected _tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
+	    protected _translate(fn: string, source: any, options: MappingOptions): T;
 	}
 
 }
@@ -1399,6 +1400,31 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' {
+	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
+	export type AccessorDescription = {
+	    name: string;
+	    isGetter: boolean;
+	    isSetter: boolean;
+	};
+	/**
+	 * A model auto mapper which supports getter and setter.
+	 */
+	export class AccessorSupportMapper<T> extends ModelAutoMapper<T> {
+	    /**
+	     * @override
+	     */
+	    protected _createMap(): ICreateMapFluentFunctions;
+	    /**
+	     * A replacement for native `AutoMapper.forAllMembers`,
+	     * working well with our custom converter.
+	     */
+	    protected _forAllMembers(destObj: any, destPropName: string, srcObj: any): void;
+	    protected _forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void;
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/lazyInject' {
 	/**
 	 * Injects value to the decorated property.
@@ -1421,6 +1447,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';
 	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
+	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/validators/JoiExtended';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';

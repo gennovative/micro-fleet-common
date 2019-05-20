@@ -59,7 +59,7 @@ class JoiModelValidator {
     pk(pk) {
         Guard_1.Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!');
         const { error, value } = this._compiledPk.validate(pk);
-        return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
+        return (error) ? [ValidationError_1.ValidationError.fromJoi(error.details), null] : [null, value];
     }
     /**
      * Validates model for creation operation, which doesn't need `pk` property.
@@ -120,7 +120,7 @@ class JoiModelValidator {
             stripUnknown: true,
         }, options);
         const { error, value } = schema.validate(target, opts);
-        return (error) ? [new ValidationError_1.ValidationError(error.details), null] : [null, value];
+        return (error) ? [ValidationError_1.ValidationError.fromJoi(error.details), null] : [null, value];
     }
 }
 exports.JoiModelValidator = JoiModelValidator;

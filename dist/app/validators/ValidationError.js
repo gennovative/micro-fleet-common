@@ -5,26 +5,23 @@ const Exceptions_1 = require("../models/Exceptions");
  * Represents an error when a model does not pass validation.
  */
 class ValidationError extends Exceptions_1.MinorException {
-    constructor(joiDetails) {
+    constructor(details) {
         super();
+        this.details = details;
         this.name = 'ValidationError';
-        this.details = this.parseDetails(joiDetails);
         Error.captureStackTrace(this, ValidationError);
     }
-    parseDetails(joiDetails) {
-        const details = [];
+    static fromJoi(joiDetails) {
+        let details;
         /* istanbul ignore next */
-        if (!joiDetails || !joiDetails.length) {
-            return details;
-        }
-        joiDetails.forEach(d => {
-            details.push({
+        if (joiDetails && joiDetails.length) {
+            details = joiDetails.map(d => ({
                 message: d.message,
                 path: d.path,
-                value: d.context.value,
-            });
-        });
-        return details;
+                value: (d.context ? d.context.value : d['value']),
+            }));
+        }
+        return new ValidationError(details || []);
     }
 }
 exports.ValidationError = ValidationError;

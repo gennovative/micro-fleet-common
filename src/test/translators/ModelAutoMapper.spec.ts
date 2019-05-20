@@ -33,7 +33,7 @@ class NestingTranslator extends ModelAutoMapper<SampleModel> {
     /**
      * @override
      */
-    protected createMap(): ICreateMapFluentFunctions {
+    protected _createMap(): ICreateMapFluentFunctions {
         return automapper.createMap('any', this.ModelClass)
             .forSourceMember('items', transformation)
     }

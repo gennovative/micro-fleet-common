@@ -118,7 +118,7 @@ export class JoiModelValidator<T> {
     public pk(pk: any): [ValidationError, any] {
         Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!')
         const { error, value } = this._compiledPk.validate<any>(pk)
-        return (error) ? [new ValidationError(error.details), null] : [null, value]
+        return (error) ? [ ValidationError.fromJoi(error.details), null] : [null, value]
     }
 
     /**
@@ -189,6 +189,6 @@ export class JoiModelValidator<T> {
 
         const { error, value } = schema.validate<T>(target, opts)
 
-        return (error) ? [new ValidationError(error.details), null] : [null, value]
+        return (error) ? [ ValidationError.fromJoi(error.details), null] : [null, value]
     }
 }

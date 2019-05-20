@@ -45,7 +45,7 @@ export class ModelAutoMapper<T extends Object> {
         protected _validator?: JoiModelValidator<T>
     ) {
         this.enableValidation = (_validator != null)
-        this._internalMapper = this.createMap()
+        this._internalMapper = this._createMap()
     }
 
 
@@ -87,7 +87,7 @@ export class ModelAutoMapper<T extends Object> {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     public partial(source: object, options?: MappingOptions): Partial<T> {
-        return this.tryTranslate('partial', source, options) as Partial<T>
+        return this._tryTranslate('partial', source, options) as Partial<T>
     }
 
     /**
@@ -99,7 +99,7 @@ export class ModelAutoMapper<T extends Object> {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     public partialMany(sources: object[], options?: MappingOptions): Partial<T>[] {
-        return this.tryTranslate('partial', sources, options) as Partial<T>[]
+        return this._tryTranslate('partial', sources, options) as Partial<T>[]
     }
 
     /**
@@ -110,7 +110,7 @@ export class ModelAutoMapper<T extends Object> {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     public whole(source: object, options?: MappingOptions): T {
-        return this.tryTranslate('whole', source, options) as T
+        return this._tryTranslate('whole', source, options) as T
     }
 
     /**
@@ -121,26 +121,26 @@ export class ModelAutoMapper<T extends Object> {
      * @throws {ValidationError} If no `errorCallback` is provided.
      */
     public wholeMany(sources: object[], options?: MappingOptions): T[] {
-        return this.tryTranslate('whole', sources, options) as T[]
+        return this._tryTranslate('whole', sources, options) as T[]
     }
 
 
     /**
      * Initializes the model mapping engine.
      */
-    protected createMap(): ICreateMapFluentFunctions {
+    protected _createMap(): ICreateMapFluentFunctions {
         return automapper.createMap('any', this.ModelClass)
     }
 
     /**
      * Is invoked after source object is validated to map source object to target model.
      */
-    protected map(source: any): T {
+    protected _map(source: any): T {
         return automapper.map('any', this.ModelClass, source)
     }
 
 
-    protected tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[] {
+    protected _tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[] {
         if (source == null || typeof source !== 'object') { return source }
 
         options = Object.assign(<MappingOptions>{
@@ -149,14 +149,14 @@ export class ModelAutoMapper<T extends Object> {
 
         // Translate an array or single item
         if (Array.isArray(source)) {
-            return source.map(s => this.translate(fn, s, options))
+            return source.map(s => this._translate(fn, s, options))
         }
-        return this.translate(fn, source, options)
+        return this._translate(fn, source, options)
     }
 
-    protected translate(fn: string, source: any, options: MappingOptions): T {
+    protected _translate(fn: string, source: any, options: MappingOptions): T {
         if (!options.enableValidation) {
-            return this.map(source)
+            return this._map(source)
         }
 
         const [error, model] = this.validator[fn](source),
@@ -173,7 +173,7 @@ export class ModelAutoMapper<T extends Object> {
             return null
         }
         try {
-            return this.map(model)
+            return this._map(model)
         } catch (ex) {
             handleError(ex, options.errorCallback) // Mapping error
         }
