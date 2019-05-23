@@ -64,7 +64,7 @@ describe('JoiModelValidator', () => {
                         tenantId: extJoi.genn().bigint().required(),
                     },
                 }),
-                target = <TenantPk>{
+                target = {
                     id: 9007199254740991n + 999n, // Number.MAX_SAFE_INTEGER + 999n
                     tenantId: 9007199254740991n + 888n,
                 }

@@ -11,16 +11,18 @@ function isGetter(obj, prop) {
     const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), prop);
     return Boolean(descriptor) && Boolean(descriptor.get);
 }
-/**
- * Checks if `obj.prop` is a setter.
- */
-// function isSetter(obj: object, prop: string): boolean {
-//     const descriptor = Object.getOwnPropertyDescriptor(
-//         Object.getPrototypeOf(obj),
-//         prop,
-//     )
-//     return Boolean(descriptor) && Boolean(descriptor.set)
-// }
+function capitalize(source) {
+    source = source.replace(/[_#]/g, '');
+    return `${source.charAt(0).toUpperCase()}${source.substr(1)}`;
+}
+function setFunc(obj, prop) {
+    const setName = `set${capitalize(prop)}`;
+    return (typeof obj[setName] === 'function') ? obj[setName] : null;
+}
+function getFunc(obj, prop) {
+    const getName = `get${capitalize(prop)}`;
+    return (typeof obj[getName] === 'function') ? obj[getName] : null;
+}
 function describeAccessor(obj) {
     return (prop) => {
         const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), prop);
@@ -68,11 +70,19 @@ class AccessorSupportMapper extends ModelAutoMapper_1.ModelAutoMapper {
      * working well with our custom converter.
      */
     _forAllMembers(destObj, destPropName, srcObj) {
-        if (destPropName.startsWith('_') // Private field (by convention)
-            || destPropName.startsWith('#')) { // Native private field (>= Node v12)
+        const setFn = setFunc(destObj, destPropName);
+        if (!setFn &&
+            (destPropName.startsWith('_') // Private field (by convention)
+                || destPropName.startsWith('#') // Native private field (>= Node v12)
+            )) {
             return;
         }
-        destObj[destPropName] = srcObj[destPropName];
+        if (setFn) {
+            setFn.call(destObj, srcObj[destPropName], srcObj);
+        }
+        else {
+            destObj[destPropName] = srcObj[destPropName];
+        }
     }
     _forAllAccessors(destObj, srcObj, desc) {
         if (desc.isSetter) {
@@ -81,8 +91,8 @@ class AccessorSupportMapper extends ModelAutoMapper_1.ModelAutoMapper {
                 srcVal = srcObj[desc.name];
             }
             else { // If src getter isn't available, we try method `getProp()`
-                const getFn = srcObj[`get${desc.name.toUpperCase()}`]; // Eg: name => getName
-                if (typeof getFn === 'function') {
+                const getFn = getFunc(srcObj, desc.name); // Eg: name => getName
+                if (getFn) {
                     srcVal = getFn.call(srcObj); // Equiv: srcObj.getName()
                 }
                 else {

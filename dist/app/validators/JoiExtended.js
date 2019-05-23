@@ -10,11 +10,23 @@ const bigintRule = {
         this['_flags'].bigint = true; // Set a flag for later use
     },
     validate(params, value, state, options) {
-        if (typeof value !== 'bigint') {
-            // Generate an error, state and options need to be passed
-            return this.createError('genn.bigint', { v: value }, state, options);
+        let isBigInt = true;
+        try {
+            // '987654321' => valid
+            // 'ABC876' => invalid
+            // Other non-bigint non-string values are all invalid
+            isBigInt = (typeof value === 'string')
+                ? (typeof BigInt(value) === 'bigint')
+                : (typeof value === 'bigint');
         }
-        return value; // Everything is OK
+        catch {
+            isBigInt = false;
+        }
+        return isBigInt
+            // Everything is OK
+            ? value
+            // Generate an error, state and options need to be passed
+            : this.createError('genn.bigint', { v: value }, state, options);
     },
 };
 function toDate(dateString) {
@@ -83,7 +95,12 @@ const joiExtensions = {
     pre(value, state, options) {
         const flags = this['_flags'];
         if (flags.bigint === true) {
-            return (options.convert ? BigInt(value) : value);
+            try {
+                return (options.convert ? BigInt(value) : value);
+            }
+            catch {
+                return value;
+            }
         }
         return value; // Keep the value as it was
     },

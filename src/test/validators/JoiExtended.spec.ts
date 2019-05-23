@@ -32,15 +32,35 @@ describe('JoiExtended', () => {
             expect(valueTwo).to.equal(BigInt(targetTwo))
         })
 
+        it('Should return an error object if input cannot be converted to bigint', () => {
+            // Arrange
+            const targetOne = {},
+                targetTwo = 'ABC123'
+
+            // Act
+            const schema = extJoi.genn().bigint()
+            const { error: errorOne } = schema.validate(targetOne)
+            const { error: errorTwo } = schema.validate(targetTwo)
+
+            // Assert
+            expect(errorOne).to.to.exist
+            expect(errorOne.message).to.equal('"value" needs to be a bigint')
+
+            expect(errorTwo).to.to.exist
+            expect(errorTwo.message).to.equal('"value" needs to be a bigint')
+        })
+
         it('Should return the value without convert if valid', () => {
             // Arrange
             const targetOne = 12345n,
-                targetTwo = BigInt(Number.MAX_SAFE_INTEGER) + 999n
+                targetTwo = BigInt(Number.MAX_SAFE_INTEGER) + 999n,
+                targetThree = '98765432135798642099887766554433221100'
 
             // Act
             const schema = extJoi.genn().bigint()
             const { error: errorOne, value: valueOne } = schema.validate(targetOne, { convert: false })
             const { error: errorTwo, value: valueTwo } = schema.validate(targetTwo, { convert: false })
+            const { error: errorThree, value: valueThree } = schema.validate(targetThree, { convert: false })
 
             // Assert
             if (errorOne) {
@@ -56,12 +76,19 @@ describe('JoiExtended', () => {
             expect(errorTwo).not.to.exist
             expect(typeof valueTwo).to.equal('bigint')
             expect(valueTwo).to.equal(targetTwo)
+
+            if (errorThree) {
+                console.error(errorThree)
+            }
+            expect(errorThree).not.to.exist
+            expect(typeof valueThree).to.equal('string')
+            expect(valueThree).to.equal(targetThree)
         })
 
-        it('Should return an error object if invalid', () => {
+        it('Should return an error object if input is invalid and not converting', () => {
             // Arrange
-            const targetOne = '12345',
-                targetTwo = Number.MAX_SAFE_INTEGER + 999
+            const targetOne = 'ABC987',
+                targetTwo = Number.MAX_SAFE_INTEGER
 
             // Act
             const schema = extJoi.genn().bigint()
@@ -69,10 +96,10 @@ describe('JoiExtended', () => {
             const { error: errorTwo } = schema.validate(targetTwo, { convert: false })
 
             // Assert
-            expect(errorOne).to.exist
+            expect(errorOne).to.to.exist
             expect(errorOne.message).to.equal('"value" needs to be a bigint')
 
-            expect(errorTwo).to.exist
+            expect(errorTwo).to.to.exist
             expect(errorTwo.message).to.equal('"value" needs to be a bigint')
         })
 
@@ -234,11 +261,11 @@ describe('JoiExtended', () => {
             const { error: errorTwo } = schema.validate(targetTwo)
 
             // Assert
-            expect(errorOne).to.exist
+            expect(errorOne).to.to.exist
             expect(errorOne.message).to.equal('"value" needs to be a date string compliant' +
                 ' with W3C Date and Time Formats (YYYY-MM-DDThh:mm+hh:mm or -hh:mm)')
 
-            expect(errorTwo).to.exist
+            expect(errorTwo).to.to.exist
             expect(errorTwo.message).to.equal('"value" needs all components to have valid values')
         })
 
@@ -255,10 +282,10 @@ describe('JoiExtended', () => {
             // Assert
             const ERR_MSG = '"value" needs to be a date string compliant' +
                 ' with W3C Date and Time Formats (YYYY-MM-DDThh:mm:ssZ)'
-            expect(errorOne).to.exist
+            expect(errorOne).to.to.exist
             expect(errorOne.message).to.equal(ERR_MSG)
 
-            expect(errorTwo).to.exist
+            expect(errorTwo).to.to.exist
             expect(errorTwo.message).to.equal(ERR_MSG)
         })
 

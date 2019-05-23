@@ -49,8 +49,8 @@ declare type FunctionType<T=void> = (...args: any[]) => T;
  * A datatype that presents composite primary key.
  */
 declare type TenantPk = {
-    id: bigint,
-    tenantId: bigint,
+    id: string,
+    tenantId: string,
 };
 
 /**
@@ -60,14 +60,14 @@ declare type NameUk = {
     name: string
 }
 
-declare type PkType = bigint | TenantPk;
+declare type PkType = string | TenantPk;
 
 /**
  * Represents a domain model object, aka: business model.
  */
 declare interface IDomainModel {
-    id?: bigint;
-    tenantId?: bigint;
+    id?: string;
+    tenantId?: string;
 }
 
 /**
