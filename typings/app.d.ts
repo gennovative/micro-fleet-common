@@ -936,46 +936,6 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
-	import * as joi from 'joi';
-	export type JoiDateStringOptions = {
-	    /**
-	     * Whether the input string is in UTC format.
-	     * Default: false.
-	     */
-	    isUTC?: boolean;
-	    /**
-	     * Function to convert input string to desired data type.
-	     * Default function returns native Date object.
-	     */
-	    translator?: any;
-	};
-	export type ExtendedJoi = joi.AnySchema & {
-	    genn: () => {
-	        /**
-	         * Makes sure input is native bigint type.
-	         *
-	         * @example extJoi.genn().bigint().validate('98765443123456');
-	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
-	         */
-	        bigint: () => joi.AnySchema;
-	        /**
-	         * Makes sure input is in W3C Date and Time Formats,
-	         * but must have at least year, month, and day.
-	         *
-	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
-	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
-	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
-	         */
-	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
-	    };
-	};
-	/**
-	 * Joi instance with "genn()" extension enabled, including some custom rules.
-	 */
-	export const extJoi: ExtendedJoi;
-
-}
 declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
 	import * as joi from 'joi';
 	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
@@ -1007,7 +967,7 @@ declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
+declare module '@micro-fleet/common/dist/app/validators/IModelValidator' {
 	import * as joi from 'joi';
 	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
 	export interface ValidationOptions extends joi.ValidationOptions {
@@ -1033,36 +993,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	     */
 	    schemaMapPk?: joi.SchemaMap;
 	};
-	export class JoiModelValidator<T> {
-	    protected _schemaMap: joi.SchemaMap;
-	    protected _isCompositePk: boolean;
-	    protected _schemaMapPk?: joi.SchemaMap;
-	    /**
-	     * Builds a new instance of ModelValidatorBase.
-	     */
-	    static create<T>({ schemaMapModel, isCompositePk, requirePk, schemaMapPk, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
-	    /**
-	     * Compiled rules for model primary key.
-	     */
-	    protected _compiledPk: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties.
-	     */
-	    protected _compiledWhole: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties, but all of them are OPTIONAL.
-	     * Used for patch operation.
-	     */
-	    protected _compiledPartial: joi.ObjectSchema;
-	    /**
-	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {boolean} _isCompositePk Whether the primary key is made of multiple properties. Default to `false`
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {boolean} requirePk Whether to validate ID.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
-	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
+	export interface IModelValidator<T> {
 	    readonly schemaMap: joi.SchemaMap;
 	    readonly schemaMapPk: joi.SchemaMap;
 	    readonly isCompositePk: boolean;
@@ -1083,14 +1014,13 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	     * or after `schemaMap` or `schemaMapId` is changed.
 	     */
 	    compile(): void;
-	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
-	import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
-	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+declare module '@micro-fleet/common/dist/app/translators/IModelAutoMapper' {
 	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
 	export interface MappingOptions {
 	    /**
 	     * Temporarily turns on or off model validation.
@@ -1102,23 +1032,12 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     */
 	    errorCallback?: (err: ValidationError) => void;
 	}
-	/**
-	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
-	 */
-	export class ModelAutoMapper<T extends Object> {
-	    protected ModelClass: Newable;
-	    protected _validator?: JoiModelValidator<T>;
+	export interface IModelAutoMapper<T extends Object> {
 	    /**
 	     * Turns on or off model validation before translating.
 	     * Is set to `true` if validator is passed to class constructor.
 	     */
 	    enableValidation: boolean;
-	    protected _internalMapper: ICreateMapFluentFunctions;
-	    /**
-	     * @param {class} ModelClass The model class
-	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
-	     */
-	    constructor(ModelClass: Newable, _validator?: JoiModelValidator<T>);
 	    /**
 	     * Gets the internal AutoMapper instance for advanced configuration.
 	     */
@@ -1126,7 +1045,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	    /**
 	     * Gets the validator.
 	     */
-	    readonly validator: JoiModelValidator<T>;
+	    readonly validator: IModelValidator<T>;
 	    /**
 	     * Copies properties from `sources` to dest then optionally validates
 	     * the result (depends on `enableValidation`).
@@ -1171,6 +1090,57 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     * @throws {ValidationError} If no `errorCallback` is provided.
 	     */
 	    wholeMany(sources: object[], options?: MappingOptions): T[];
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
+	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { IModelAutoMapper, MappingOptions } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
+	/**
+	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
+	 */
+	export class ModelAutoMapper<T extends Object> implements IModelAutoMapper<T> {
+	    protected ModelClass: Newable;
+	    protected _validator?: IModelValidator<T>;
+	    /**
+	     * @see IModelAutoMapper.enableValidation
+	     */
+	    enableValidation: boolean;
+	    protected _internalMapper: ICreateMapFluentFunctions;
+	    /**
+	     * @param {class} ModelClass The model class
+	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
+	     */
+	    constructor(ModelClass: Newable, _validator?: IModelValidator<T>);
+	    /**
+	     * @see IModelAutoMapper.internalMapper
+	     */
+	    readonly internalMapper: ICreateMapFluentFunctions;
+	    /**
+	     * @see IModelAutoMapper.validator
+	     */
+	    readonly validator: IModelValidator<T>;
+	    /**
+	     * @see IModelAutoMapper.merge
+	     */
+	    merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T>;
+	    /**
+	     * @see IModelAutoMapper.partial
+	     */
+	    partial(source: object, options?: MappingOptions): Partial<T>;
+	    /**
+	     * @see IModelAutoMapper.partialMany
+	     */
+	    partialMany(sources: object[], options?: MappingOptions): Partial<T>[];
+	    /**
+	     * @see IModelAutoMapper.whole
+	     */
+	    whole(source: object, options?: MappingOptions): T;
+	    /**
+	     * @see IModelAutoMapper.wholeMany
+	     */
+	    wholeMany(sources: object[], options?: MappingOptions): T[];
 	    /**
 	     * Initializes the model mapping engine.
 	     */
@@ -1181,6 +1151,103 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	    protected _map(source: any): T;
 	    protected _tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
 	    protected _translate(fn: string, source: any, options: MappingOptions): T;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
+	import * as joi from 'joi';
+	export type JoiDateStringOptions = {
+	    /**
+	     * Whether the input string is in UTC format.
+	     * Default: false.
+	     */
+	    isUTC?: boolean;
+	    /**
+	     * Function to convert input string to desired data type.
+	     * Default function returns native Date object.
+	     */
+	    translator?: any;
+	};
+	export type ExtendedJoi = joi.AnySchema & {
+	    genn: () => {
+	        /**
+	         * Makes sure input is native bigint type.
+	         *
+	         * @example extJoi.genn().bigint().validate('98765443123456');
+	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
+	         */
+	        bigint: () => joi.AnySchema;
+	        /**
+	         * Makes sure input is in W3C Date and Time Formats,
+	         * but must have at least year, month, and day.
+	         *
+	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
+	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
+	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
+	         */
+	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
+	    };
+	};
+	/**
+	 * Joi instance with "genn()" extension enabled, including some custom rules.
+	 */
+	export const extJoi: ExtendedJoi;
+
+}
+declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
+	import * as joi from 'joi';
+	import { IModelValidator, JoiModelValidatorCreateOptions, ValidationOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	export class JoiModelValidator<T> implements IModelValidator<T> {
+	    protected _schemaMap: joi.SchemaMap;
+	    protected _isCompositePk: boolean;
+	    protected _schemaMapPk?: joi.SchemaMap;
+	    /**
+	     * Builds a new instance of ModelValidatorBase.
+	     */
+	    static create<T>({ schemaMapModel, isCompositePk, requirePk, schemaMapPk, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
+	    /**
+	     * Compiled rules for model primary key.
+	     */
+	    protected _compiledPk: joi.ObjectSchema;
+	    /**
+	     * Compiled rules for model properties.
+	     */
+	    protected _compiledWhole: joi.ObjectSchema;
+	    /**
+	     * Compiled rules for model properties, but all of them are OPTIONAL.
+	     * Used for patch operation.
+	     */
+	    protected _compiledPartial: joi.ObjectSchema;
+	    /**
+	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
+	     * @param {boolean} _isCompositePk Whether the primary key is made of multiple properties. Default to `false`
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {boolean} requirePk Whether to validate ID.
+	     *     This param is IGNORED if param `schemaMapPk` has value.
+	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
+	     */
+	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
+	    readonly schemaMap: joi.SchemaMap;
+	    readonly schemaMapPk: joi.SchemaMap;
+	    readonly isCompositePk: boolean;
+	    /**
+	     * @see IModelValidator.pk
+	     */
+	    pk(pk: any): [ValidationError, any];
+	    /**
+	     * @see IModelValidator.whole
+	     */
+	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
+	    /**
+	     * @see IModelValidator.partial
+	     */
+	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
+	    /**
+	     * @see IModelValidator.compile
+	     */
+	    compile(): void;
+	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
 	}
 
 }
@@ -1403,6 +1470,7 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' {
 	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
 	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
+	import { IModelAutoMapper } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	export type AccessorDescription = {
 	    name: string;
 	    isGetter: boolean;
@@ -1411,7 +1479,7 @@ declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' 
 	/**
 	 * A model auto mapper which supports getter and setter.
 	 */
-	export class AccessorSupportMapper<T> extends ModelAutoMapper<T> {
+	export class AccessorSupportMapper<T extends Object> extends ModelAutoMapper<T> implements IModelAutoMapper<T> {
 	    /**
 	     * @override
 	     */
@@ -1448,8 +1516,10 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';
 	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
 	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
+	export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/validators/JoiExtended';
+	export * from '@micro-fleet/common/dist/app/validators/IModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/ValidationError';
 	export * from '@micro-fleet/common/dist/app/DependencyContainer';

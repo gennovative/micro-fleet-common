@@ -1,5 +1,6 @@
 import { ICreateMapFluentFunctions } from '../interfaces/automapper'
 import { ModelAutoMapper } from './ModelAutoMapper'
+import { IModelAutoMapper } from './IModelAutoMapper'
 
 /**
  * Checks if `obj.prop` is a getter.
@@ -54,7 +55,9 @@ export type AccessorDescription = {
 /**
  * A model auto mapper which supports getter and setter.
  */
-export class AccessorSupportMapper<T> extends ModelAutoMapper<T> {
+export class AccessorSupportMapper<T extends Object>
+        extends ModelAutoMapper<T>
+        implements IModelAutoMapper<T> {
 
     /**
      * @override

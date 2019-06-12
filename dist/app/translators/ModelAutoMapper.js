@@ -20,25 +20,19 @@ class ModelAutoMapper {
         this._internalMapper = this._createMap();
     }
     /**
-     * Gets the internal AutoMapper instance for advanced configuration.
+     * @see IModelAutoMapper.internalMapper
      */
     get internalMapper() {
         return this._internalMapper;
     }
     /**
-     * Gets the validator.
+     * @see IModelAutoMapper.validator
      */
     get validator() {
         return this._validator;
     }
     /**
-     * Copies properties from `sources` to dest then optionally validates
-     * the result (depends on `enableValidation`).
-     * If `enableValidation` is turned off, it works just like native `Object.assign()` function,
-     * therefore, use `Object.assign()` for better performance if validation is not needed.
-     * Note that it uses `partial()` internally, hence `required` validation is IGNORED.
-     *
-     * @throws {ValidationError}
+     * @see IModelAutoMapper.merge
      */
     merge(dest, sources, options) {
         if (dest == null || typeof dest !== 'object') {
@@ -48,43 +42,25 @@ class ModelAutoMapper {
         return this.partial(dest, options);
     }
     /**
-     * Validates then converts an object to type <T>.
-     * but ONLY properties with value are validated and copied.
-     * Note that `required` validation is IGNORED.
-     * @param {object} source The object to be translated.
-     *
-     * @throws {ValidationError} If no `errorCallback` is provided.
+     * @see IModelAutoMapper.partial
      */
     partial(source, options) {
         return this._tryTranslate('partial', source, options);
     }
     /**
-     * Validates then converts a list of objects to type <T>.
-     * but ONLY properties with value are validated and copied.
-     * Note that `required` validation is IGNORED.
-     * @param {object[]} sources A list of objects to be translated.
-     *
-     * @throws {ValidationError} If no `errorCallback` is provided.
+     * @see IModelAutoMapper.partialMany
      */
     partialMany(sources, options) {
         return this._tryTranslate('partial', sources, options);
     }
     /**
-     * Validates then converts an object to type <T>.
-     * ALL properties are validated and copied regardless with or without value.
-     * @param {object} source The object to be translated.
-     *
-     * @throws {ValidationError} If no `errorCallback` is provided.
+     * @see IModelAutoMapper.whole
      */
     whole(source, options) {
         return this._tryTranslate('whole', source, options);
     }
     /**
-     * Validates then converts a list of objects to type <T>.
-     * ALL properties are validated and copied regardless with or without value.
-     * @param {object[]} sources The list of objects to be translated.
-     *
-     * @throws {ValidationError} If no `errorCallback` is provided.
+     * @see IModelAutoMapper.wholeMany
      */
     wholeMany(sources, options) {
         return this._tryTranslate('whole', sources, options);

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
-const JoiExtended_1 = require("./JoiExtended");
 const Guard_1 = require("../Guard");
+const JoiExtended_1 = require("./JoiExtended");
 const ValidationError_1 = require("./ValidationError");
 class JoiModelValidator {
     /**
@@ -54,7 +54,7 @@ class JoiModelValidator {
         return this._isCompositePk;
     }
     /**
-     * Validates model PK.
+     * @see IModelValidator.pk
      */
     pk(pk) {
         Guard_1.Guard.assertIsDefined(this._compiledPk, 'Must call `compile` before using this function!');
@@ -62,20 +62,19 @@ class JoiModelValidator {
         return (error) ? [ValidationError_1.ValidationError.fromJoi(error.details), null] : [null, value];
     }
     /**
-     * Validates model for creation operation, which doesn't need `pk` property.
+     * @see IModelValidator.whole
      */
     whole(target, options = {}) {
         return this.validate(this._compiledWhole, target, options);
     }
     /**
-     * Validates model for modification operation, which requires `pk` property.
+     * @see IModelValidator.partial
      */
     partial(target, options = {}) {
         return this.validate(this._compiledPartial, target, options);
     }
     /**
-     * Must call this method before using `whole` or `partial`,
-     * or after `schemaMap` or `schemaMapId` is changed.
+     * @see IModelValidator.compile
      */
     compile() {
         if (!this._compiledPk) {

@@ -1,5 +1,8 @@
 ## VERSIONS
 
+### 1.3.3
+- Extracts `IModelAutoMapper` and `IModelValidator`.
+
 ### 1.3.2
 - New getter `ModelAutoMapper.internalMapper` for advanced mapping configuration.
 - Replaced term "DTO" with "Domain model".
