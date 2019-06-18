@@ -3,6 +3,9 @@ export const constants = constantObj.constants
 
 export * from './interfaces/automapper'
 export * from './interfaces/configurations'
+export * from './models/id/IdBase'
+export * from './models/id/SingleId'
+export * from './models/id/TenantId'
 export * from './models/settings/CacheSettings'
 export * from './models/settings/DatabaseSettings'
 export * from './models/settings/GetSettingRequest'

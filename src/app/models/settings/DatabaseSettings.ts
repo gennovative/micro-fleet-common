@@ -68,7 +68,7 @@ export class DatabaseSettings
                 value: detail.clientName,
             }) as SettingItem)
         } else {
-            return new Maybe
+            return Maybe.Nothing()
         }
 
         if (detail.filePath) {
@@ -106,9 +106,9 @@ export class DatabaseSettings
                 value: detail.host.database,
             }) as SettingItem)
         } else {
-            return new Maybe
+            return Maybe.Nothing()
         }
-        return settings.length ? new Maybe(settings) : new Maybe
+        return settings.length ? Maybe.Just(settings) : Maybe.Nothing()
     }
 
     constructor() {

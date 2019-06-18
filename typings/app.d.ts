@@ -5,6 +5,7 @@ declare module '@micro-fleet/common/dist/app/models/Exceptions' {
 	    readonly isCritical: boolean;
 	    stack: string;
 	    name: string;
+	    details: any;
 	    /**
 	     *
 	     * @param message
@@ -306,240 +307,6 @@ declare module '@micro-fleet/common/dist/app/constants/ports' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/constants/names/actions' {
-	export enum ActionNames {
-	    /**
-	     * Assign to group
-	     */
-	    ASSIGN_TO_GROUP = "assignToGroup",
-	    /**
-	     * Can deploy
-	     */
-	    CAN_DEPLOY = "canDeploy",
-	    /**
-	     * Create
-	     */
-	    CREATE = "create",
-	    /**
-	     * Count all
-	     */
-	    COUNT_ALL = "countAll",
-	    /**
-	     * Configure program
-	     */
-	    CONFIGURE_PROGRAM = "configureProgram",
-	    /**
-	     * Configure program group
-	     */
-	    CONFIGURE_PROGRAM_GROUP = "configureProgramGroup",
-	    /**
-	     * Deploy
-	     */
-	    DEPLOY = "deploy",
-	    /**
-	     * Soft delete
-	     */
-	    DELETE_SOFT = "deleteSoft",
-	    /**
-	     * Hard delete
-	     */
-	    DELETE_HARD = "deleteHard",
-	    /**
-	     * Hard delete versions
-	     */
-	    DELETE_HARD_VERSIONS = "deleteHardVersions",
-	    /**
-	     * Exists
-	     */
-	    EXISTS = "exists",
-	    /**
-	     * Find by PK
-	     */
-	    FIND_BY_PK = "findByPk",
-	    /**
-	     * Get by host ID
-	     */
-	    GET_BY_HOST_ID = "getByHostId",
-	    /**
-	     * Get by program slug
-	     */
-	    GET_BY_PROGRAM_SLUG = "getByProgramSlug",
-	    /**
-	     * Get by program ID
-	     */
-	    GET_BY_PROGRAM_ID = "getByProgramId",
-	    /**
-	     * Get settings
-	     */
-	    GET_SETTINGS = "getSettings",
-	    /**
-	     * Get programs
-	     */
-	    GET_PROGRAMS = "getPrograms",
-	    /**
-	     * Next big int
-	     */
-	    NEXT_BIG_INT = "nextBigInt",
-	    /**
-	     * Next short ID
-	     */
-	    NEXT_SHORT_ID = "nextShortId",
-	    /**
-	     * Next version-4 UUID
-	     */
-	    NEXT_UUID_V4 = "nextUuidv4",
-	    /**
-	     * Page
-	     */
-	    PAGE = "page",
-	    /**
-	     * Page
-	     */
-	    PAGE_VERSIONS = "pageVersions",
-	    /**
-	     * Patch
-	     */
-	    PATCH = "patch",
-	    /**
-	     * Recover
-	     */
-	    RECOVER = "recover",
-	    /**
-	     * Restrict quantity
-	     */
-	    RESTRICT_QUANTITY = "restrictQuantity",
-	    /**
-	     * Recover
-	     */
-	    SET_AS_MAIN = "setAsMain",
-	    /**
-	     * Upload
-	     */
-	    UPLOAD = "upload",
-	    /**
-	     * Update
-	     */
-	    UPDATE = "update"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/names/modules' {
-	export enum ModuleNames {
-	    /**
-	     * Account
-	     */
-	    ACCOUNT = "account",
-	    /**
-	     * Account configuration
-	     */
-	    ACCOUNT_CONFIGURATION = "accConfig",
-	    /**
-	     * Agency
-	     */
-	    AGENCY = "agency",
-	    /**
-	     * Asset
-	     */
-	    ASSET = "asset",
-	    /**
-	     * Audit
-	     */
-	    AUDIT = "audit",
-	    /**
-	     * Brand
-	     */
-	    BRAND = "brand",
-	    /**
-	     * Bio-profile
-	     */
-	    BIO_PROFILE = "bioProfile",
-	    /**
-	     * Civilian
-	     */
-	    CIVILIAN = "civilian",
-	    /**
-	     * Country
-	     */
-	    COUNTRY = "country",
-	    /**
-	     * Device
-	     */
-	    DEVICE = "device",
-	    /**
-	     * Device group
-	     */
-	    DEVICE_GROUP = "deviceGroup",
-	    /**
-	     * Event
-	     */
-	    EVENT = "event",
-	    /**
-	     * Host
-	     */
-	    HOST = "host",
-	    /**
-	     * ID Generator
-	     */
-	    ID_GEN = "idGen",
-	    /**
-	     * Geo-profile
-	     */
-	    GEO_PROFILE = "geoProfile",
-	    /**
-	     * Gift
-	     */
-	    GIFT = "gift",
-	    /**
-	     * Location
-	     */
-	    LOCATION = "location",
-	    /**
-	     * Playlist
-	     */
-	    PLAYLIST = "playlist",
-	    /**
-	     * Profile
-	     */
-	    PROFILE = "profile",
-	    /**
-	     * Program
-	     */
-	    PROGRAM = "program",
-	    /**
-	     * Program configuration
-	     */
-	    PROGRAM_CONFIGURATION = "progConfig",
-	    /**
-	     * Program group
-	     */
-	    PROGRAM_GROUP = "progGroup",
-	    /**
-	     * Region
-	     */
-	    REGION = "region",
-	    /**
-	     * Role
-	     */
-	    ROLE = "role",
-	    /**
-	     * Settings
-	     */
-	    SETTINGS = "settings",
-	    /**
-	     * Schedule
-	     */
-	    SCHEDULE = "schedule",
-	    /**
-	     * Tenant
-	     */
-	    TENANT = "tenant",
-	    /**
-	     * Tenant configuration
-	     */
-	    TENANT_CONFIGURATION = "tenantConfig"
-	}
-
-}
 declare module '@micro-fleet/common/dist/app/constants/setting-keys/auth' {
 	export enum AuthSettingKeys {
 	    /**
@@ -573,16 +340,15 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/cache' {
 	     */
 	    CACHE_NUM_CONN = "cache_num_conn",
 	    /**
-	     * IP or host name of cache service.
-	     * Must use with connection index: CACHE_HOST + '0', CACHE_HOST + '1'
-	     * Data type: string
+	     * A single string or an array of IP or host name of cache service.
+	     * Data type: string | string[]
 	     */
-	    CACHE_HOST = "cache_host_",
+	    CACHE_HOST = "cache_host",
 	    /**
-	     * Port number.
-	     * Data type: number
+	     * A single value or an array of port number.
+	     * Data type: number | number[]
 	     */
-	    CACHE_PORT = "cache_port_"
+	    CACHE_PORT = "cache_port"
 	}
 
 }
@@ -765,8 +531,6 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/web' {
 declare module '@micro-fleet/common/dist/app/constants/index' {
 	import { DbClient } from '@micro-fleet/common/dist/app/constants/DbClient';
 	import { ServicePorts } from '@micro-fleet/common/dist/app/constants/ports';
-	import { ActionNames } from '@micro-fleet/common/dist/app/constants/names/actions';
-	import { ModuleNames } from '@micro-fleet/common/dist/app/constants/names/modules';
 	import { AuthSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/auth';
 	import { CacheSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/cache';
 	import { DbSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/database';
@@ -777,8 +541,6 @@ declare module '@micro-fleet/common/dist/app/constants/index' {
 	export type Constants = {
 	    DbClient: typeof DbClient;
 	    ServicePorts: typeof ServicePorts;
-	    ActionNames: typeof ActionNames;
-	    ModuleNames: typeof ModuleNames;
 	    AuthSettingKeys: typeof AuthSettingKeys;
 	    CacheSettingKeys: typeof CacheSettingKeys;
 	    DbSettingKeys: typeof DbSettingKeys;
@@ -911,28 +673,59 @@ declare module '@micro-fleet/common/dist/app/interfaces/automapper' {
 
 }
 declare module '@micro-fleet/common/dist/app/models/Maybe' {
+	import { Exception } from '@micro-fleet/common/dist/app/models/Exceptions';
+	/**
+	 * Represents an error when attempting to get value from a Maybe.Nothing
+	 */
+	export class EmptyMaybeException extends Exception {
+	    constructor();
+	}
 	/**
 	 * Represents an object which may or may not have a value.
 	 * Use this class to avoid assigning `null` to a variable.
-	 * Inspired by V8 Maybe: https://v8docs.nodesource.com/node-9.3/d9/d4b/classv8_1_1_maybe.html
+	 * Source code inspired by: https://github.com/ramda/ramda-fantasy/blob/master/dist/Maybe.js
+	 * and V8 Maybe: https://v8docs.nodesource.com/node-9.3/d9/d4b/classv8_1_1_maybe.html
 	 */
-	export class Maybe<T> {
-	    	    	    /**
-	     * Gets whether this object has value or not.
-	     */
-	    readonly hasValue: boolean;
+	export abstract class Maybe<T = any> {
+	    static Nothing(): Maybe;
+	    static Just<T>(value: T): Maybe<T>;
+	    static isJust: (maybe: Maybe<any>) => boolean;
+	    static isNothing: (maybe: Maybe<any>) => boolean;
+	    static of: typeof Maybe.Just;
+	    abstract readonly isJust: boolean;
+	    abstract readonly isNothing: boolean;
 	    /**
-	     * Attempts to get the contained value, and throws exception if there is no value.
-	     * Use function `TryGetValue` to avoid exception.
-	     * @throws {MinorException} If there is no value.
+	     * Gets the contained value if Just, or throws an `EmptyMaybeException` if Nothing.
+	     * If you want to avoid exception, use `tryGetValue()` instead.
 	     */
-	    readonly value: T;
-	    constructor(value?: T);
+	    abstract readonly value: T;
+	    constructor();
+	    of: typeof Maybe.Just;
+	    /**
+	     * Applies the funtion `f` to internal value if Just,
+	     * or does nothing if Nothing.
+	     */
+	    abstract map<TMap>(f: (val: T) => TMap): Maybe<TMap>;
+	    /**
+	     * Execute the callback function if Nothing,
+	     * or does nothing if Just.
+	     */
+	    abstract orElse(f: () => void): Maybe<T>;
+	    /**
+	     * Takes another Maybe that wraps a function and applies its `map`
+	     * method to this Maybe's value, which must be a function.
+	     */
+	    abstract ap(m: Maybe): Maybe;
+	    /**
+	     * `f` must be a function which returns a value of the same Chain
+	     *  chain must return a value of the same Chain
+	     */
+	    abstract chain<TChain>(f: (val: T) => Maybe<TChain>): Maybe<TChain>;
 	    /**
 	     * Attempts to get the contained value, if there is not, returns the given default value.
 	     * @param defaultVal Value to return in case there is no contained value.
 	     */
-	    TryGetValue(defaultVal: T): T;
+	    abstract tryGetValue(defaultVal: any): T;
 	}
 
 }
@@ -1375,6 +1168,42 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/models/id/IdBase' {
+	/**
+	 * Base class for ID type.
+	 * Models in DDD (domain-driven design) often have ID as a class instance.
+	 */
+	export abstract class IdBase<T = string> {
+	    abstract toArray(): T[];
+	    toJSON(): PrimitiveFlatJson;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/id/SingleId' {
+	import { IdBase } from '@micro-fleet/common/dist/app/models/id/IdBase';
+	export class SingleId extends IdBase {
+	    id: string;
+	    constructor(id: string);
+	    /**
+	     * @override
+	     */
+	    toArray(): string[];
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/id/TenantId' {
+	import { IdBase } from '@micro-fleet/common/dist/app/models/id/IdBase';
+	export class TenantId extends IdBase {
+	    id: string;
+	    tenantId: string;
+	    constructor(id: string, tenantId: string);
+	    /**
+	     * @override
+	     */
+	    toArray(): string[];
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/models/settings/CacheSettings' {
 	import { CacheConnectionDetail } from '@micro-fleet/common/dist/app/interfaces/configurations';
 	import { SettingItem } from '@micro-fleet/common/dist/app/models/settings/SettingItem';
@@ -1436,14 +1265,14 @@ declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' 
 
 }
 declare module '@micro-fleet/common/dist/app/models/DomainModelBase' {
-	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
+	import { IModelAutoMapper } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	export class DomainModelBase implements IDomainModel {
 	    /**
 	     * @abstract
 	     * Function to convert other object to this class type.
 	     * This method must be implemented by derived class!
 	     */
-	    static readonly translator: ModelAutoMapper<any>;
+	    static readonly translator: IModelAutoMapper<any>;
 	}
 
 }
@@ -1506,6 +1335,9 @@ declare module '@micro-fleet/common' {
 	export const constants: constantObj.Constants;
 	export * from '@micro-fleet/common/dist/app/interfaces/automapper';
 	export * from '@micro-fleet/common/dist/app/interfaces/configurations';
+	export * from '@micro-fleet/common/dist/app/models/id/IdBase';
+	export * from '@micro-fleet/common/dist/app/models/id/SingleId';
+	export * from '@micro-fleet/common/dist/app/models/id/TenantId';
 	export * from '@micro-fleet/common/dist/app/models/settings/CacheSettings';
 	export * from '@micro-fleet/common/dist/app/models/settings/DatabaseSettings';
 	export * from '@micro-fleet/common/dist/app/models/settings/GetSettingRequest';

@@ -63,7 +63,7 @@ class DatabaseSettings extends Array {
             }));
         }
         else {
-            return new Maybe_1.Maybe;
+            return Maybe_1.Maybe.Nothing();
         }
         if (detail.filePath) {
             settings.push(SettingItem_1.SettingItem.translator.whole({
@@ -102,9 +102,9 @@ class DatabaseSettings extends Array {
             }));
         }
         else {
-            return new Maybe_1.Maybe;
+            return Maybe_1.Maybe.Nothing();
         }
-        return settings.length ? new Maybe_1.Maybe(settings) : new Maybe_1.Maybe;
+        return settings.length ? Maybe_1.Maybe.Just(settings) : Maybe_1.Maybe.Nothing();
     }
     constructor() {
         super();

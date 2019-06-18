@@ -77,12 +77,24 @@ declare interface IAuditable extends IDomainModel {
     /**
      * The time when this model is created.
      */
-    createdAt?: Date;
+    createdAt?: string;
 
     /**
      * The time when this model is last updated.
      */
-    updatedAt?: Date;
+    updatedAt?: string;
+}
+
+/**
+ * Represents a model that is stored in database but isn't
+ * included in normal queries.
+ */
+declare interface IArchivable extends IDomainModel {
+    /**
+     * If has value, this model is marked as archived.
+     * Otherwise, it is still active.
+     */
+    archivedAt?: string;
 }
 
 /**
@@ -93,7 +105,7 @@ declare interface ISoftDeletable extends IDomainModel {
      * If has value, this model is marked as deleted.
      * Otherwise, it is still active.
      */
-    deletedAt?: Date;
+    deletedAt?: string;
 }
 
 /**
@@ -114,7 +126,7 @@ declare interface IVersionControlled extends IDomainModel {
     /**
      * The time when this version is created.
      */
-    createdAt: Date;
+    createdAt: string;
 
     /**
      * Whether this is official version.

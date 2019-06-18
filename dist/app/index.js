@@ -5,6 +5,9 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantObj = require("./constants/index");
 exports.constants = constantObj.constants;
+__export(require("./models/id/IdBase"));
+__export(require("./models/id/SingleId"));
+__export(require("./models/id/TenantId"));
 __export(require("./models/settings/CacheSettings"));
 __export(require("./models/settings/DatabaseSettings"));
 __export(require("./models/settings/GetSettingRequest"));

@@ -104,9 +104,9 @@ describe('DatabaseSettings', () => {
             const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail)
 
             // Assert
-            expect(parseResult.hasValue).to.be.true
+            expect(parseResult.isJust).to.be.true
 
-            const settings: DatabaseSettings = parseResult.value
+            const settings: DatabaseSettings = parseResult.tryGetValue(null)
             expect(settings.length).to.equal(5)
             expect(settings[0].name).to.equal(S.DB_ENGINE)
             expect(settings[0].value).to.equal(detail.clientName)
@@ -131,9 +131,9 @@ describe('DatabaseSettings', () => {
             const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail)
 
             // Assert
-            expect(parseResult.hasValue).to.be.true
+            expect(parseResult.isJust).to.be.true
 
-            const settings: DatabaseSettings = parseResult.value
+            const settings: DatabaseSettings = parseResult.tryGetValue(null)
             expect(settings.length).to.equal(2)
             expect(settings[0].name).to.equal(S.DB_ENGINE)
             expect(settings[0].value).to.equal(detail.clientName)
@@ -152,9 +152,9 @@ describe('DatabaseSettings', () => {
             const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail)
 
             // Assert
-            expect(parseResult.hasValue).to.be.true
+            expect(parseResult.isJust).to.be.true
 
-            const settings: DatabaseSettings = parseResult.value
+            const settings: DatabaseSettings = parseResult.tryGetValue(null)
             expect(settings.length).to.equal(2)
             expect(settings[0].name).to.equal(S.DB_ENGINE)
             expect(settings[0].value).to.equal(detail.clientName)
@@ -174,7 +174,7 @@ describe('DatabaseSettings', () => {
             const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail)
 
             // Assert
-            expect(parseResult.hasValue).to.be.false
+            expect(parseResult.isJust).to.be.false
         })
 
         it('Should return empty result if no connection option is specified', () => {
@@ -187,7 +187,7 @@ describe('DatabaseSettings', () => {
             const parseResult: Maybe<DatabaseSettings> = DatabaseSettings.fromConnectionDetail(detail)
 
             // Assert
-            expect(parseResult.hasValue).to.be.false
+            expect(parseResult.isJust).to.be.false
         })
     }) // END describe 'fromConnectionDetail'
 

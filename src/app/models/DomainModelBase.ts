@@ -1,4 +1,5 @@
-import { ModelAutoMapper } from '../translators/ModelAutoMapper'
+import { IModelAutoMapper } from '../translators/IModelAutoMapper'
+
 
 export class DomainModelBase implements IDomainModel {
 
@@ -7,5 +8,5 @@ export class DomainModelBase implements IDomainModel {
      * Function to convert other object to this class type.
      * This method must be implemented by derived class!
      */
-    public static readonly translator: ModelAutoMapper<any> = undefined
+    public static readonly translator: IModelAutoMapper<any> = undefined
 }

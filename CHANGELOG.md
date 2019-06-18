@@ -1,5 +1,11 @@
 ## VERSIONS
 
+### 1.4.0
+- [Breaking change] Re-implemented `Maybe`.
+- Removed action and module constant names.
+- Added property "detail" to class `Exception`.
+- Added Id classes for DDD.
+
 ### 1.3.3
 - Extracts `IModelAutoMapper` and `IModelValidator`.
 

@@ -6,15 +6,14 @@ export enum CacheSettingKeys {
     CACHE_NUM_CONN = 'cache_num_conn',
 
     /**
-     * IP or host name of cache service.
-     * Must use with connection index: CACHE_HOST + '0', CACHE_HOST + '1'
-     * Data type: string
+     * A single string or an array of IP or host name of cache service.
+     * Data type: string | string[]
      */
-    CACHE_HOST = 'cache_host_',
+    CACHE_HOST = 'cache_host',
 
     /**
-     * Port number.
-     * Data type: number
+     * A single value or an array of port number.
+     * Data type: number | number[]
      */
-    CACHE_PORT = 'cache_port_',
+    CACHE_PORT = 'cache_port',
 }
