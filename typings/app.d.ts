@@ -301,12 +301,6 @@ declare module '@micro-fleet/common/dist/app/constants/DbClient' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/constants/ports' {
-	export enum ServicePorts {
-	    SETTINGS = 50100
-	}
-
-}
 declare module '@micro-fleet/common/dist/app/constants/setting-keys/auth' {
 	export enum AuthSettingKeys {
 	    /**
@@ -456,30 +450,30 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/rpc' {
 declare module '@micro-fleet/common/dist/app/constants/setting-keys/service' {
 	export enum SvcSettingKeys {
 	    /**
-	     * Number of milliseconds to wait before actually stop addons.
+	     * Number of milliseconds to wait before actually disposing addons.
 	     * Date type: number
 	     */
-	    ADDONS_DEADLETTER_TIMEOUT = "addons_deadletter_timeout",
+	    DEADLETTER_TIMEOUT = "svc_deadletter_timeout",
 	    /**
-	     * Array of addresses to IdGeneratorService.
+	     * Number of milliseconds to wait before actually exiting the process.
+	     * Date type: number
+	     */
+	    STOP_TIMEOUT = "svc_stop_timeout",
+	    /**
+	     * Array of addresses to fetch configuration.
 	     * Data type: string[]
 	     */
-	    ID_SERVICE_ADDRESSES = "id_service_addresses",
-	    /**
-	     * Array of addresses to SettingService.
-	     * Data type: string[]
-	     */
-	    SETTINGS_SERVICE_ADDRESSES = "settings_service_addresses",
+	    CONFIG_SERVICE_ADDRESSES = "svc_config_service_addresses",
 	    /**
 	     * Number of milliseconds between refetchings.
 	     * Date type: number
 	     */
-	    SETTINGS_REFETCH_INTERVAL = "settings_refetch_interval",
+	    CONFIG_REFETCH_INTERVAL = "svc_config_refetch_interval",
 	    /**
 	     * Service URL-safe name.
 	     * Data type: string
 	     */
-	    SERVICE_SLUG = "service_slug"
+	    SERVICE_SLUG = "svc_slug"
 	}
 
 }
@@ -530,7 +524,6 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/web' {
 }
 declare module '@micro-fleet/common/dist/app/constants/index' {
 	import { DbClient } from '@micro-fleet/common/dist/app/constants/DbClient';
-	import { ServicePorts } from '@micro-fleet/common/dist/app/constants/ports';
 	import { AuthSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/auth';
 	import { CacheSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/cache';
 	import { DbSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/database';
@@ -540,7 +533,6 @@ declare module '@micro-fleet/common/dist/app/constants/index' {
 	import { WebSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/web';
 	export type Constants = {
 	    DbClient: typeof DbClient;
-	    ServicePorts: typeof ServicePorts;
 	    AuthSettingKeys: typeof AuthSettingKeys;
 	    CacheSettingKeys: typeof CacheSettingKeys;
 	    DbSettingKeys: typeof DbSettingKeys;
@@ -1148,6 +1140,10 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	     * Turns on or off remote settings fetching.
 	     */
 	    enableRemote: boolean;
+	    /**
+	     * Absolute path to configuration file
+	     */
+	    configFilePath: string;
 	    /**
 	     * Attempts to get settings from remote Configuration Service, environmental variables,
 	     * and `appconfig.json` file, respectedly.

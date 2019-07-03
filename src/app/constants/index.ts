@@ -1,5 +1,4 @@
 import { DbClient } from './DbClient'
-import { ServicePorts } from './ports'
 import { AuthSettingKeys } from './setting-keys/auth'
 import { CacheSettingKeys } from './setting-keys/cache'
 import { DbSettingKeys } from './setting-keys/database'
@@ -10,7 +9,6 @@ import { WebSettingKeys } from './setting-keys/web'
 
 export type Constants = {
     DbClient: typeof DbClient,
-    ServicePorts: typeof ServicePorts,
     AuthSettingKeys: typeof AuthSettingKeys,
     CacheSettingKeys: typeof CacheSettingKeys,
     DbSettingKeys: typeof DbSettingKeys,
@@ -22,7 +20,6 @@ export type Constants = {
 
 export const constants: Constants = {
     DbClient,
-    ServicePorts,
     AuthSettingKeys,
     CacheSettingKeys,
     DbSettingKeys,

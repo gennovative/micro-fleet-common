@@ -63,6 +63,11 @@ export interface IConfigurationProvider extends IServiceAddOn {
     enableRemote: boolean
 
     /**
+     * Absolute path to configuration file
+     */
+    configFilePath: string
+
+    /**
      * Attempts to get settings from remote Configuration Service, environmental variables,
      * and `appconfig.json` file, respectedly.
      * @param {string} key Setting key
