@@ -1135,7 +1135,7 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	     */
 	    port?: number;
 	};
-	export interface IConfigurationProvider extends IServiceAddOn {
+	export interface IConfigurationProvider {
 	    /**
 	     * Turns on or off remote settings fetching.
 	     */

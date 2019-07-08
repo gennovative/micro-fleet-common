@@ -56,7 +56,7 @@ export type CacheConnectionDetail = {
     port?: number;
 }
 
-export interface IConfigurationProvider extends IServiceAddOn {
+export interface IConfigurationProvider {
     /**
      * Turns on or off remote settings fetching.
      */
