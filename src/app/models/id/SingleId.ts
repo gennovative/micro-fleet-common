@@ -12,6 +12,20 @@ export class SingleId extends IdBase {
     /**
      * @override
      */
+    public toString(): string {
+        return this.id
+    }
+
+    /**
+     * @override
+     */
+    public valueOf(): any {
+        return this.id
+    }
+
+    /**
+     * @override
+     */
     public toArray(): string[] {
         return [ this.id ]
     }

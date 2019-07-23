@@ -12,7 +12,7 @@ export class PagedArray<T> extends Array<T> {
         return this._total
     }
 
-    constructor(total: number = 0, ...items: T[]) {
+    constructor(total: number = 0, items: T[] = []) {
         super()
         /* istanbul ignore else */
         if (Array.isArray(items)) {

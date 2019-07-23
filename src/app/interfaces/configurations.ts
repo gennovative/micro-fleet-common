@@ -1,61 +1,6 @@
 import { Maybe } from '../models/Maybe'
 import { SettingItemDataType } from '../models/settings/SettingItem'
 
-/**
- * Stores a database connection detail.
- */
-export type DbConnectionDetail = {
-    /**
-     * Database driver name, should use constants in class DbClient.
-     * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
-     */
-    clientName: string;
-
-    /**
-     * Connection string for specified `clientName`.
-     */
-    connectionString?: string;
-
-    /**
-     * Absolute path to database file name.
-     */
-    filePath?: string;
-
-    host?: {
-        /**
-         * IP Address or Host name.
-         */
-        address: string,
-
-        /**
-         * Username to login database.
-         */
-        user: string,
-
-        /**
-         * Password to login database.
-         */
-        password: string,
-
-        /**
-         * Database name.
-         */
-        database: string
-    };
-}
-
-export type CacheConnectionDetail = {
-    /**
-         * Address of remote cache service.
-         */
-    host?: string;
-
-    /**
-     * Port of remote cache service.
-     */
-    port?: number;
-}
-
 export interface IConfigurationProvider {
     /**
      * Turns on or off remote settings fetching.

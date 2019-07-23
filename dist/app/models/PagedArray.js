@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * A wrapper array that contains paged items.
  */
 class PagedArray extends Array {
-    constructor(total = 0, ...items) {
+    constructor(total = 0, items = []) {
         super();
         this._total = 0;
         /* istanbul ignore else */

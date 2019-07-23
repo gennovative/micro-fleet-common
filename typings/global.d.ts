@@ -12,15 +12,6 @@ declare namespace NodeJS {
     }
 }
 
-/**
- * A data type representing Json object.
- */
-interface Json {
-    [x: string]: string | number | boolean | Date | Json | JsonArray;
-}
-
-interface JsonArray extends Array<string | number | boolean | Date | Json | JsonArray> { }
-
 // Based on ES6 native Promise definition
 declare type PromiseResolveFn = (value?: any | PromiseLike<any>) => void;
 declare type PromiseRejectFn = (reason?: any) => void;
@@ -43,6 +34,18 @@ declare type PrimitiveFlatJson = {
 };
 
 declare type FunctionType<T=void> = (...args: any[]) => T;
+
+/**
+ * A data type representing Json object.
+ */
+interface Json {
+    [x: string]: PrimitiveType | Json | JsonArray;
+}
+
+/**
+ * A data type representing Json array.
+ */
+interface JsonArray extends Array<PrimitiveType | Json | JsonArray> { }
 
 
 /**
@@ -166,4 +169,38 @@ declare interface IServiceAddOn {
      */
     dispose(): Promise<void>;
 
+}
+
+/**
+ * Represents a state object
+ */
+declare interface IDomainState {
+
+	[key: string]: any
+
+	/**
+	 * Checks if any of its properties has been changed
+	 */
+	isDirty(): boolean
+
+	/**
+	 * Checks if the given property name has its value changed.
+	 */
+	isPropDirty(prop: string): boolean
+
+	/**
+	 * Gets an object containing modified properties
+	 */
+	getChanges(): object
+}
+
+/**
+ * Represents an object backed by a state
+ */
+declare interface IStateBacked {
+	readonly state: IDomainState
+}
+
+declare interface ISerializable {
+	toJSON(): object
 }

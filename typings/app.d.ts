@@ -681,8 +681,9 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	export abstract class Maybe<T = any> {
 	    static Nothing(): Maybe;
 	    static Just<T>(value: T): Maybe<T>;
-	    static isJust: (maybe: Maybe<any>) => boolean;
-	    static isNothing: (maybe: Maybe<any>) => boolean;
+	    static isJust(target: any): target is Just<any>;
+	    static isNothing(target: any): target is Nothing;
+	    static isMaybe(target: any): target is Maybe;
 	    static of: typeof Maybe.Just;
 	    abstract readonly isJust: boolean;
 	    abstract readonly isNothing: boolean;
@@ -699,11 +700,6 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	     */
 	    abstract map<TMap>(f: (val: T) => TMap): Maybe<TMap>;
 	    /**
-	     * Execute the callback function if Nothing,
-	     * or does nothing if Just.
-	     */
-	    abstract orElse(f: () => void): Maybe<T>;
-	    /**
 	     * Takes another Maybe that wraps a function and applies its `map`
 	     * method to this Maybe's value, which must be a function.
 	     */
@@ -714,11 +710,103 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	     */
 	    abstract chain<TChain>(f: (val: T) => Maybe<TChain>): Maybe<TChain>;
 	    /**
+	     * Same as `map`, but only executes the callback function if Nothing,
+	     * or does nothing if Just.
+	     */
+	    abstract mapElse(f: () => void): Maybe<T>;
+	    /**
+	     * Same as `chain`, but only executes the callback function if Nothing,
+	     * or does nothing if Just.
+	     */
+	    abstract chainElse<TChain>(f: () => Maybe<TChain>): Maybe<TChain>;
+	    /**
 	     * Attempts to get the contained value, if there is not, returns the given default value.
 	     * @param defaultVal Value to return in case there is no contained value.
 	     */
 	    abstract tryGetValue(defaultVal: any): T;
+	} class Just<T> extends Maybe {
+	    	    /**
+	     * @override
+	     */
+	    readonly isJust: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly isNothing: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly value: T;
+	    constructor(_value: T);
+	    /**
+	     * @override
+	     */
+	    map<TMap>(f: (val: T) => TMap): Maybe<TMap>;
+	    /**
+	     * @override
+	     */
+	    mapElse: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    chainElse: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    ap(m: Maybe): Maybe;
+	    /**
+	     * @override
+	     */
+	    chain<TChain>(f: (val: T) => Maybe<TChain>): Maybe<TChain>;
+	    /**
+	     * @override
+	     */
+	    tryGetValue(defaultVal: any): T;
+	    /**
+	     * @override
+	     */
+	    toString(): string;
+	} function returnThis(this: any): any; class Nothing extends Maybe {
+	    /**
+	     * @override
+	     */
+	    readonly isJust: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly isNothing: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly value: any;
+	    constructor();
+	    /**
+	     * @override
+	     */
+	    map: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    mapElse(f: () => void): Maybe;
+	    chainElse<TChain>(f: () => Maybe<TChain>): Maybe<TChain>;
+	    /**
+	     * @override
+	     */
+	    ap: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    chain: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    tryGetValue(defaultVal: any): any;
+	    /**
+	     * @override
+	     */
+	    toString(): string;
 	}
+	export {};
 
 }
 declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
@@ -736,11 +824,11 @@ declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
 	    /**
 	     * Path to the target property in validation schema.
 	     */
-	    path: string[];
+	    path?: string[];
 	    /**
 	     * The invalid property value.
 	     */
-	    value: any;
+	    value?: any;
 	};
 	/**
 	 * Represents an error when a model does not pass validation.
@@ -1089,52 +1177,6 @@ declare module '@micro-fleet/common/dist/app/models/settings/SettingItem' {
 declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	import { Maybe } from '@micro-fleet/common/dist/app/models/Maybe';
 	import { SettingItemDataType } from '@micro-fleet/common/dist/app/models/settings/SettingItem';
-	/**
-	 * Stores a database connection detail.
-	 */
-	export type DbConnectionDetail = {
-	    /**
-	     * Database driver name, should use constants in class DbClient.
-	     * Eg: DbClient.SQLITE3, DbClient.POSTGRESQL, ...
-	     */
-	    clientName: string;
-	    /**
-	     * Connection string for specified `clientName`.
-	     */
-	    connectionString?: string;
-	    /**
-	     * Absolute path to database file name.
-	     */
-	    filePath?: string;
-	    host?: {
-	        /**
-	         * IP Address or Host name.
-	         */
-	        address: string;
-	        /**
-	         * Username to login database.
-	         */
-	        user: string;
-	        /**
-	         * Password to login database.
-	         */
-	        password: string;
-	        /**
-	         * Database name.
-	         */
-	        database: string;
-	    };
-	};
-	export type CacheConnectionDetail = {
-	    /**
-	         * Address of remote cache service.
-	         */
-	    host?: string;
-	    /**
-	     * Port of remote cache service.
-	     */
-	    port?: number;
-	};
 	export interface IConfigurationProvider {
 	    /**
 	     * Turns on or off remote settings fetching.
@@ -1171,6 +1213,8 @@ declare module '@micro-fleet/common/dist/app/models/id/IdBase' {
 	 */
 	export abstract class IdBase<T = string> {
 	    abstract toArray(): T[];
+	    abstract toString(): string;
+	    abstract valueOf(): any;
 	    toJSON(): PrimitiveFlatJson;
 	}
 
@@ -1180,6 +1224,14 @@ declare module '@micro-fleet/common/dist/app/models/id/SingleId' {
 	export class SingleId extends IdBase {
 	    id: string;
 	    constructor(id: string);
+	    /**
+	     * @override
+	     */
+	    toString(): string;
+	    /**
+	     * @override
+	     */
+	    valueOf(): any;
 	    /**
 	     * @override
 	     */
@@ -1197,46 +1249,14 @@ declare module '@micro-fleet/common/dist/app/models/id/TenantId' {
 	     * @override
 	     */
 	    toArray(): string[];
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/settings/CacheSettings' {
-	import { CacheConnectionDetail } from '@micro-fleet/common/dist/app/interfaces/configurations';
-	import { SettingItem } from '@micro-fleet/common/dist/app/models/settings/SettingItem';
-	/**
-	 * Represents an array of cache settings.
-	 */
-	export class CacheSettings extends Array<SettingItem> {
-	    	    constructor();
 	    /**
-	     * Gets number of connection settings.
+	     * @override
 	     */
-	    readonly total: number;
+	    toString(): string;
 	    /**
-	     * Parses then adds a server detail to setting item array.
+	     * Returns a JSON { id: '', tenantId: '' }
 	     */
-	    pushServer(detail: CacheConnectionDetail): void;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/settings/DatabaseSettings' {
-	import { /*IConfigurationProvider,*/ DbConnectionDetail } from '@micro-fleet/common/dist/app/interfaces/configurations';
-	import { Maybe } from '@micro-fleet/common/dist/app/models/Maybe';
-	import { SettingItem } from '@micro-fleet/common/dist/app/models/settings/SettingItem';
-	/**
-	 * Represents an array of database settings.
-	 */
-	export class DatabaseSettings extends Array<SettingItem> {
-	    /**
-	     * Parses from configuration provider.
-	     * @param {IConfigurationProvider} provider.
-	     */
-	    /**
-	     * Parses from connection detail.
-	     * @param {DbConnectionDetail} detail Connection detail loaded from JSON data source.
-	     */
-	    static fromConnectionDetail(detail: DbConnectionDetail): Maybe<DatabaseSettings>;
-	    constructor();
+	    valueOf(): any;
 	}
 
 }
@@ -1281,7 +1301,7 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	     * Gets total number of items.
 	     */
 	    readonly total: number;
-	    constructor(total?: number, ...items: T[]);
+	    constructor(total?: number, items?: T[]);
 	    /**
 	     * Returns a serializable object.
 	     */
@@ -1318,6 +1338,35 @@ declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' 
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/utils/ObjectUtil' {
+	/**
+	 * Provides helper methods to manipulate objects.
+	 */
+	export class ObjectUtil {
+	    	    /**
+	     * Creates an object composed of the picked object properties.
+	     */
+	    static pickNotNull(source: object, ...props: string[]): object;
+	    /**
+	     * Checks if the object implements interface `ISerializable`
+	     */
+	    static isSerializable(target: object): target is ISerializable;
+	    /**
+	     * Converts object to string
+	     */
+	    static serialize(target: any): string;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/BusinessInvariantError' {
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	/**
+	 * Represents a business rul violation.
+	 */
+	export class BusinessInvariantError extends ValidationError {
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/lazyInject' {
 	/**
 	 * Injects value to the decorated property.
@@ -1334,8 +1383,6 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/id/IdBase';
 	export * from '@micro-fleet/common/dist/app/models/id/SingleId';
 	export * from '@micro-fleet/common/dist/app/models/id/TenantId';
-	export * from '@micro-fleet/common/dist/app/models/settings/CacheSettings';
-	export * from '@micro-fleet/common/dist/app/models/settings/DatabaseSettings';
 	export * from '@micro-fleet/common/dist/app/models/settings/GetSettingRequest';
 	export * from '@micro-fleet/common/dist/app/models/settings/SettingItem';
 	export * from '@micro-fleet/common/dist/app/models/DomainModelBase';
@@ -1346,6 +1393,8 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
 	export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
+	export * from '@micro-fleet/common/dist/app/utils/ObjectUtil';
+	export * from '@micro-fleet/common/dist/app/validators/BusinessInvariantError';
 	export * from '@micro-fleet/common/dist/app/validators/JoiExtended';
 	export * from '@micro-fleet/common/dist/app/validators/IModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';

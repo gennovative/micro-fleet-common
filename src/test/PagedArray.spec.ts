@@ -15,7 +15,7 @@ describe('PagedArray', () => {
 
     it('Should initialize with one value', () => {
         // Act
-        const arr = new PagedArray(100, 'a')
+        const arr = new PagedArray(100, ['a'])
 
         // Assert
         expect(Array.isArray(arr)).to.be.true
@@ -25,7 +25,7 @@ describe('PagedArray', () => {
 
     it('Should initialize with multiple values', () => {
         // Act
-        const arr = new PagedArray(100, 'a', 'b', 'c')
+        const arr = new PagedArray(100, ['a', 'b', 'c'])
 
         // Assert
         expect(Array.isArray(arr)).to.be.true
@@ -35,7 +35,7 @@ describe('PagedArray', () => {
 
     it('Should support normal array functions', () => {
         // Act
-        const arr = new PagedArray(100, 'a', 'b', 'c')
+        const arr = new PagedArray(100, ['a', 'b', 'c'])
 
         const pagedStr = arr.concat(['d', 'e']).join(','),
             normalStr = ['a', 'b', 'c', 'd', 'e'].join(',')
@@ -46,7 +46,7 @@ describe('PagedArray', () => {
 
     it('Should support normal array functions', () => {
         // Act
-        const arr = new PagedArray(100, 'a', 'b', 'c')
+        const arr = new PagedArray(100, ['a', 'b', 'c'])
 
         const pagedStr = arr.concat(['d', 'e']).join(','),
             normalStr = ['a', 'b', 'c', 'd', 'e'].join(',')
@@ -58,7 +58,7 @@ describe('PagedArray', () => {
     describe('asObject', () => {
         it('Should return a serializable object.', () => {
             // Arrange
-            const pagedArr = new PagedArray(100, 'a', 'b', 'c'),
+            const pagedArr = new PagedArray(100, ['a', 'b', 'c']),
                 normalArr = ['a', 'b', 'c']
 
             // Act

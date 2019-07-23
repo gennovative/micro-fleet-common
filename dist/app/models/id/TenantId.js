@@ -13,6 +13,18 @@ class TenantId extends IdBase_1.IdBase {
     toArray() {
         return [this.id, this.tenantId];
     }
+    /**
+     * @override
+     */
+    toString() {
+        return `${this.id},${this.tenantId}`;
+    }
+    /**
+     * Returns a JSON { id: '', tenantId: '' }
+     */
+    valueOf() {
+        return this.toJSON();
+    }
 }
 exports.TenantId = TenantId;
 //# sourceMappingURL=TenantId.js.map

@@ -16,4 +16,18 @@ export class TenantId extends IdBase {
     public toArray(): string[] {
         return [ this.id, this.tenantId ]
     }
+
+    /**
+     * @override
+     */
+    public toString(): string {
+        return `${this.id},${this.tenantId}`
+    }
+
+    /**
+     * Returns a JSON { id: '', tenantId: '' }
+     */
+    public valueOf(): any {
+        return this.toJSON()
+    }
 }

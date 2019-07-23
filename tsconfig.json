@@ -2,7 +2,7 @@
     "extends": "../../../tsconfig.base",
     "include": [
         "src",
-        "typings"
+        "typings",
     ],
     "exclude": [
         "typings/app.d.ts",

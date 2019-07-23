@@ -9,6 +9,18 @@ class SingleId extends IdBase_1.IdBase {
     /**
      * @override
      */
+    toString() {
+        return this.id;
+    }
+    /**
+     * @override
+     */
+    valueOf() {
+        return this.id;
+    }
+    /**
+     * @override
+     */
     toArray() {
         return [this.id];
     }

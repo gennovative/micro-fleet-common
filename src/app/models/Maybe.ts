@@ -29,12 +29,16 @@ export abstract class Maybe<T = any> {
         return new Just<T>(value)
     }
 
-    public static isJust = function(maybe: Maybe) {
-        return (maybe instanceof Just)
+    public static isJust(target: any): target is Just<any> {
+        return (target instanceof Just)
     }
 
-    public static isNothing = function(maybe: Maybe) {
-        return (maybe === _nothing)
+    public static isNothing(target: any): target is Nothing {
+        return (target === _nothing)
+    }
+
+    public static isMaybe(target: any): target is Maybe {
+        return this.isJust(target) || this.isNothing(target)
     }
 
 
@@ -63,12 +67,6 @@ export abstract class Maybe<T = any> {
     public abstract map<TMap>(f: (val: T) => TMap): Maybe<TMap>
 
     /**
-     * Execute the callback function if Nothing,
-     * or does nothing if Just.
-     */
-    public abstract orElse(f: () => void): Maybe<T>
-
-    /**
      * Takes another Maybe that wraps a function and applies its `map`
      * method to this Maybe's value, which must be a function.
      */
@@ -79,6 +77,18 @@ export abstract class Maybe<T = any> {
      *  chain must return a value of the same Chain
      */
     public abstract chain<TChain>(f: (val: T) => Maybe<TChain>): Maybe<TChain>
+
+    /**
+     * Same as `map`, but only executes the callback function if Nothing,
+     * or does nothing if Just.
+     */
+    public abstract mapElse(f: () => void): Maybe<T>
+
+    /**
+     * Same as `chain`, but only executes the callback function if Nothing,
+     * or does nothing if Just.
+     */
+    public abstract chainElse<TChain>(f: () => Maybe<TChain>): Maybe<TChain>
 
     /**
      * Attempts to get the contained value, if there is not, returns the given default value.
@@ -125,7 +135,12 @@ class Just<T> extends Maybe {
     /**
      * @override
      */
-    public orElse = returnThis
+    public mapElse = returnThis
+
+    /**
+     * @override
+     */
+    public chainElse = returnThis
 
     /**
      * @override
@@ -196,8 +211,12 @@ class Nothing extends Maybe {
     /**
      * @override
      */
-    public orElse(f: () => void): Maybe {
+    public mapElse(f: () => void): Maybe {
         return this.of(f())
+    }
+
+    public chainElse<TChain>(f: () => Maybe<TChain>): Maybe<TChain> {
+        return f()
     }
 
     /**

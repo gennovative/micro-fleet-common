@@ -28,13 +28,16 @@ class Maybe {
     static Just(value) {
         return new Just(value);
     }
+    static isJust(target) {
+        return (target instanceof Just);
+    }
+    static isNothing(target) {
+        return (target === _nothing);
+    }
+    static isMaybe(target) {
+        return this.isJust(target) || this.isNothing(target);
+    }
 }
-Maybe.isJust = function (maybe) {
-    return (maybe instanceof Just);
-};
-Maybe.isNothing = function (maybe) {
-    return (maybe === _nothing);
-};
 Maybe.of = Maybe.Just;
 exports.Maybe = Maybe;
 class Just extends Maybe {
@@ -44,7 +47,11 @@ class Just extends Maybe {
         /**
          * @override
          */
-        this.orElse = returnThis;
+        this.mapElse = returnThis;
+        /**
+         * @override
+         */
+        this.chainElse = returnThis;
     }
     /**
      * @override
@@ -135,8 +142,11 @@ class Nothing extends Maybe {
     /**
      * @override
      */
-    orElse(f) {
+    mapElse(f) {
         return this.of(f());
+    }
+    chainElse(f) {
+        return f();
     }
     /**
      * @override
