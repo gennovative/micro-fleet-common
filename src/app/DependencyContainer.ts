@@ -6,6 +6,7 @@ if (!Reflect || typeof Reflect['hasOwnMetadata'] !== 'function') {
 import { injectable, inject, decorate, Container, interfaces,
     unmanaged, optional } from 'inversify'
 
+import { Newable } from './interfaces/misc'
 import { MinorException } from './models/Exceptions'
 import { Guard } from './Guard'
 

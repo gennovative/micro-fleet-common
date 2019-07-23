@@ -1,4 +1,61 @@
 /// <reference path="./global.d.ts" />
+declare module '@micro-fleet/common/dist/app/interfaces/misc' {
+	/**
+	 * A data type representing a class.
+	 */
+	export type Newable<T = any> = (new (...args: any[]) => T);
+	/**
+	 * If an object wants to be initialized when microservice proccess starts, it must
+	 * implements this interface to be able to add to add-on list.
+	 */
+	export interface IServiceAddOn {
+	    /**
+	     * Gets add-on name.
+	     */
+	    readonly name: string;
+	    /**
+	     * Initializes this add-on.
+	     * @returns A promise that resolves `true` if success, rejects if otherwise.
+	     */
+	    init(): Promise<void>;
+	    /**
+	     * Invoked before `dispose` is called.
+	     */
+	    deadLetter(): Promise<void>;
+	    /**
+	     * Stops this add-on and cleans all resources.
+	     */
+	    dispose(): Promise<void>;
+	}
+	/**
+	 * Represents a state object
+	 */
+	export interface IDomainState {
+	    [key: string]: any;
+	    /**
+	     * Checks if any of its properties has been changed
+	     */
+	    isDirty(): boolean;
+	    /**
+	     * Checks if the given property name has its value changed.
+	     */
+	    isPropDirty(prop: string): boolean;
+	    /**
+	     * Gets an object containing modified properties
+	     */
+	    getChanges(): object;
+	}
+	/**
+	 * Represents an object backed by a state
+	 */
+	export interface IStateBacked {
+	    readonly state: IDomainState;
+	}
+	export interface ISerializable {
+	    toJSON(): object;
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/models/Exceptions' {
 	export class Exception implements Error {
 	    readonly message: string;
@@ -145,6 +202,7 @@ declare module '@micro-fleet/common/dist/app/Guard' {
 }
 declare module '@micro-fleet/common/dist/app/DependencyContainer' {
 	import { injectable, inject, decorate, interfaces, unmanaged, optional } from 'inversify';
+	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
 	export class BindingScope<T> {
 	    	    constructor(_binding: interfaces.BindingInWhenOnSyntax<T>);
 	    asSingleton(): void;
@@ -967,8 +1025,9 @@ declare module '@micro-fleet/common/dist/app/translators/IModelAutoMapper' {
 
 }
 declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
-	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
 	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
+	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
 	import { IModelAutoMapper, MappingOptions } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	/**
 	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
@@ -1193,7 +1252,7 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 	     * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
 	     *         Has no effect with remote settings.
 	     */
-	    get(key: string, dataType?: SettingItemDataType): Maybe<PrimitiveType | any[]>;
+	    get(key: string, dataType?: SettingItemDataType): Maybe<any>;
 	    /**
 	     * Attempts to fetch settings from remote Configuration Service.
 	     */
@@ -1215,7 +1274,7 @@ declare module '@micro-fleet/common/dist/app/models/id/IdBase' {
 	    abstract toArray(): T[];
 	    abstract toString(): string;
 	    abstract valueOf(): any;
-	    toJSON(): PrimitiveFlatJson;
+	    toJSON(): object;
 	}
 
 }
@@ -1280,18 +1339,6 @@ declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' 
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/models/DomainModelBase' {
-	import { IModelAutoMapper } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
-	export class DomainModelBase implements IDomainModel {
-	    /**
-	     * @abstract
-	     * Function to convert other object to this class type.
-	     * This method must be implemented by derived class!
-	     */
-	    static readonly translator: IModelAutoMapper<any>;
-	}
-
-}
 declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	/**
 	 * A wrapper array that contains paged items.
@@ -1339,6 +1386,7 @@ declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' 
 
 }
 declare module '@micro-fleet/common/dist/app/utils/ObjectUtil' {
+	import { ISerializable } from '@micro-fleet/common/dist/app/interfaces/misc';
 	/**
 	 * Provides helper methods to manipulate objects.
 	 */
@@ -1380,12 +1428,12 @@ declare module '@micro-fleet/common' {
 	export const constants: constantObj.Constants;
 	export * from '@micro-fleet/common/dist/app/interfaces/automapper';
 	export * from '@micro-fleet/common/dist/app/interfaces/configurations';
+	export * from '@micro-fleet/common/dist/app/interfaces/misc';
 	export * from '@micro-fleet/common/dist/app/models/id/IdBase';
 	export * from '@micro-fleet/common/dist/app/models/id/SingleId';
 	export * from '@micro-fleet/common/dist/app/models/id/TenantId';
 	export * from '@micro-fleet/common/dist/app/models/settings/GetSettingRequest';
 	export * from '@micro-fleet/common/dist/app/models/settings/SettingItem';
-	export * from '@micro-fleet/common/dist/app/models/DomainModelBase';
 	export * from '@micro-fleet/common/dist/app/models/Exceptions';
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';

@@ -1,3 +1,5 @@
+/// <reference types="automapper-ts" />
+
 import * as joi from 'joi'
 import { expect } from 'chai'
 

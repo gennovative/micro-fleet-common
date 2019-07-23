@@ -4,9 +4,10 @@ if (!global['automapper']) {
     require('automapper-ts')
 }
 
+import { ICreateMapFluentFunctions } from '../interfaces/automapper'
+import { Newable } from '../interfaces/misc'
 import { IModelValidator } from '../validators/IModelValidator'
 import { ValidationError } from '../validators/ValidationError'
-import { ICreateMapFluentFunctions } from '../interfaces/automapper'
 import { IModelAutoMapper, MappingOptions } from './IModelAutoMapper'
 
 

@@ -1,3 +1,4 @@
+import { ISerializable } from '../interfaces/misc'
 
 /**
  * Provides helper methods to manipulate objects.

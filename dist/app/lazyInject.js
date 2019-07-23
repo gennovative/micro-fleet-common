@@ -1,7 +1,7 @@
 "use strict";
-/// <reference types="reflect-metadata" />
+/// <reference types='reflect-metadata' />
 Object.defineProperty(exports, "__esModule", { value: true });
-const common_1 = require("@micro-fleet/common");
+const ServiceContext_1 = require("./models/ServiceContext");
 const INJECTION = Symbol();
 function proxyGetter(proto, key, resolve) {
     function getter() {
@@ -27,7 +27,7 @@ function proxyGetter(proto, key, resolve) {
  */
 function lazyInject(depIdentifier) {
     return function (proto, key) {
-        const resolve = () => common_1.serviceContext.dependencyContainer.resolve(depIdentifier);
+        const resolve = () => ServiceContext_1.serviceContext.dependencyContainer.resolve(depIdentifier);
         proxyGetter(proto, key, resolve);
     };
 }

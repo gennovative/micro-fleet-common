@@ -10,7 +10,6 @@ __export(require("./models/id/SingleId"));
 __export(require("./models/id/TenantId"));
 __export(require("./models/settings/GetSettingRequest"));
 __export(require("./models/settings/SettingItem"));
-__export(require("./models/DomainModelBase"));
 __export(require("./models/Exceptions"));
 __export(require("./models/Maybe"));
 __export(require("./models/PagedArray"));

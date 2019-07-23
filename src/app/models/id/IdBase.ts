@@ -9,7 +9,7 @@ export abstract class IdBase<T = string> {
     public abstract toString(): string
     public abstract valueOf(): any
 
-    public toJSON(): PrimitiveFlatJson {
+    public toJSON(): object {
         return Object.assign({}, this)
     }
 }

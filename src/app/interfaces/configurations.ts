@@ -19,7 +19,7 @@ export interface IConfigurationProvider {
      * @param {SettingItemDataType} dataType Data type to parse some settings from file or ENV variables.
      *         Has no effect with remote settings.
      */
-    get(key: string, dataType?: SettingItemDataType): Maybe<PrimitiveType | any[]>
+    get(key: string, dataType?: SettingItemDataType): Maybe<any>
 
     /**
      * Attempts to fetch settings from remote Configuration Service.

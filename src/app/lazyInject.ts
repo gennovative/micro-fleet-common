@@ -1,7 +1,7 @@
-/// <reference types="reflect-metadata" />
+/// <reference types='reflect-metadata' />
 
-import { serviceContext } from '@micro-fleet/common'
 
+import { serviceContext } from './models/ServiceContext'
 
 const INJECTION = Symbol()
 
