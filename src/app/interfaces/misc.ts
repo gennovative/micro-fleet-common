@@ -1,5 +1,10 @@
 
 /**
+ * A data type representing Javascript primitive types.
+ */
+export type PrimitiveType = string | number | boolean | bigint
+
+/**
  * A data type representing a class.
  */
 export type Newable<T = any> = (new (...args: any[]) => T)

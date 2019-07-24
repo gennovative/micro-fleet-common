@@ -1,6 +1,10 @@
 /// <reference path="./global.d.ts" />
 declare module '@micro-fleet/common/dist/app/interfaces/misc' {
 	/**
+	 * A data type representing Javascript primitive types.
+	 */
+	export type PrimitiveType = string | number | boolean | bigint;
+	/**
 	 * A data type representing a class.
 	 */
 	export type Newable<T = any> = (new (...args: any[]) => T);
