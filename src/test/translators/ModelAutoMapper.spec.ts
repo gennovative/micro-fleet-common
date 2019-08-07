@@ -12,8 +12,8 @@ const itemValidator = JoiModelValidator.create({
     schemaMapModel: {
         name: joi.string().required(),
     },
-    isCompositePk: false,
-    requirePk: false,
+    isCompositeId: false,
+    requireId: false,
 })
 
 

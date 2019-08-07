@@ -21,9 +21,9 @@ SampleModel.validator = JoiModelValidator.create<SampleModel>({
             .allow(null).optional(),
         gender: joi.only('male', 'female').allow(null).optional(),
     },
-    isCompositePk: null,
-    requirePk: false,
-    schemaMapPk: {
+    isCompositeId: null,
+    requireId: false,
+    schemaMapId: {
         theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER),
     },
 })

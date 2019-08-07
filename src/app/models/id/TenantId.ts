@@ -13,6 +13,14 @@ export class TenantId extends IdBase {
     /**
      * @override
      */
+    public equals(target: any): boolean {
+        if (!target) { return false }
+        return (this.id === target.id && this.tenantId === target.tenantId)
+    }
+
+    /**
+     * @override
+     */
     public toArray(): string[] {
         return [ this.id, this.tenantId ]
     }

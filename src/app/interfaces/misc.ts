@@ -37,36 +37,6 @@ export interface IServiceAddOn {
 
 }
 
-/**
- * Represents a state object
- */
-export interface IDomainState {
-
-    [key: string]: any
-
-    /**
-     * Checks if any of its properties has been changed
-     */
-    isDirty(): boolean
-
-    /**
-     * Checks if the given property name has its value changed.
-     */
-    isPropDirty(prop: string): boolean
-
-    /**
-     * Gets an object containing modified properties
-     */
-    getChanges(): object
-}
-
-/**
- * Represents an object backed by a state
- */
-export interface IStateBacked {
-    readonly state: IDomainState
-}
-
 export interface ISerializable {
     toJSON(): object
 }

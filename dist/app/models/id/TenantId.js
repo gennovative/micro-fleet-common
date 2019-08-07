@@ -10,6 +10,15 @@ class TenantId extends IdBase_1.IdBase {
     /**
      * @override
      */
+    equals(target) {
+        if (!target) {
+            return false;
+        }
+        return (this.id === target.id && this.tenantId === target.tenantId);
+    }
+    /**
+     * @override
+     */
     toArray() {
         return [this.id, this.tenantId];
     }

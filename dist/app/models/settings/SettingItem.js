@@ -57,8 +57,8 @@ SettingItem.validator = JoiModelValidator_1.JoiModelValidator.create({
             .only(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
         value: joi.string().allow('').required(),
     },
-    isCompositePk: false,
-    requirePk: false,
+    isCompositeId: false,
+    requireId: false,
 });
 SettingItem.translator = new ModelAutoMapper_1.ModelAutoMapper(SettingItem, SettingItem.validator);
 //# sourceMappingURL=SettingItem.js.map

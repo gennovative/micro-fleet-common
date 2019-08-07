@@ -9,6 +9,21 @@ class SingleId extends IdBase_1.IdBase {
     /**
      * @override
      */
+    equals(target) {
+        if (!target) {
+            return false;
+        }
+        return this.id === target.id;
+    }
+    /**
+     * @override
+     */
+    toArray() {
+        return [this.id];
+    }
+    /**
+     * @override
+     */
     toString() {
         return this.id;
     }
@@ -17,12 +32,6 @@ class SingleId extends IdBase_1.IdBase {
      */
     valueOf() {
         return this.id;
-    }
-    /**
-     * @override
-     */
-    toArray() {
-        return [this.id];
     }
 }
 exports.SingleId = SingleId;

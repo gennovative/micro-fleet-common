@@ -13,6 +13,7 @@ __export(require("./models/settings/SettingItem"));
 __export(require("./models/Exceptions"));
 __export(require("./models/Maybe"));
 __export(require("./models/PagedArray"));
+__export(require("./models/Result"));
 __export(require("./models/ServiceContext"));
 __export(require("./translators/AccessorSupportMapper"));
 __export(require("./translators/ModelAutoMapper"));

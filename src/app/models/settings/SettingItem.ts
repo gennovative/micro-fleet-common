@@ -67,8 +67,8 @@ SettingItem.validator = JoiModelValidator.create({
                 SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
         value: joi.string().allow('').required(),
     },
-    isCompositePk: false,
-    requirePk: false,
+    isCompositeId: false,
+    requireId: false,
 })
 
 SettingItem.translator = new ModelAutoMapper(SettingItem, SettingItem.validator)

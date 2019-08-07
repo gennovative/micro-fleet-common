@@ -31,30 +31,6 @@ declare module '@micro-fleet/common/dist/app/interfaces/misc' {
 	     */
 	    dispose(): Promise<void>;
 	}
-	/**
-	 * Represents a state object
-	 */
-	export interface IDomainState {
-	    [key: string]: any;
-	    /**
-	     * Checks if any of its properties has been changed
-	     */
-	    isDirty(): boolean;
-	    /**
-	     * Checks if the given property name has its value changed.
-	     */
-	    isPropDirty(prop: string): boolean;
-	    /**
-	     * Gets an object containing modified properties
-	     */
-	    getChanges(): object;
-	}
-	/**
-	 * Represents an object backed by a state
-	 */
-	export interface IStateBacked {
-	    readonly state: IDomainState;
-	}
 	export interface ISerializable {
 	    toJSON(): object;
 	}
@@ -746,6 +722,9 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	    static isJust(target: any): target is Just<any>;
 	    static isNothing(target: any): target is Nothing;
 	    static isMaybe(target: any): target is Maybe;
+	    /**
+	     * Alias of Maybe.Just
+	     */
 	    static of: typeof Maybe.Just;
 	    abstract readonly isJust: boolean;
 	    abstract readonly isNothing: boolean;
@@ -754,7 +733,9 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	     * If you want to avoid exception, use `tryGetValue()` instead.
 	     */
 	    abstract readonly value: T;
-	    constructor();
+	    /**
+	     * Alias of Maybe.Just
+	     */
 	    of: typeof Maybe.Just;
 	    /**
 	     * Applies the funtion `f` to internal value if Just,
@@ -916,32 +897,32 @@ declare module '@micro-fleet/common/dist/app/validators/IModelValidator' {
 	     * Whether the primary key is composite. Default to `false`.
 	     * This param is IGNORED if param `schemaMapPk` has value.
 	     */
-	    isCompositePk?: boolean;
+	    isCompositeId?: boolean;
 	    /**
 	     * Whether to validate PK.
 	     * This param is IGNORED if param `schemaMapPk` has value.
 	     * Default to be `false`.
 	     */
-	    requirePk?: boolean;
+	    requireId?: boolean;
 	    /**
 	     * Rule to validate model PK.
 	     */
-	    schemaMapPk?: joi.SchemaMap;
+	    schemaMapId?: joi.SchemaMap;
 	};
 	export interface IModelValidator<T> {
 	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapPk: joi.SchemaMap;
-	    readonly isCompositePk: boolean;
+	    readonly schemaMapId: joi.SchemaMap;
+	    readonly isCompositeId: boolean;
 	    /**
-	     * Validates model PK.
+	     * Validates model ID.
 	     */
-	    pk(pk: any): [ValidationError, any];
+	    id(id: any): [ValidationError, any];
 	    /**
-	     * Validates model for creation operation, which doesn't need `pk` property.
+	     * Validates model for creation operation, which doesn't need `id` property.
 	     */
 	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
 	    /**
-	     * Validates model for modification operation, which requires `pk` property.
+	     * Validates model for modification operation, which requires `id` property.
 	     */
 	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
 	    /**
@@ -1136,16 +1117,16 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
 	export class JoiModelValidator<T> implements IModelValidator<T> {
 	    protected _schemaMap: joi.SchemaMap;
-	    protected _isCompositePk: boolean;
-	    protected _schemaMapPk?: joi.SchemaMap;
+	    protected _isCompositeId: boolean;
+	    protected _schemaMapId?: joi.SchemaMap;
 	    /**
 	     * Builds a new instance of ModelValidatorBase.
 	     */
-	    static create<T>({ schemaMapModel, isCompositePk, requirePk, schemaMapPk, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
+	    static create<T>({ schemaMapModel, isCompositeId, requireId, schemaMapId: schemaMapId, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
 	    /**
-	     * Compiled rules for model primary key.
+	     * Compiled rules for model ID.
 	     */
-	    protected _compiledPk: joi.ObjectSchema;
+	    protected _compiledId: joi.ObjectSchema;
 	    /**
 	     * Compiled rules for model properties.
 	     */
@@ -1157,20 +1138,20 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 	    protected _compiledPartial: joi.ObjectSchema;
 	    /**
 	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {boolean} _isCompositePk Whether the primary key is made of multiple properties. Default to `false`
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {boolean} requirePk Whether to validate ID.
-	     *     This param is IGNORED if param `schemaMapPk` has value.
-	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model PK.
+	     * @param {boolean} _isCompositeId Whether the primary key is made of multiple properties. Default to `false`
+	     *     This param is IGNORED if param `schemaMapId` has value.
+	     * @param {boolean} requireId Whether to validate ID.
+	     *     This param is IGNORED if param `schemaMapId` has value.
+	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID.
 	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositePk: boolean, requirePk: boolean, _schemaMapPk?: joi.SchemaMap);
+	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositeId: boolean, requireId: boolean, _schemaMapId?: joi.SchemaMap);
 	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapPk: joi.SchemaMap;
-	    readonly isCompositePk: boolean;
+	    readonly schemaMapId: joi.SchemaMap;
+	    readonly isCompositeId: boolean;
 	    /**
-	     * @see IModelValidator.pk
+	     * @see IModelValidator.id
 	     */
-	    pk(pk: any): [ValidationError, any];
+	    id(id: any): [ValidationError, any];
 	    /**
 	     * @see IModelValidator.whole
 	     */
@@ -1270,14 +1251,16 @@ declare module '@micro-fleet/common/dist/app/interfaces/configurations' {
 
 }
 declare module '@micro-fleet/common/dist/app/models/id/IdBase' {
+	import { ISerializable } from '@micro-fleet/common/dist/app/interfaces/misc';
 	/**
 	 * Base class for ID type.
 	 * Models in DDD (domain-driven design) often have ID as a class instance.
 	 */
-	export abstract class IdBase<T = string> {
+	export abstract class IdBase<T = string> implements ISerializable {
 	    abstract toArray(): T[];
 	    abstract toString(): string;
 	    abstract valueOf(): any;
+	    abstract equals(target: any): boolean;
 	    toJSON(): object;
 	}
 
@@ -1290,15 +1273,19 @@ declare module '@micro-fleet/common/dist/app/models/id/SingleId' {
 	    /**
 	     * @override
 	     */
+	    equals(target: any): boolean;
+	    /**
+	     * @override
+	     */
+	    toArray(): string[];
+	    /**
+	     * @override
+	     */
 	    toString(): string;
 	    /**
 	     * @override
 	     */
 	    valueOf(): any;
-	    /**
-	     * @override
-	     */
-	    toArray(): string[];
 	}
 
 }
@@ -1308,6 +1295,10 @@ declare module '@micro-fleet/common/dist/app/models/id/TenantId' {
 	    id: string;
 	    tenantId: string;
 	    constructor(id: string, tenantId: string);
+	    /**
+	     * @override
+	     */
+	    equals(target: any): boolean;
 	    /**
 	     * @override
 	     */
@@ -1361,6 +1352,185 @@ declare module '@micro-fleet/common/dist/app/models/PagedArray' {
 	        data: any[];
 	    };
 	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/Result' {
+	import { Exception } from '@micro-fleet/common/dist/app/models/Exceptions'; function returnThis(this: any): any;
+	/**
+	 * Represents an error when attempting to get value from a Result.Failure
+	 */
+	export class NoValueFromFailureResultException extends Exception {
+	    constructor();
+	}
+	/**
+	 * Represents an error when attempting to get error from a Result.Ok
+	 */
+	export class NoErrorFromOkResultException extends Exception {
+	    constructor();
+	}
+	/**
+	 * Represents an object which can be Ok or Failure.
+	 * Use this class to avoid throwing Exception.
+	 * Source code inspired by: https://github.com/ramda/ramda-fantasy/blob/master/dist/Either.js
+	 */
+	export abstract class Result<TOk = any, TFail = any> {
+	    static Failure<TO, TF>(reason: TF): Result<TO, TF>;
+	    static Ok<TO>(value: TO): Result<TO>;
+	    static isOk(target: any): target is Ok<any>;
+	    static isFailure(target: any): target is Failure;
+	    static isResult(target: any): target is Result;
+	    /**
+	     * Alias of Result.Ok
+	     */
+	    static of: typeof Result.Ok;
+	    abstract readonly isOk: boolean;
+	    abstract readonly isFailure: boolean;
+	    /**
+	     * Gets the success value if Ok, or throws an `NoValueFromFailureResultException` if Failure.
+	     * If you want to avoid exception, use `tryGetValue()` instead.
+	     */
+	    abstract readonly value: TOk;
+	    /**
+	     * Gets the error if Failure, or throws an `NoErrorFromOkResultException` if Ok.
+	     */
+	    abstract readonly error: TFail;
+	    /**
+	     * Alias of Result.Ok
+	     */
+	    of: typeof Result.Ok;
+	    /**
+	     * Applies the funtion `f` to internal value if Ok,
+	     * or does nothing if Failure.
+	     */
+	    abstract map<TMap>(f: (val: TOk) => TMap): Result<TMap>;
+	    /**
+	     * Takes another Result that wraps a function and applies its `map`
+	     * method to this Result's value, which must be a function.
+	     */
+	    abstract ap(m: Result): Result;
+	    /**
+	     * `f` must be a function which returns a value of the same Chain
+	     *  chain must return a value of the same Chain
+	     */
+	    abstract chain<TChain>(f: (val: TOk) => Result<TChain>): Result<TChain>;
+	    /**
+	     * Same as `map`, but only executes the callback function if Failure,
+	     * or does nothing if Ok.
+	     */
+	    abstract mapElse(f: (reason: TFail) => void): Result<TOk>;
+	    /**
+	     * Same as `chain`, but only executes the callback function if Failure,
+	     * or does nothing if Ok.
+	     */
+	    abstract chainElse<TChain>(f: (reason: TFail) => Result<TChain>): Result<TChain>;
+	    /**
+	     * Attempts to get the success value, if this is Failure, returns the given default value.
+	     * @param defaultVal Value to return in case there is no contained value.
+	     */
+	    abstract tryGetValue(defaultVal: any): TOk;
+	    /**
+	     * Throws the error if Failure, or does nothing if Ok.
+	     */
+	    abstract throwError(): void;
+	} class Ok<T> extends Result<T, any> {
+	    	    /**
+	     * @override
+	     */
+	    readonly isOk: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly isFailure: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly error: any;
+	    /**
+	     * @override
+	     */
+	    readonly value: T;
+	    constructor(_value: T);
+	    /**
+	     * @override
+	     */
+	    map<TMap>(f: (val: T) => TMap): Result<TMap>;
+	    /**
+	     * @override
+	     */
+	    mapElse: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    chainElse: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    ap(m: Result): Result;
+	    /**
+	     * @override
+	     */
+	    chain<TChain>(f: (val: T) => Result<TChain>): Result<TChain>;
+	    /**
+	     * @override
+	     */
+	    tryGetValue(defaultVal: any): T;
+	    /**
+	     * @override
+	     */
+	    throwError(): void;
+	    /**
+	     * @override
+	     */
+	    toString(): string;
+	} class Failure<T = any> extends Result<any, T> {
+	    	    /**
+	     * @override
+	     */
+	    readonly isOk: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly isFailure: boolean;
+	    /**
+	     * @override
+	     */
+	    readonly error: T;
+	    /**
+	     * @override
+	     */
+	    readonly value: any;
+	    constructor(_reason: T);
+	    /**
+	     * @override
+	     */
+	    map: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    mapElse(f: (reason: T) => void): Result;
+	    chainElse<TChain>(f: (reason: T) => Result<TChain>): Result<TChain>;
+	    /**
+	     * @override
+	     */
+	    ap: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    chain: typeof returnThis;
+	    /**
+	     * @override
+	     */
+	    tryGetValue(defaultVal: any): any;
+	    /**
+	     * @override
+	     */
+	    throwError(): void;
+	    /**
+	     * @override
+	     */
+	    toString(): string;
+	}
+	export {};
 
 }
 declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' {
@@ -1441,6 +1611,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/Exceptions';
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedArray';
+	export * from '@micro-fleet/common/dist/app/models/Result';
 	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
 	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
 	export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
@@ -1456,5 +1627,15 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/Guard';
 	export * from '@micro-fleet/common/dist/app/lazyInject';
 	export * from '@micro-fleet/common/dist/app/Types';
+
+}
+declare module '@micro-fleet/common/dist/app/models/Future' {
+	export class Future<T> extends Promise<T> {
+	    static fromPromise<T>(promise: Promise<T>): Future<T>;
+	    constructor(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void);
+	    map<TMap>(f: (val: T) => TMap): Future<TMap>;
+	    chain<TChain>(f: (val: T) => Future<TChain>): Future<TChain>;
+	    toPromise(): Promise<T>;
+	}
 
 }

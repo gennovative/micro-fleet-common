@@ -7,7 +7,7 @@ let _nothing;
  */
 class EmptyMaybeException extends Exceptions_1.Exception {
     constructor() {
-        super('This Maybe is Nothing!', false, EmptyMaybeException);
+        super('This Maybe has Nothing', false, EmptyMaybeException);
     }
 }
 exports.EmptyMaybeException = EmptyMaybeException;
@@ -19,8 +19,10 @@ exports.EmptyMaybeException = EmptyMaybeException;
  */
 class Maybe {
     constructor() {
+        /**
+         * Alias of Maybe.Just
+         */
         this.of = Maybe.Just;
-        // x == null ? _nothing : Maybe.Just(x)
     }
     static Nothing() {
         return _nothing;
@@ -38,6 +40,9 @@ class Maybe {
         return this.isJust(target) || this.isNothing(target);
     }
 }
+/**
+ * Alias of Maybe.Just
+ */
 Maybe.of = Maybe.Just;
 exports.Maybe = Maybe;
 class Just extends Maybe {
@@ -52,6 +57,7 @@ class Just extends Maybe {
          * @override
          */
         this.chainElse = returnThis;
+        Object.freeze(this);
     }
     /**
      * @override
@@ -120,6 +126,7 @@ class Nothing extends Maybe {
          * @override
          */
         this.chain = returnThis;
+        Object.freeze(this);
     }
     /**
      * @override

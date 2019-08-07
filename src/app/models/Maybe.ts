@@ -9,7 +9,7 @@ let _nothing: any
  */
 export class EmptyMaybeException extends Exception {
     constructor() {
-        super('This Maybe is Nothing!', false, EmptyMaybeException)
+        super('This Maybe has Nothing', false, EmptyMaybeException)
     }
 }
 
@@ -42,6 +42,9 @@ export abstract class Maybe<T = any> {
     }
 
 
+    /**
+     * Alias of Maybe.Just
+     */
     public static of = Maybe.Just
 
     public abstract get isJust(): boolean
@@ -54,10 +57,10 @@ export abstract class Maybe<T = any> {
      */
     public abstract get value(): T
 
-    constructor() {
-        // x == null ? _nothing : Maybe.Just(x)
-    }
 
+    /**
+     * Alias of Maybe.Just
+     */
     public of = Maybe.Just
 
     /**
@@ -123,6 +126,7 @@ class Just<T> extends Maybe {
 
     constructor(private _value: T) {
         super()
+        Object.freeze(this)
     }
 
     /**
@@ -201,6 +205,7 @@ class Nothing extends Maybe {
 
     constructor() {
         super()
+        Object.freeze(this)
     }
 
     /**
