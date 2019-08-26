@@ -52,8 +52,8 @@ describe('JoiExtended', () => {
 
         it('Should return the value without convert if valid', () => {
             // Arrange
-            const targetOne = 12345n,
-                targetTwo = BigInt(Number.MAX_SAFE_INTEGER) + 999n,
+            const targetOne = BigInt(12345),
+                targetTwo = BigInt(Number.MAX_SAFE_INTEGER) + BigInt(999),
                 targetThree = '98765432135798642099887766554433221100'
 
             // Act

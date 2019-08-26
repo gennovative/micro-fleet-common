@@ -1,4 +1,5 @@
 import { Exception } from './Exceptions'
+import { Newable } from '../interfaces/misc'
 
 
 
@@ -115,8 +116,9 @@ export abstract class Result<TOk = any, TFail = any> {
 
     /**
      * Throws the error if Failure, or does nothing if Ok.
+     * @param ExceptionClass The class to wrap error
      */
-    public abstract throwError(): void
+    public abstract throwError(ExceptionClass?: Newable): void
 }
 
 class Ok<T> extends Result<T, any> {
@@ -196,7 +198,7 @@ class Ok<T> extends Result<T, any> {
     /**
      * @override
      */
-    public throwError(): void {
+    public throwError(ExceptionClass?: Newable): void {
         return
     }
 
@@ -281,7 +283,10 @@ class Failure<T = any> extends Result<any, T> {
     /**
      * @override
      */
-    public throwError(): void {
+    public throwError(ExceptionClass?: Newable): void {
+        if (ExceptionClass) {
+            throw new ExceptionClass(this._reason)
+        }
         throw this._reason
     }
 

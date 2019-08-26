@@ -150,7 +150,8 @@ class Nothing extends Maybe {
      * @override
      */
     mapElse(f) {
-        return this.of(f());
+        f();
+        return this;
     }
     chainElse(f) {
         return f();

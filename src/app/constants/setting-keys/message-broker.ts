@@ -12,10 +12,10 @@ export enum MbSettingKeys {
     MSG_BROKER_EXCHANGE = 'msgBroker_exchange',
 
     /**
-     * Default queue name to connect to.
+     * Default queue name for RPC handler to connect to.
      * Data type: string
      */
-    MSG_BROKER_QUEUE = 'msgBroker_queue',
+    MSG_BROKER_HANDLER_QUEUE = 'msgBroker_handler_queue',
 
     /**
      * Number of milliseconds to delay before reconnect to message broker.

@@ -120,7 +120,7 @@ class Ok extends Result {
     /**
      * @override
      */
-    throwError() {
+    throwError(ExceptionClass) {
         return;
     }
     /**
@@ -190,7 +190,10 @@ class Failure extends Result {
     /**
      * @override
      */
-    throwError() {
+    throwError(ExceptionClass) {
+        if (ExceptionClass) {
+            throw new ExceptionClass(this._reason);
+        }
         throw this._reason;
     }
     /**

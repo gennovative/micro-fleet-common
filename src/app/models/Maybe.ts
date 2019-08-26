@@ -217,7 +217,8 @@ class Nothing extends Maybe {
      * @override
      */
     public mapElse(f: () => void): Maybe {
-        return this.of(f())
+        f()
+        return this
     }
 
     public chainElse<TChain>(f: () => Maybe<TChain>): Maybe<TChain> {

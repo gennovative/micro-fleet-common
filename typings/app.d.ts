@@ -342,10 +342,43 @@ declare module '@micro-fleet/common/dist/app/constants/DbClient' {
 declare module '@micro-fleet/common/dist/app/constants/setting-keys/auth' {
 	export enum AuthSettingKeys {
 	    /**
-	     * Secret key to encrypt auth tokens.
+	     * Key to verify auth tokens.
+	     *
+	     * If signing algorithm is RS256, this is the PUBLIC key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
 	     * Data type: string
 	     */
-	    AUTH_SECRET = "auth_secret",
+	    AUTH_KEY_VERIFY = "auth_key_verify",
+	    /**
+	     * Path to the file containing key to verify auth tokens.
+	     * The key must be stored as UTF-8 plain text.
+	     *
+	     * If signing algorithm is RS256, this is the PUBLIC key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_VERIFY_FILE = "auth_key_verify_file",
+	    /**
+	     * Key to sign auth tokens.
+	     *
+	     * If signing algorithm is RS256, this is the PRIVATE key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_SIGN = "auth_key_sign",
+	    /**
+	     * Path to the file containing key to sign auth tokens.
+	     * The key must be stored as UTF-8 plain text.
+	     *
+	     * If signing algorithm is RS256, this is the PRIVATE key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_SIGN_FILE = "auth_key_signfile",
 	    /**
 	     * Issuer of auth tokens.
 	     * Data type: string
@@ -443,10 +476,10 @@ declare module '@micro-fleet/common/dist/app/constants/setting-keys/message-brok
 	     */
 	    MSG_BROKER_EXCHANGE = "msgBroker_exchange",
 	    /**
-	     * Default queue name to connect to.
+	     * Default queue name for RPC handler to connect to.
 	     * Data type: string
 	     */
-	    MSG_BROKER_QUEUE = "msgBroker_queue",
+	    MSG_BROKER_HANDLER_QUEUE = "msgBroker_handler_queue",
 	    /**
 	     * Number of milliseconds to delay before reconnect to message broker.
 	     * Data type: number
@@ -1334,28 +1367,41 @@ declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' 
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/models/PagedArray' {
+declare module '@micro-fleet/common/dist/app/models/PagedData' {
+	import { ISerializable } from '@micro-fleet/common/dist/app/interfaces/misc';
 	/**
-	 * A wrapper array that contains paged items.
+	 * An object that contains paged array of items.
 	 */
-	export class PagedArray<T> extends Array<T> {
-	    	    /**
+	export class PagedData<T> implements ISerializable {
+	    	    	    /**
+	     * Gets number of contained items
+	     */
+	    readonly length: number;
+	    /**
 	     * Gets total number of items.
 	     */
 	    readonly total: number;
-	    constructor(total?: number, items?: T[]);
+	    /**
+	     * Gets array of items.
+	     */
+	    readonly items: T[];
+	    constructor(items?: T[], total?: number);
+	    concat(arr: T[]): PagedData<T>;
+	    forEach(callbackFn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+	    map<U>(callbackFn: (value: T, index: number, array: T[]) => U, thisArg?: any): PagedData<U>;
 	    /**
 	     * Returns a serializable object.
 	     */
-	    asObject(): {
+	    toJSON(): {
 	        total: number;
-	        data: any[];
+	        items: T[];
 	    };
 	}
 
 }
 declare module '@micro-fleet/common/dist/app/models/Result' {
-	import { Exception } from '@micro-fleet/common/dist/app/models/Exceptions'; function returnThis(this: any): any;
+	import { Exception } from '@micro-fleet/common/dist/app/models/Exceptions';
+	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc'; function returnThis(this: any): any;
 	/**
 	 * Represents an error when attempting to get value from a Result.Failure
 	 */
@@ -1430,8 +1476,9 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
 	    abstract tryGetValue(defaultVal: any): TOk;
 	    /**
 	     * Throws the error if Failure, or does nothing if Ok.
+	     * @param ExceptionClass The class to wrap error
 	     */
-	    abstract throwError(): void;
+	    abstract throwError(ExceptionClass?: Newable): void;
 	} class Ok<T> extends Result<T, any> {
 	    	    /**
 	     * @override
@@ -1477,7 +1524,7 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
 	    /**
 	     * @override
 	     */
-	    throwError(): void;
+	    throwError(ExceptionClass?: Newable): void;
 	    /**
 	     * @override
 	     */
@@ -1524,7 +1571,7 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
 	    /**
 	     * @override
 	     */
-	    throwError(): void;
+	    throwError(ExceptionClass?: Newable): void;
 	    /**
 	     * @override
 	     */
@@ -1581,11 +1628,12 @@ declare module '@micro-fleet/common/dist/app/utils/ObjectUtil' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/BusinessInvariantError' {
-	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	import { ValidationError, ValidationErrorItem } from '@micro-fleet/common/dist/app/validators/ValidationError';
 	/**
-	 * Represents a business rul violation.
+	 * Represents a business rule violation.
 	 */
 	export class BusinessInvariantError extends ValidationError {
+	    constructor(details: ValidationErrorItem[]);
 	}
 
 }
@@ -1610,7 +1658,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/settings/SettingItem';
 	export * from '@micro-fleet/common/dist/app/models/Exceptions';
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
-	export * from '@micro-fleet/common/dist/app/models/PagedArray';
+	export * from '@micro-fleet/common/dist/app/models/PagedData';
 	export * from '@micro-fleet/common/dist/app/models/Result';
 	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
 	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
@@ -1627,15 +1675,5 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/Guard';
 	export * from '@micro-fleet/common/dist/app/lazyInject';
 	export * from '@micro-fleet/common/dist/app/Types';
-
-}
-declare module '@micro-fleet/common/dist/app/models/Future' {
-	export class Future<T> extends Promise<T> {
-	    static fromPromise<T>(promise: Promise<T>): Future<T>;
-	    constructor(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void);
-	    map<TMap>(f: (val: T) => TMap): Future<TMap>;
-	    chain<TChain>(f: (val: T) => Future<TChain>): Future<TChain>;
-	    toPromise(): Promise<T>;
-	}
 
 }

@@ -65,8 +65,8 @@ describe('JoiModelValidator', () => {
                     },
                 }),
                 target = {
-                    id: 9007199254740991n + 999n, // Number.MAX_SAFE_INTEGER + 999n
-                    tenantId: 9007199254740991n + 888n,
+                    id: BigInt('9007199254740991') + BigInt(999), // Number.MAX_SAFE_INTEGER + 999n
+                    tenantId: BigInt('9007199254740991') + BigInt(888),
                 }
 
             // Act

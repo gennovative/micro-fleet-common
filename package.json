@@ -1,6 +1,6 @@
 {
     "name": "@micro-fleet/common",
-    "version": "1.4.0-rc4",
+    "version": "1.4.1",
     "description": "Contains helpers, models and constants used by other packages.",
     "scripts": {
         "build": "npm run compile && npm run test",
@@ -12,13 +12,12 @@
         "test": "nyc --reporter=json --reporter=html --include dist/app/**/*.js mocha --recursive dist/test",
         "lint": "tslint --fix 'src/**/*.ts'",
         "watch": "npm run clean && npm run lint && tsc --watch --pretty",
-        "linkPackages": "node ../../../scripts/linkPackages.js",
         "prepublishOnly": "npm run release"
     },
     "dependencies": {
-        "automapper-ts": "~1.8",
-        "joi": "~13.0",
+        "automapper-ts": "~1.9",
         "inversify": "~4.11",
+        "joi": "~13.0",
         "lodash": "~4.17",
         "reflect-metadata": "~0.1"
     },
@@ -34,7 +33,7 @@
         "chai-spies": "git://github.com/chaijs/chai-spies.git#b11aeebf",
         "fs-extra": "~6.0",
         "mocha": "~5.2",
-        "moment": "^2.24.0",
+        "moment": "~2.24",
         "nyc": "~13.3",
         "rimraf": "~2.6",
         "ts-declarator": "~1.0",
