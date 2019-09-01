@@ -2,7 +2,7 @@
 /**
  * A data type representing Javascript primitive types.
  */
-export type PrimitiveType = string | number | boolean | bigint
+export type PrimitiveType = string | number | boolean
 
 /**
  * A data type representing a class.

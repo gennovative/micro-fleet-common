@@ -11,7 +11,10 @@ class ObjectUtil {
     static pickNotNull(source, ...props) {
         return props.reduce((prev, cur) => (source[cur] == null)
             ? prev
-            : (Object.assign({ [cur]: source[cur] }, prev)), {});
+            : ({
+                [cur]: source[cur],
+                ...prev,
+            }), {});
     }
     /**
      * Checks if the object implements interface `ISerializable`

@@ -1,9 +1,309 @@
 /// <reference path="./global.d.ts" />
+declare module '@micro-fleet/common/dist/app/setting-keys/DbClient' {
+	/**
+	 * Db driver names.
+	 */
+	export enum DbClient {
+	    /**
+	     * Microsoft SQL Server
+	     */
+	    MSSQL = "mssql",
+	    /**
+	     * MySQL
+	     */
+	    MYSQL = "mysql",
+	    /**
+	     * PostgreSQL
+	     */
+	    POSTGRESQL = "pg",
+	    /**
+	     * SQLite 3
+	     */
+	    SQLITE3 = "sqlite3"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
+	export enum Auth {
+	    /**
+	     * Key to verify auth tokens.
+	     *
+	     * If signing algorithm is RS256, this is the PUBLIC key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_VERIFY = "auth_key_verify",
+	    /**
+	     * Path to the file containing key to verify auth tokens.
+	     * The key must be stored as UTF-8 plain text.
+	     *
+	     * If signing algorithm is RS256, this is the PUBLIC key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_VERIFY_FILE = "auth_key_verify_file",
+	    /**
+	     * Key to sign auth tokens.
+	     *
+	     * If signing algorithm is RS256, this is the PRIVATE key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_SIGN = "auth_key_sign",
+	    /**
+	     * Path to the file containing key to sign auth tokens.
+	     * The key must be stored as UTF-8 plain text.
+	     *
+	     * If signing algorithm is RS256, this is the PRIVATE key.
+	     * Otherwise the key for verify may also be the key for signing.
+	     *
+	     * Data type: string
+	     */
+	    AUTH_KEY_SIGN_FILE = "auth_key_signfile",
+	    /**
+	     * Issuer of auth tokens.
+	     * Data type: string
+	     */
+	    AUTH_ISSUER = "auth_issuer",
+	    /**
+	     * Access token expiration duration in seconds.
+	     * Data type: number
+	     */
+	    AUTH_EXPIRE_ACCESS = "auth_expire_access",
+	    /**
+	     * Refresh token expiration duration in seconds.
+	     * Data type: number
+	     */
+	    AUTH_EXPIRE_REFRESH = "auth_expire_refresh"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/cache' {
+	export enum Cache {
+	    /**
+	     * Number of cache servers in cluster.
+	     * Data type: number
+	     */
+	    CACHE_NUM_CONN = "cache_num_conn",
+	    /**
+	     * A single string or an array of IP or host name of cache service.
+	     * Data type: string | string[]
+	     */
+	    CACHE_HOST = "cache_host",
+	    /**
+	     * A single value or an array of port number.
+	     * Data type: number | number[]
+	     */
+	    CACHE_PORT = "cache_port"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/database' {
+	export enum Database {
+	    /**
+	     * Name of database engine.
+	     * Data type: enum `DbClient` in `back-lib-persistence`
+	     */
+	    DB_ENGINE = "db_engine",
+	    /**
+	     * IP or host name of database.
+	     * Must use with connection index: DB_HOST + '0', DB_HOST + '1'
+	     * Data type: string
+	     */
+	    DB_ADDRESS = "db_host",
+	    /**
+	     * Username to log into database.
+	     * Must use with connection index: DB_USER + '0', DB_USER + '1'
+	     * Data type: string
+	     */
+	    DB_USER = "db_user",
+	    /**
+	     * Password to log into database.
+	     * Must use with connection index: DB_PASSWORD + '0', DB_PASSWORD + '1'
+	     * Data type: string
+	     */
+	    DB_PASSWORD = "db_pass",
+	    /**
+	     * Database name.
+	     * Must use with connection index: DB_NAME + '0', DB_NAME + '1'
+	     * Data type: string
+	     */
+	    DB_NAME = "db_name",
+	    /**
+	     * Path to database file.
+	     * Must use with connection index: DB_FILE + '0', DB_FILE + '1'
+	     * Data type: string
+	     */
+	    DB_FILE = "db_file",
+	    /**
+	     * Database connection string.
+	     * Must use with connection index: DB_CONN_STRING + '0', DB_CONN_STRING + '1'
+	     * Data type: string
+	     */
+	    DB_CONN_STRING = "db_connStr"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/message-broker' {
+	export enum MessageBroker {
+	    /**
+	     * IP or host name of message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_HOST = "msgBroker_host",
+	    /**
+	     * Exchange name on message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_EXCHANGE = "msgBroker_exchange",
+	    /**
+	     * Default queue name for RPC handler to connect to.
+	     * Data type: string
+	     */
+	    MSG_BROKER_HANDLER_QUEUE = "msgBroker_handler_queue",
+	    /**
+	     * Number of milliseconds to delay before reconnect to message broker.
+	     * Data type: number
+	     */
+	    MSG_BROKER_RECONN_TIMEOUT = "msgBroker_reconnectTimeout",
+	    /**
+	     * Username to log into message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_USERNAME = "msgBroker_username",
+	    /**
+	     * Password to log into message broker.
+	     * Data type: string
+	     */
+	    MSG_BROKER_PASSWORD = "msgBroker_password",
+	    /**
+	     * Number of milliseconds that messages live in queue.
+	     * Data type: number
+	     */
+	    MSG_BROKER_MSG_EXPIRE = "msgBroker_msg_expr"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/rpc' {
+	export enum RPC {
+	    /**
+	     * Number of milliseconds after which RPC caller stops waiting for response.
+	     * Data type: number
+	     */
+	    RPC_CALLER_TIMEOUT = "rpc_caller_timeout",
+	    /**
+	     * Http port to which HTTP RPC handler listens.
+	     * Data type: number
+	     */
+	    RPC_HANDLER_PORT = "rpc_handler_port"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/service' {
+	export enum Service {
+	    /**
+	     * Number of milliseconds to wait before actually disposing addons.
+	     * Date type: number
+	     */
+	    DEADLETTER_TIMEOUT = "svc_deadletter_timeout",
+	    /**
+	     * Number of milliseconds to wait before actually exiting the process.
+	     * Date type: number
+	     */
+	    STOP_TIMEOUT = "svc_stop_timeout",
+	    /**
+	     * Array of addresses to fetch configuration.
+	     * Data type: string[]
+	     */
+	    CONFIG_SERVICE_ADDRESSES = "svc_config_service_addresses",
+	    /**
+	     * Number of milliseconds between refetchings.
+	     * Date type: number
+	     */
+	    CONFIG_REFETCH_INTERVAL = "svc_config_refetch_interval",
+	    /**
+	     * Service URL-safe name.
+	     * Data type: string
+	     */
+	    SERVICE_SLUG = "svc_slug"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/web' {
+	export enum Web {
+	    /**
+	     * Configuration for Cross-Origin Resource Sharing.
+	     * Type: string | string[]
+	     */
+	    WEB_CORS = "web_cors",
+	    /**
+	     * Whether to start HTTPS server.
+	     * Type: boolean
+	     */
+	    WEB_SSL_ENABLED = "web_ssl_enabled",
+	    /**
+	     * Whether to redirect all HTTP request to HTTPS endpoints.
+	     * Type: boolean
+	     */
+	    WEB_SSL_ONLY = "web_ssl_only",
+	    /**
+	     * Path to SSL key file.
+	     * Type: string
+	     */
+	    WEB_SSL_KEY_FILE = "web_ssl_key_file",
+	    /**
+	     * Path to SSL cert file.
+	     * Type: string
+	     */
+	    WEB_SSL_CERT_FILE = "web_ssl_cert_file",
+	    /**
+	     * HTTPS port listened by webserver.
+	     * Type: number
+	     */
+	    WEB_SSL_PORT = "web_ssl_port",
+	    /**
+	     * HTTP port listened by webserver.
+	     * Type: number
+	     */
+	    WEB_PORT = "web_port",
+	    /**
+	     * Prefix to route url.
+	     * Type: string
+	     */
+	    WEB_URL_PREFIX = "web_url_prefix"
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/constants' {
+	import { DbClient } from '@micro-fleet/common/dist/app/setting-keys/DbClient';
+	import { Auth } from '@micro-fleet/common/dist/app/setting-keys/auth';
+	import { Cache } from '@micro-fleet/common/dist/app/setting-keys/cache';
+	import { Database } from '@micro-fleet/common/dist/app/setting-keys/database';
+	import { MessageBroker } from '@micro-fleet/common/dist/app/setting-keys/message-broker';
+	import { RPC } from '@micro-fleet/common/dist/app/setting-keys/rpc';
+	import { Service } from '@micro-fleet/common/dist/app/setting-keys/service';
+	import { Web } from '@micro-fleet/common/dist/app/setting-keys/web';
+	export type Constants = {
+	    DbClient: typeof DbClient;
+	    AuthSettingKeys: typeof Auth;
+	    CacheSettingKeys: typeof Cache;
+	    DbSettingKeys: typeof Database;
+	    MbSettingKeys: typeof MessageBroker;
+	    RpcSettingKeys: typeof RPC;
+	    SvcSettingKeys: typeof Service;
+	    WebSettingKeys: typeof Web;
+	};
+	export const constants: Constants;
+
+}
 declare module '@micro-fleet/common/dist/app/interfaces/misc' {
 	/**
 	 * A data type representing Javascript primitive types.
 	 */
-	export type PrimitiveType = string | number | boolean | bigint;
+	export type PrimitiveType = string | number | boolean;
 	/**
 	 * A data type representing a class.
 	 */
@@ -87,7 +387,7 @@ declare module '@micro-fleet/common/dist/app/models/Exceptions' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/Guard' {
+declare module '@micro-fleet/common/dist/app/utils/Guard' {
 	export class Guard {
 	    /**
 	     * Makes sure the specified `target` is not null or undefined.
@@ -180,7 +480,7 @@ declare module '@micro-fleet/common/dist/app/Guard' {
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/DependencyContainer' {
+declare module '@micro-fleet/common/dist/app/di/DependencyContainer' {
 	import { injectable, inject, decorate, interfaces, unmanaged, optional } from 'inversify';
 	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
 	export class BindingScope<T> {
@@ -253,13 +553,13 @@ declare module '@micro-fleet/common/dist/app/DependencyContainer' {
 	    	    	}
 
 }
-declare module '@micro-fleet/common/dist/app/models/ServiceContext' {
-	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
+declare module '@micro-fleet/common/dist/app/di/ServiceContext' {
+	import { IDependencyContainer } from '@micro-fleet/common/dist/app/di/DependencyContainer';
 	/**
 	 * Serves as a global variables container.
 	 */
-	export class ServiceContext {
-	    	    /**
+	export const serviceContext: {
+	    /**
 	     * Gets dependency container.
 	     */
 	    readonly dependencyContainer: IDependencyContainer;
@@ -267,12 +567,11 @@ declare module '@micro-fleet/common/dist/app/models/ServiceContext' {
 	     * Sets dependency container. Must be set before add-ons initialization phase.
 	     */
 	    setDependencyContainer(container: IDependencyContainer): void;
-	}
-	export const serviceContext: ServiceContext;
+	};
 
 }
-declare module '@micro-fleet/common/dist/app/HandlerContainer' {
-	import { IDependencyContainer } from '@micro-fleet/common/dist/app/DependencyContainer';
+declare module '@micro-fleet/common/dist/app/di/HandlerContainer' {
+	import { IDependencyContainer } from '@micro-fleet/common/dist/app/di/DependencyContainer';
 	export type ActionFactory = (obj: any, action: string) => Function;
 	export type HandlerDetails = {
 	    dependencyIdentifier: string;
@@ -308,311 +607,19 @@ declare module '@micro-fleet/common/dist/app/HandlerContainer' {
 	    	}
 
 }
-declare module '@micro-fleet/common/dist/app/Types' {
+declare module '@micro-fleet/common/dist/app/di/lazyInject' {
+	/**
+	 * Injects value to the decorated property.
+	 * Used to decorate properties of a class that's cannot be resolved by dependency container.
+	 */
+	export function lazyInject(depIdentifier: symbol | string): Function;
+
+}
+declare module '@micro-fleet/common/dist/app/di/Types' {
 	export class Types {
 	    static readonly CONFIG_PROVIDER = "common.IConfigurationProvider";
 	    static readonly DEPENDENCY_CONTAINER = "common.IDependencyContainer";
 	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/DbClient' {
-	/**
-	 * Db driver names.
-	 */
-	export enum DbClient {
-	    /**
-	     * Microsoft SQL Server
-	     */
-	    MSSQL = "mssql",
-	    /**
-	     * MySQL
-	     */
-	    MYSQL = "mysql",
-	    /**
-	     * PostgreSQL
-	     */
-	    POSTGRESQL = "pg",
-	    /**
-	     * SQLite 3
-	     */
-	    SQLITE3 = "sqlite3"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/auth' {
-	export enum AuthSettingKeys {
-	    /**
-	     * Key to verify auth tokens.
-	     *
-	     * If signing algorithm is RS256, this is the PUBLIC key.
-	     * Otherwise the key for verify may also be the key for signing.
-	     *
-	     * Data type: string
-	     */
-	    AUTH_KEY_VERIFY = "auth_key_verify",
-	    /**
-	     * Path to the file containing key to verify auth tokens.
-	     * The key must be stored as UTF-8 plain text.
-	     *
-	     * If signing algorithm is RS256, this is the PUBLIC key.
-	     * Otherwise the key for verify may also be the key for signing.
-	     *
-	     * Data type: string
-	     */
-	    AUTH_KEY_VERIFY_FILE = "auth_key_verify_file",
-	    /**
-	     * Key to sign auth tokens.
-	     *
-	     * If signing algorithm is RS256, this is the PRIVATE key.
-	     * Otherwise the key for verify may also be the key for signing.
-	     *
-	     * Data type: string
-	     */
-	    AUTH_KEY_SIGN = "auth_key_sign",
-	    /**
-	     * Path to the file containing key to sign auth tokens.
-	     * The key must be stored as UTF-8 plain text.
-	     *
-	     * If signing algorithm is RS256, this is the PRIVATE key.
-	     * Otherwise the key for verify may also be the key for signing.
-	     *
-	     * Data type: string
-	     */
-	    AUTH_KEY_SIGN_FILE = "auth_key_signfile",
-	    /**
-	     * Issuer of auth tokens.
-	     * Data type: string
-	     */
-	    AUTH_ISSUER = "auth_issuer",
-	    /**
-	     * Access token expiration duration in seconds.
-	     * Data type: number
-	     */
-	    AUTH_EXPIRE_ACCESS = "auth_expire_access",
-	    /**
-	     * Refresh token expiration duration in seconds.
-	     * Data type: number
-	     */
-	    AUTH_EXPIRE_REFRESH = "auth_expire_refresh"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/cache' {
-	export enum CacheSettingKeys {
-	    /**
-	     * Number of cache servers in cluster.
-	     * Data type: number
-	     */
-	    CACHE_NUM_CONN = "cache_num_conn",
-	    /**
-	     * A single string or an array of IP or host name of cache service.
-	     * Data type: string | string[]
-	     */
-	    CACHE_HOST = "cache_host",
-	    /**
-	     * A single value or an array of port number.
-	     * Data type: number | number[]
-	     */
-	    CACHE_PORT = "cache_port"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/database' {
-	export enum DbSettingKeys {
-	    /**
-	     * Name of database engine.
-	     * Data type: enum `DbClient` in `back-lib-persistence`
-	     */
-	    DB_ENGINE = "db_engine",
-	    /**
-	     * IP or host name of database.
-	     * Must use with connection index: DB_HOST + '0', DB_HOST + '1'
-	     * Data type: string
-	     */
-	    DB_ADDRESS = "db_host",
-	    /**
-	     * Username to log into database.
-	     * Must use with connection index: DB_USER + '0', DB_USER + '1'
-	     * Data type: string
-	     */
-	    DB_USER = "db_user",
-	    /**
-	     * Password to log into database.
-	     * Must use with connection index: DB_PASSWORD + '0', DB_PASSWORD + '1'
-	     * Data type: string
-	     */
-	    DB_PASSWORD = "db_pass",
-	    /**
-	     * Database name.
-	     * Must use with connection index: DB_NAME + '0', DB_NAME + '1'
-	     * Data type: string
-	     */
-	    DB_NAME = "db_name",
-	    /**
-	     * Path to database file.
-	     * Must use with connection index: DB_FILE + '0', DB_FILE + '1'
-	     * Data type: string
-	     */
-	    DB_FILE = "db_file",
-	    /**
-	     * Database connection string.
-	     * Must use with connection index: DB_CONN_STRING + '0', DB_CONN_STRING + '1'
-	     * Data type: string
-	     */
-	    DB_CONN_STRING = "db_connStr"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/message-broker' {
-	export enum MbSettingKeys {
-	    /**
-	     * IP or host name of message broker.
-	     * Data type: string
-	     */
-	    MSG_BROKER_HOST = "msgBroker_host",
-	    /**
-	     * Exchange name on message broker.
-	     * Data type: string
-	     */
-	    MSG_BROKER_EXCHANGE = "msgBroker_exchange",
-	    /**
-	     * Default queue name for RPC handler to connect to.
-	     * Data type: string
-	     */
-	    MSG_BROKER_HANDLER_QUEUE = "msgBroker_handler_queue",
-	    /**
-	     * Number of milliseconds to delay before reconnect to message broker.
-	     * Data type: number
-	     */
-	    MSG_BROKER_RECONN_TIMEOUT = "msgBroker_reconnectTimeout",
-	    /**
-	     * Username to log into message broker.
-	     * Data type: string
-	     */
-	    MSG_BROKER_USERNAME = "msgBroker_username",
-	    /**
-	     * Password to log into message broker.
-	     * Data type: string
-	     */
-	    MSG_BROKER_PASSWORD = "msgBroker_password",
-	    /**
-	     * Number of milliseconds that messages live in queue.
-	     * Data type: number
-	     */
-	    MSG_BROKER_MSG_EXPIRE = "msgBroker_msg_expr"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/rpc' {
-	export enum RpcSettingKeys {
-	    /**
-	     * Number of milliseconds after which RPC caller stops waiting for response.
-	     * Data type: number
-	     */
-	    RPC_CALLER_TIMEOUT = "rpc_caller_timeout",
-	    /**
-	     * Http port to which HTTP RPC handler listens.
-	     * Data type: number
-	     */
-	    RPC_HANDLER_PORT = "rpc_handler_port"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/service' {
-	export enum SvcSettingKeys {
-	    /**
-	     * Number of milliseconds to wait before actually disposing addons.
-	     * Date type: number
-	     */
-	    DEADLETTER_TIMEOUT = "svc_deadletter_timeout",
-	    /**
-	     * Number of milliseconds to wait before actually exiting the process.
-	     * Date type: number
-	     */
-	    STOP_TIMEOUT = "svc_stop_timeout",
-	    /**
-	     * Array of addresses to fetch configuration.
-	     * Data type: string[]
-	     */
-	    CONFIG_SERVICE_ADDRESSES = "svc_config_service_addresses",
-	    /**
-	     * Number of milliseconds between refetchings.
-	     * Date type: number
-	     */
-	    CONFIG_REFETCH_INTERVAL = "svc_config_refetch_interval",
-	    /**
-	     * Service URL-safe name.
-	     * Data type: string
-	     */
-	    SERVICE_SLUG = "svc_slug"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/setting-keys/web' {
-	export enum WebSettingKeys {
-	    /**
-	     * Configuration for Cross-Origin Resource Sharing.
-	     * Type: string | string[]
-	     */
-	    WEB_CORS = "web_cors",
-	    /**
-	     * Whether to start HTTPS server.
-	     * Type: boolean
-	     */
-	    WEB_SSL_ENABLED = "web_ssl_enabled",
-	    /**
-	     * Whether to redirect all HTTP request to HTTPS endpoints.
-	     * Type: boolean
-	     */
-	    WEB_SSL_ONLY = "web_ssl_only",
-	    /**
-	     * Path to SSL key file.
-	     * Type: string
-	     */
-	    WEB_SSL_KEY_FILE = "web_ssl_key_file",
-	    /**
-	     * Path to SSL cert file.
-	     * Type: string
-	     */
-	    WEB_SSL_CERT_FILE = "web_ssl_cert_file",
-	    /**
-	     * HTTPS port listened by webserver.
-	     * Type: number
-	     */
-	    WEB_SSL_PORT = "web_ssl_port",
-	    /**
-	     * HTTP port listened by webserver.
-	     * Type: number
-	     */
-	    WEB_PORT = "web_port",
-	    /**
-	     * Prefix to route url.
-	     * Type: string
-	     */
-	    WEB_URL_PREFIX = "web_url_prefix"
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/constants/index' {
-	import { DbClient } from '@micro-fleet/common/dist/app/constants/DbClient';
-	import { AuthSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/auth';
-	import { CacheSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/cache';
-	import { DbSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/database';
-	import { MbSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/message-broker';
-	import { RpcSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/rpc';
-	import { SvcSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/service';
-	import { WebSettingKeys } from '@micro-fleet/common/dist/app/constants/setting-keys/web';
-	export type Constants = {
-	    DbClient: typeof DbClient;
-	    AuthSettingKeys: typeof AuthSettingKeys;
-	    CacheSettingKeys: typeof CacheSettingKeys;
-	    DbSettingKeys: typeof DbSettingKeys;
-	    MbSettingKeys: typeof MbSettingKeys;
-	    RpcSettingKeys: typeof RpcSettingKeys;
-	    SvcSettingKeys: typeof SvcSettingKeys;
-	    WebSettingKeys: typeof WebSettingKeys;
-	};
-	export const constants: Constants;
 
 }
 declare module '@micro-fleet/common/dist/app/interfaces/automapper' {
@@ -1635,17 +1642,14 @@ declare module '@micro-fleet/common/dist/app/validators/BusinessInvariantError' 
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/lazyInject' {
-	/**
-	 * Injects value to the decorated property.
-	 * Used to decorate properties of a class that's cannot be resolved by dependency container.
-	 */
-	export function lazyInject(depIdentifier: symbol | string): Function;
-
-}
 declare module '@micro-fleet/common' {
-	import constantObj = require('@micro-fleet/common/dist/app/constants/index');
+	import constantObj = require('@micro-fleet/common/dist/app/constants');
 	export const constants: constantObj.Constants;
+	export * from '@micro-fleet/common/dist/app/di/DependencyContainer';
+	export * from '@micro-fleet/common/dist/app/di/HandlerContainer';
+	export * from '@micro-fleet/common/dist/app/di/lazyInject';
+	export * from '@micro-fleet/common/dist/app/di/ServiceContext';
+	export * from '@micro-fleet/common/dist/app/di/Types';
 	export * from '@micro-fleet/common/dist/app/interfaces/automapper';
 	export * from '@micro-fleet/common/dist/app/interfaces/configurations';
 	export * from '@micro-fleet/common/dist/app/interfaces/misc';
@@ -1658,20 +1662,440 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedData';
 	export * from '@micro-fleet/common/dist/app/models/Result';
-	export * from '@micro-fleet/common/dist/app/models/ServiceContext';
 	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
 	export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/utils/ObjectUtil';
+	export * from '@micro-fleet/common/dist/app/utils/Guard';
 	export * from '@micro-fleet/common/dist/app/validators/BusinessInvariantError';
 	export * from '@micro-fleet/common/dist/app/validators/JoiExtended';
 	export * from '@micro-fleet/common/dist/app/validators/IModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/ValidationError';
-	export * from '@micro-fleet/common/dist/app/DependencyContainer';
-	export * from '@micro-fleet/common/dist/app/HandlerContainer';
-	export * from '@micro-fleet/common/dist/app/Guard';
-	export * from '@micro-fleet/common/dist/app/lazyInject';
-	export * from '@micro-fleet/common/dist/app/Types';
+
+}
+declare module '@micro-fleet/common/dist/app/models/IModelAutoMapper' {
+	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	export interface MappingOptions {
+	    /**
+	     * Temporarily turns on or off model validation.
+	     * Can only be turned on if validator is provided to constructor.
+	     */
+	    enableValidation?: boolean;
+	    /**
+	     * If specified, gives validation error to this callback. Otherwise, throw error.
+	     */
+	    errorCallback?: (err: ValidationError) => void;
+	}
+	export interface IModelAutoMapper<T extends Object> {
+	    /**
+	     * Turns on or off model validation before translating.
+	     * Is set to `true` if validator is passed to class constructor.
+	     */
+	    enableValidation: boolean;
+	    /**
+	     * Gets the internal AutoMapper instance for advanced configuration.
+	     */
+	    readonly internalMapper: ICreateMapFluentFunctions;
+	    /**
+	     * Gets the validator.
+	     */
+	    readonly validator: IModelValidator<T>;
+	    /**
+	     * Copies properties from `sources` to dest then optionally validates
+	     * the result (depends on `enableValidation`).
+	     * If `enableValidation` is turned off, it works just like native `Object.assign()` function,
+	     * therefore, use `Object.assign()` for better performance if validation is not needed.
+	     * Note that it uses `partial()` internally, hence `required` validation is IGNORED.
+	     *
+	     * @throws {ValidationError}
+	     */
+	    merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T>;
+	    /**
+	     * Validates then converts an object to type <T>.
+	     * but ONLY properties with value are validated and copied.
+	     * Note that `required` validation is IGNORED.
+	     * @param {object} source The object to be translated.
+	     *
+	     * @throws {ValidationError} If no `errorCallback` is provided.
+	     */
+	    partial(source: object, options?: MappingOptions): Partial<T>;
+	    /**
+	     * Validates then converts a list of objects to type <T>.
+	     * but ONLY properties with value are validated and copied.
+	     * Note that `required` validation is IGNORED.
+	     * @param {object[]} sources A list of objects to be translated.
+	     *
+	     * @throws {ValidationError} If no `errorCallback` is provided.
+	     */
+	    partialMany(sources: object[], options?: MappingOptions): Partial<T>[];
+	    /**
+	     * Validates then converts an object to type <T>.
+	     * ALL properties are validated and copied regardless with or without value.
+	     * @param {object} source The object to be translated.
+	     *
+	     * @throws {ValidationError} If no `errorCallback` is provided.
+	     */
+	    whole(source: object, options?: MappingOptions): T;
+	    /**
+	     * Validates then converts a list of objects to type <T>.
+	     * ALL properties are validated and copied regardless with or without value.
+	     * @param {object[]} sources The list of objects to be translated.
+	     *
+	     * @throws {ValidationError} If no `errorCallback` is provided.
+	     */
+	    wholeMany(sources: object[], options?: MappingOptions): T[];
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/ModelAutoMapper' {
+	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
+	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { IModelAutoMapper, MappingOptions } from '@micro-fleet/common/dist/app/models/IModelAutoMapper';
+	/**
+	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
+	 */
+	export class ModelAutoMapper<T extends Object> implements IModelAutoMapper<T> {
+	    protected ModelClass: Newable;
+	    protected _validator?: IModelValidator<T>;
+	    /**
+	     * @see IModelAutoMapper.enableValidation
+	     */
+	    enableValidation: boolean;
+	    protected _internalMapper: ICreateMapFluentFunctions;
+	    /**
+	     * @param {class} ModelClass The model class
+	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
+	     */
+	    constructor(ModelClass: Newable, _validator?: IModelValidator<T>);
+	    /**
+	     * @see IModelAutoMapper.internalMapper
+	     */
+	    readonly internalMapper: ICreateMapFluentFunctions;
+	    /**
+	     * @see IModelAutoMapper.validator
+	     */
+	    readonly validator: IModelValidator<T>;
+	    /**
+	     * @see IModelAutoMapper.merge
+	     */
+	    merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T>;
+	    /**
+	     * @see IModelAutoMapper.partial
+	     */
+	    partial(source: object, options?: MappingOptions): Partial<T>;
+	    /**
+	     * @see IModelAutoMapper.partialMany
+	     */
+	    partialMany(sources: object[], options?: MappingOptions): Partial<T>[];
+	    /**
+	     * @see IModelAutoMapper.whole
+	     */
+	    whole(source: object, options?: MappingOptions): T;
+	    /**
+	     * @see IModelAutoMapper.wholeMany
+	     */
+	    wholeMany(sources: object[], options?: MappingOptions): T[];
+	    /**
+	     * Initializes the model mapping engine.
+	     */
+	    protected _createMap(): ICreateMapFluentFunctions;
+	    /**
+	     * Is invoked after source object is validated to map source object to target model.
+	     */
+	    protected _map(source: any): T;
+	    protected _tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
+	    protected _translate(fn: string, source: any, options: MappingOptions): T;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/AccessorSupportMapper' {
+	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
+	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/models/ModelAutoMapper';
+	import { IModelAutoMapper } from '@micro-fleet/common/dist/app/models/IModelAutoMapper';
+	export type AccessorDescription = {
+	    name: string;
+	    isGetter: boolean;
+	    isSetter: boolean;
+	};
+	/**
+	 * A model auto mapper which supports getter and setter.
+	 */
+	export class AccessorSupportMapper<T extends Object> extends ModelAutoMapper<T> implements IModelAutoMapper<T> {
+	    /**
+	     * @override
+	     */
+	    protected _createMap(): ICreateMapFluentFunctions;
+	    /**
+	     * A replacement for native `AutoMapper.forAllMembers`,
+	     * working well with our custom converter.
+	     */
+	    protected _forAllMembers(destObj: any, destPropName: string, srcObj: any): void;
+	    protected _forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/ValidationError' {
+	import * as joi from 'joi';
+	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
+	/**
+	 * Represents a validation error for a property.
+	 * UI Form should use this information to highlight the particular input.
+	 */
+	export type ValidationErrorItem = {
+	    /**
+	     * Error message for this item.
+	     */
+	    message: string;
+	    /**
+	     * Path to the target property in validation schema.
+	     */
+	    path?: string[];
+	    /**
+	     * The invalid property value.
+	     */
+	    value?: any;
+	};
+	/**
+	 * Represents an error when a model does not pass validation.
+	 */
+	export class ValidationError extends MinorException {
+	    readonly details: ValidationErrorItem[];
+	    static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError;
+	    constructor(details: ValidationErrorItem[]);
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/BusinessInvariantError' {
+	import { ValidationError, ValidationErrorItem } from '@micro-fleet/common/dist/app/models/ValidationError';
+	/**
+	 * Represents a business rule violation.
+	 */
+	export class BusinessInvariantError extends ValidationError {
+	    constructor(details: ValidationErrorItem[]);
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/IModelValidator' {
+	import * as joi from 'joi';
+	import { ValidationError } from '@micro-fleet/common/dist/app/models/ValidationError';
+	export interface ValidationOptions extends joi.ValidationOptions {
+	}
+	export type JoiModelValidatorCreateOptions = {
+	    /**
+	     * Rules to validate model properties.
+	     */
+	    schemaMapModel: joi.SchemaMap;
+	    /**
+	     * Whether the primary key is composite. Default to `false`.
+	     * This param is IGNORED if param `schemaMapPk` has value.
+	     */
+	    isCompositeId?: boolean;
+	    /**
+	     * Whether to validate PK.
+	     * This param is IGNORED if param `schemaMapPk` has value.
+	     * Default to be `false`.
+	     */
+	    requireId?: boolean;
+	    /**
+	     * Rule to validate model PK.
+	     */
+	    schemaMapId?: joi.SchemaMap;
+	};
+	export interface IModelValidator<T> {
+	    readonly schemaMap: joi.SchemaMap;
+	    readonly schemaMapId: joi.SchemaMap;
+	    readonly isCompositeId: boolean;
+	    /**
+	     * Validates model ID.
+	     */
+	    id(id: any): [ValidationError, any];
+	    /**
+	     * Validates model for creation operation, which doesn't need `id` property.
+	     */
+	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
+	    /**
+	     * Validates model for modification operation, which requires `id` property.
+	     */
+	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
+	    /**
+	     * Must call this method before using `whole` or `partial`,
+	     * or after `schemaMap` or `schemaMapId` is changed.
+	     */
+	    compile(): void;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/IdBase' {
+	import { ISerializable } from '@micro-fleet/common/dist/app/interfaces/misc';
+	/**
+	 * Base class for ID type.
+	 * Models in DDD (domain-driven design) often have ID as a class instance.
+	 */
+	export abstract class IdBase implements ISerializable {
+	    abstract toArray(): any[];
+	    equals(target: any): boolean;
+	    toJSON(): object;
+	    /**
+	     * @override
+	     */
+	    toString(): string;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/JoiExtended' {
+	import * as joi from 'joi';
+	export type JoiDateStringOptions = {
+	    /**
+	     * Whether the input string is in UTC format.
+	     * Default: false.
+	     */
+	    isUTC?: boolean;
+	    /**
+	     * Function to convert input string to desired data type.
+	     * Default function returns native Date object.
+	     */
+	    translator?: any;
+	};
+	export type ExtendedJoi = joi.AnySchema & {
+	    genn: () => {
+	        /**
+	         * Makes sure input is native bigint type.
+	         *
+	         * @example extJoi.genn().bigint().validate('98765443123456');
+	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
+	         */
+	        bigint: () => joi.AnySchema;
+	        /**
+	         * Makes sure input is in W3C Date and Time Formats,
+	         * but must have at least year, month, and day.
+	         *
+	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
+	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
+	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
+	         */
+	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
+	    };
+	};
+	/**
+	 * Joi instance with "genn()" extension enabled, including some custom rules.
+	 */
+	export const extJoi: ExtendedJoi;
+
+}
+declare module '@micro-fleet/common/dist/app/models/JoiModelValidator' {
+	import * as joi from 'joi';
+	import { IModelValidator, JoiModelValidatorCreateOptions, ValidationOptions } from '@micro-fleet/common/dist/app/models/IModelValidator';
+	import { ValidationError } from '@micro-fleet/common/dist/app/models/ValidationError';
+	export class JoiModelValidator<T> implements IModelValidator<T> {
+	    protected _schemaMap: joi.SchemaMap;
+	    protected _isCompositeId: boolean;
+	    protected _schemaMapId?: joi.SchemaMap;
+	    /**
+	     * Builds a new instance of ModelValidatorBase.
+	     */
+	    static create<T>({ schemaMapModel, isCompositeId, requireId, schemaMapId: schemaMapId, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
+	    /**
+	     * Compiled rules for model ID.
+	     */
+	    protected _compiledId: joi.ObjectSchema;
+	    /**
+	     * Compiled rules for model properties.
+	     */
+	    protected _compiledWhole: joi.ObjectSchema;
+	    /**
+	     * Compiled rules for model properties, but all of them are OPTIONAL.
+	     * Used for patch operation.
+	     */
+	    protected _compiledPartial: joi.ObjectSchema;
+	    /**
+	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
+	     * @param {boolean} _isCompositeId Whether the primary key is made of multiple properties. Default to `false`
+	     *     This param is IGNORED if param `schemaMapId` has value.
+	     * @param {boolean} requireId Whether to validate ID.
+	     *     This param is IGNORED if param `schemaMapId` has value.
+	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID.
+	     */
+	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositeId: boolean, requireId: boolean, _schemaMapId?: joi.SchemaMap);
+	    readonly schemaMap: joi.SchemaMap;
+	    readonly schemaMapId: joi.SchemaMap;
+	    readonly isCompositeId: boolean;
+	    /**
+	     * @see IModelValidator.id
+	     */
+	    id(id: any): [ValidationError, any];
+	    /**
+	     * @see IModelValidator.whole
+	     */
+	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
+	    /**
+	     * @see IModelValidator.partial
+	     */
+	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
+	    /**
+	     * @see IModelValidator.compile
+	     */
+	    compile(): void;
+	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/SingleId' {
+	import { IdBase } from '@micro-fleet/common/dist/app/models/IdBase';
+	export class SingleId extends IdBase {
+	    id: string;
+	    constructor(id: string);
+	    /**
+	     * @override
+	     * Overriding for better performance.
+	     */
+	    equals(target: any): boolean;
+	    /**
+	     * @override
+	     */
+	    toArray(): string[];
+	    /**
+	     * @override
+	     * Overriding for better performance.
+	     */
+	    toString(): string;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/models/TenantId' {
+	import { IdBase } from '@micro-fleet/common/dist/app/models/IdBase';
+	export class TenantId extends IdBase {
+	    id: string;
+	    tenantId: string;
+	    constructor(id: string, tenantId: string);
+	    /**
+	     * @override
+	     * Overriding for better performance.
+	     */
+	    equals(target: any): boolean;
+	    /**
+	     * @override
+	     */
+	    toArray(): string[];
+	    /**
+	     * @override
+	     * Overriding for better performance.
+	     */
+	    toString(): string;
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/setting-keys/index' {
+	export * from '@micro-fleet/common/dist/app/setting-keys/DbClient';
+	export * from '@micro-fleet/common/dist/app/setting-keys/auth';
+	export * from '@micro-fleet/common/dist/app/setting-keys/cache';
+	export * from '@micro-fleet/common/dist/app/setting-keys/database';
+	export * from '@micro-fleet/common/dist/app/setting-keys/message-broker';
+	export * from '@micro-fleet/common/dist/app/setting-keys/rpc';
+	export * from '@micro-fleet/common/dist/app/setting-keys/service';
+	export * from '@micro-fleet/common/dist/app/setting-keys/web';
 
 }

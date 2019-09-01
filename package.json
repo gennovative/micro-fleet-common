@@ -1,6 +1,6 @@
 {
     "name": "@micro-fleet/common",
-    "version": "1.4.1",
+    "version": "1.4.3",
     "description": "Contains helpers, models and constants used by other packages.",
     "scripts": {
         "build": "npm run compile && npm run test",
