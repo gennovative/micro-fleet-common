@@ -12,9 +12,11 @@ export class TenantId extends IdBase {
 
     /**
      * @override
+     * Overriding for better performance.
      */
     public equals(target: any): boolean {
-        if (!target) { return false }
+        if (this === target) { return true }
+        if (! (target instanceof TenantId)) { return false }
         return (this.id === target.id && this.tenantId === target.tenantId)
     }
 
@@ -27,15 +29,9 @@ export class TenantId extends IdBase {
 
     /**
      * @override
+     * Overriding for better performance.
      */
     public toString(): string {
         return `${this.id},${this.tenantId}`
-    }
-
-    /**
-     * Returns a JSON { id: '', tenantId: '' }
-     */
-    public valueOf(): any {
-        return this.toJSON()
     }
 }

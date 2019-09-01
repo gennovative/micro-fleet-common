@@ -11,9 +11,11 @@ export class SingleId extends IdBase {
 
     /**
      * @override
+     * Overriding for better performance.
      */
     public equals(target: any): boolean {
-        if (!target) { return false }
+        if (this === target) { return true }
+        if (! (target instanceof SingleId)) { return false }
         return this.id === target.id
     }
 
@@ -23,17 +25,12 @@ export class SingleId extends IdBase {
     public toArray(): string[] {
         return [ this.id ]
     }
-    /**
-     * @override
-     */
-    public toString(): string {
-        return this.id
-    }
 
     /**
      * @override
+     * Overriding for better performance.
      */
-    public valueOf(): any {
+    public toString(): string {
         return this.id
     }
 }

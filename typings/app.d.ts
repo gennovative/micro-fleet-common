@@ -1289,12 +1289,14 @@ declare module '@micro-fleet/common/dist/app/models/id/IdBase' {
 	 * Base class for ID type.
 	 * Models in DDD (domain-driven design) often have ID as a class instance.
 	 */
-	export abstract class IdBase<T = string> implements ISerializable {
-	    abstract toArray(): T[];
-	    abstract toString(): string;
-	    abstract valueOf(): any;
-	    abstract equals(target: any): boolean;
+	export abstract class IdBase implements ISerializable {
+	    abstract toArray(): any[];
+	    equals(target: any): boolean;
 	    toJSON(): object;
+	    /**
+	     * @override
+	     */
+	    toString(): string;
 	}
 
 }
@@ -1305,6 +1307,7 @@ declare module '@micro-fleet/common/dist/app/models/id/SingleId' {
 	    constructor(id: string);
 	    /**
 	     * @override
+	     * Overriding for better performance.
 	     */
 	    equals(target: any): boolean;
 	    /**
@@ -1313,12 +1316,9 @@ declare module '@micro-fleet/common/dist/app/models/id/SingleId' {
 	    toArray(): string[];
 	    /**
 	     * @override
+	     * Overriding for better performance.
 	     */
 	    toString(): string;
-	    /**
-	     * @override
-	     */
-	    valueOf(): any;
 	}
 
 }
@@ -1330,6 +1330,7 @@ declare module '@micro-fleet/common/dist/app/models/id/TenantId' {
 	    constructor(id: string, tenantId: string);
 	    /**
 	     * @override
+	     * Overriding for better performance.
 	     */
 	    equals(target: any): boolean;
 	    /**
@@ -1338,12 +1339,9 @@ declare module '@micro-fleet/common/dist/app/models/id/TenantId' {
 	    toArray(): string[];
 	    /**
 	     * @override
+	     * Overriding for better performance.
 	     */
 	    toString(): string;
-	    /**
-	     * Returns a JSON { id: '', tenantId: '' }
-	     */
-	    valueOf(): any;
 	}
 
 }

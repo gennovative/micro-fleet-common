@@ -9,9 +9,13 @@ class TenantId extends IdBase_1.IdBase {
     }
     /**
      * @override
+     * Overriding for better performance.
      */
     equals(target) {
-        if (!target) {
+        if (this === target) {
+            return true;
+        }
+        if (!(target instanceof TenantId)) {
             return false;
         }
         return (this.id === target.id && this.tenantId === target.tenantId);
@@ -24,15 +28,10 @@ class TenantId extends IdBase_1.IdBase {
     }
     /**
      * @override
+     * Overriding for better performance.
      */
     toString() {
         return `${this.id},${this.tenantId}`;
-    }
-    /**
-     * Returns a JSON { id: '', tenantId: '' }
-     */
-    valueOf() {
-        return this.toJSON();
     }
 }
 exports.TenantId = TenantId;

@@ -8,9 +8,13 @@ class SingleId extends IdBase_1.IdBase {
     }
     /**
      * @override
+     * Overriding for better performance.
      */
     equals(target) {
-        if (!target) {
+        if (this === target) {
+            return true;
+        }
+        if (!(target instanceof SingleId)) {
             return false;
         }
         return this.id === target.id;
@@ -23,14 +27,9 @@ class SingleId extends IdBase_1.IdBase {
     }
     /**
      * @override
+     * Overriding for better performance.
      */
     toString() {
-        return this.id;
-    }
-    /**
-     * @override
-     */
-    valueOf() {
         return this.id;
     }
 }

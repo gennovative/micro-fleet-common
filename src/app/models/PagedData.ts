@@ -13,7 +13,7 @@ export class PagedData<T> implements ISerializable {
      * Gets number of contained items
      */
     public get length(): number {
-        return this.items.length
+        return this._items.length
     }
 
     /**
@@ -56,4 +56,6 @@ export class PagedData<T> implements ISerializable {
             items: [...this.items],
         }
     }
+
+    // TODO: Should implement iterable interface
 }
