@@ -7,39 +7,29 @@ export interface ValidationOptions extends joi.ValidationOptions {
     // Re-brand this interface
 }
 
-export type JoiModelValidatorCreateOptions = {
+export type JoiModelValidatorConstructorOptions = {
     /**
      * Rules to validate model properties.
      */
     schemaMapModel: joi.SchemaMap,
 
     /**
-     * Whether the primary key is composite. Default to `false`.
-     * This param is IGNORED if param `schemaMapPk` has value.
-     */
-    isCompositeId?: boolean,
-
-    /**
-     * Whether to validate PK.
-     * This param is IGNORED if param `schemaMapPk` has value.
-     * Default to be `false`.
-     */
-    requireId?: boolean,
-
-    /**
-     * Rule to validate model PK.
+     * Rule to validate model ID.
      */
     schemaMapId?: joi.SchemaMap,
+
+    /**
+     * Default options which can be override by passing "options" parameter
+     * to "whole()" and "partial()"
+     */
+    joiOptions?: ValidationOptions,
 }
 
 export interface IModelValidator<T> {
 
-    readonly schemaMap: joi.SchemaMap
+    readonly schemaMapModel: joi.SchemaMap
 
     readonly schemaMapId: joi.SchemaMap
-
-    readonly isCompositeId: boolean
-
 
     /**
      * Validates model ID.
@@ -55,11 +45,5 @@ export interface IModelValidator<T> {
      * Validates model for modification operation, which requires `id` property.
      */
     partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>]
-
-    /**
-     * Must call this method before using `whole` or `partial`,
-     * or after `schemaMap` or `schemaMapId` is changed.
-     */
-    compile(): void
 
 }

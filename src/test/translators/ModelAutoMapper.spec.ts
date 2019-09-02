@@ -8,12 +8,10 @@ import { SampleModel } from '../validators/SampleModel'
 import { ICreateMapFluentFunctions } from '../../app/interfaces/automapper'
 
 
-const itemValidator = JoiModelValidator.create({
+const itemValidator = new JoiModelValidator({
     schemaMapModel: {
         name: joi.string().required(),
     },
-    isCompositeId: false,
-    requireId: false,
 })
 
 
@@ -35,8 +33,8 @@ class NestingTranslator extends ModelAutoMapper<SampleModel> {
     /**
      * @override
      */
-    protected _createMap(): ICreateMapFluentFunctions {
-        return super._createMap()
+    protected $createMap(): ICreateMapFluentFunctions {
+        return super.$createMap()
             .forSourceMember('items', transformation)
     }
 }
@@ -232,7 +230,6 @@ describe('ModelAutoMapper', () => {
         it('Should do nested map with derived translator class', () => {
             // Arrange
             const source = {
-                    theID: 1,
                     name: 'Gennova123',
                     address: 'Unlimited length street name',
                     items: [
@@ -241,9 +238,9 @@ describe('ModelAutoMapper', () => {
                     ],
                 }
 
-            // Add 'items' key to model schema map, otherwise it will stripped.
-            SampleModel.validator.schemaMap['items'] = joi.array().length(2)
-            SampleModel.validator.compile()
+            SampleModel.resetValidator()
+            // Add 'items' key to model schema map, otherwise it will be stripped.
+            SampleModel.validator.schemaMapModel['items'] = joi.array().length(2)
 
             const translator = new NestingTranslator(SampleModel, SampleModel.validator)
 
@@ -259,21 +256,18 @@ describe('ModelAutoMapper', () => {
             // Assert
             error && console.error(error)
 
-            expect(error).not.to.exist
-            expect(converted).to.exist
-            expect(converted).to.exist
-            expect(converted.theID).to.equal(source.theID)
-            expect(converted.name).to.equal(source.name)
-            expect(converted.address).to.equal(source.address)
-            expect(converted.items.length).to.equal(2)
-            expect(converted.items[0].name).to.equal(source.items[0].name)
-            expect(converted.items[1].name).to.equal(source.items[1].name)
+            expect(error, 'error').not.to.exist
+            expect(converted, 'converted').to.exist
+            expect(converted.name, 'name').to.equal(source.name)
+            expect(converted.address, 'address').to.equal(source.address)
+            expect(converted.items.length, 'items.length').to.equal(2)
+            expect(converted.items[0].name, 'items[0].name').to.equal(source.items[0].name)
+            expect(converted.items[1].name, 'items[1].name').to.equal(source.items[1].name)
         })
 
         it('Should do nested map by configuring internal mapper', () => {
             // Arrange
             const source = {
-                    theID: 1,
                     name: 'Gennova123',
                     address: 'Unlimited length street name',
                     items: [
@@ -282,9 +276,9 @@ describe('ModelAutoMapper', () => {
                     ],
                 }
 
+            SampleModel.resetValidator()
             // Add 'items' key to model schema map, otherwise it will stripped.
-            SampleModel.validator.schemaMap['items'] = joi.array().length(2)
-            SampleModel.validator.compile()
+            SampleModel.validator.schemaMapModel['items'] = joi.array().length(2)
 
             const translator = new ModelAutoMapper(SampleModel, SampleModel.validator)
             translator.internalMapper.forSourceMember('items', transformation)
@@ -301,15 +295,13 @@ describe('ModelAutoMapper', () => {
             // Assert
             error && console.error(error)
 
-            expect(error).not.to.exist
-            expect(converted).to.exist
-            expect(converted).to.exist
-            expect(converted.theID).to.equal(source.theID)
-            expect(converted.name).to.equal(source.name)
-            expect(converted.address).to.equal(source.address)
-            expect(converted.items.length).to.equal(2)
-            expect(converted.items[0].name).to.equal(source.items[0].name)
-            expect(converted.items[1].name).to.equal(source.items[1].name)
+            expect(error, 'error').not.to.exist
+            expect(converted, 'converted').to.exist
+            expect(converted.name, 'name').to.equal(source.name)
+            expect(converted.address, 'address').to.equal(source.address)
+            expect(converted.items.length, 'items.length').to.equal(2)
+            expect(converted.items[0].name, 'items[0].name').to.equal(source.items[0].name)
+            expect(converted.items[1].name, 'items[1].name').to.equal(source.items[1].name)
         })
 
         it('Should return the input if it is not an object', () => {
@@ -452,9 +444,9 @@ describe('ModelAutoMapper', () => {
                     ],
                 }
 
+            SampleModel.resetValidator()
             // Add 'items' key to model schema map, otherwise it will stripped.
-            SampleModel.validator.schemaMap['items'] = joi.array().length(2)
-            SampleModel.validator.compile()
+            SampleModel.validator.schemaMapModel['items'] = joi.array().length(2)
 
             const translator = new NestingTranslator(SampleModel, SampleModel.validator)
 
@@ -487,9 +479,9 @@ describe('ModelAutoMapper', () => {
                     ],
                 }
 
+            SampleModel.resetValidator()
             // Add 'items' key to model schema map, otherwise it will stripped.
-            SampleModel.validator.schemaMap['items'] = joi.array().length(2)
-            SampleModel.validator.compile()
+            SampleModel.validator.schemaMapModel['items'] = joi.array().length(2)
 
             const translator = new NestingTranslator(SampleModel, SampleModel.validator)
 
@@ -644,9 +636,9 @@ describe('ModelAutoMapper', () => {
             // Arrange
             const sourceArr = [
                 {
-                    // theID: 1, // => not specified, although this property is required
+                    theID: 1,
                     name: 'Gennova123',
-                    address: 'Unlimited length street name',
+                    // address: 'Unlimited length street name', // => not specified, although this property is required
                     age: 18,
                     gender: 'male',
                 },
@@ -675,13 +667,15 @@ describe('ModelAutoMapper', () => {
             expect(convertedArr.length).to.equal(2)
 
             expect(convertedArr[0]).is.instanceOf(SampleModel)
+            expect(convertedArr[0].theID).to.equal(sourceArr[0].theID)
             expect(convertedArr[0].name).to.equal(sourceArr[0].name)
-            expect(convertedArr[0].address).to.equal(sourceArr[0].address)
+            expect(convertedArr[0].address).to.be.undefined
             expect(convertedArr[0].age).to.equal(sourceArr[0].age)
             expect(convertedArr[0].gender).to.equal(sourceArr[0].gender)
 
             expect(convertedArr[1]).is.instanceOf(SampleModel)
             expect(convertedArr[1].theID).to.equal(sourceArr[1].theID)
+            expect(convertedArr[1].name).to.be.undefined
             expect(convertedArr[1].address).to.equal(sourceArr[1].address)
         })
     }) // END describe 'partialMany'

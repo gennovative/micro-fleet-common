@@ -1,5 +1,9 @@
 ## VERSIONS
 
+### 2.3.0
+- Sync version with other packages.
+- Use decorators for validation rules.
+
 ### 1.4.0
 - [Breaking change] Re-implemented `Maybe`.
 - Removed action and module constant names.

@@ -3,6 +3,10 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
+/* istanbul ignore else */
+if (!Reflect || typeof Reflect['hasOwnMetadata'] !== 'function') {
+    require('reflect-metadata');
+}
 const constantObj = require("./constants");
 exports.constants = constantObj.constants;
 __export(require("./di/DependencyContainer"));
@@ -19,6 +23,7 @@ __export(require("./models/Exceptions"));
 __export(require("./models/Maybe"));
 __export(require("./models/PagedData"));
 __export(require("./models/Result"));
+__export(require("./models/Translatable"));
 __export(require("./translators/AccessorSupportMapper"));
 __export(require("./translators/ModelAutoMapper"));
 __export(require("./utils/ObjectUtil"));
@@ -26,5 +31,6 @@ __export(require("./utils/Guard"));
 __export(require("./validators/BusinessInvariantError"));
 __export(require("./validators/JoiExtended"));
 __export(require("./validators/JoiModelValidator"));
+__export(require("./validators/validate-decorator"));
 __export(require("./validators/ValidationError"));
 //# sourceMappingURL=index.js.map

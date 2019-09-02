@@ -1,7 +1,7 @@
 import * as joi from 'joi'
 
-import { ModelAutoMapper } from '../../translators/ModelAutoMapper'
-import { JoiModelValidator } from '../../validators/JoiModelValidator'
+import { validateProp, string, required } from '../../validators/validate-decorator'
+import { Translatable } from '../Translatable'
 
 
 export enum SettingItemDataType {
@@ -35,40 +35,31 @@ export enum SettingItemDataType {
 /**
  * Represents a setting record.
  */
-export class SettingItem {
-
-    public static validator: JoiModelValidator<SettingItem>
-    public static translator: ModelAutoMapper<SettingItem>
+export class SettingItem extends Translatable {
 
     /**
      * Gets or sets setting name (aka setting key).
      * This is also the key in `appconfig.json` and the name of environment variable.
      */
+    @validateProp(joi.string().token().required())
     public readonly name: string = undefined
 
     /**
      * Gets or sets data type of setting value.
      * Must be one of: 'string', 'string[]', 'number', 'number[]', 'boolean'.
      */
+    @validateProp(
+        joi.string().required()
+            .only(SettingItemDataType.String, SettingItemDataType.StringArray,
+                SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
+    )
     public readonly dataType: SettingItemDataType = undefined
 
     /**
      * Gets or set value.
      * Whatever `dataType` is, value must always be string.
      */
+    @required()
+    @string()
     public readonly value: string = undefined
 }
-
-SettingItem.validator = JoiModelValidator.create({
-    schemaMapModel: {
-        name: joi.string().token().required(),
-        dataType: joi.string().required()
-            .only(SettingItemDataType.String, SettingItemDataType.StringArray,
-                SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
-        value: joi.string().allow('').required(),
-    },
-    isCompositeId: false,
-    requireId: false,
-})
-
-SettingItem.translator = new ModelAutoMapper(SettingItem, SettingItem.validator)

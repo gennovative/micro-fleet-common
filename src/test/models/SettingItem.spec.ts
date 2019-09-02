@@ -19,7 +19,7 @@ describe('SettingItem\'s validator', () => {
             targetTwo.value = '199'
 
             // Act
-            const validator = SettingItem.validator,
+            const validator = SettingItem.getValidator(),
                 [errorOne, validatedOne] = validator.whole(targetOne),
                 [errorTwo, validatedTwo] = validator.whole(targetTwo)
 
@@ -53,7 +53,7 @@ describe('SettingItem\'s validator', () => {
                 }
 
             // Act
-            const validator = SettingItem.validator,
+            const validator = SettingItem.getValidator(),
                 [errorOne, validatedOne] = validator.whole(targetOne),
                 [errorTwo, validatedTwo] = validator.whole(targetTwo),
                 [errorThree, validatedThree] = validator.whole(targetThree)

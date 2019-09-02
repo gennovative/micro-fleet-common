@@ -62,7 +62,7 @@ export class AccessorSupportMapper<T extends Object>
     /**
      * @override
      */
-    protected _createMap(): ICreateMapFluentFunctions {
+    protected $createMap(): ICreateMapFluentFunctions {
         const mapper = automapper.createMap('any', this.ModelClass)
         const thiz = this
         mapper.convertUsing(function (resolutionContext: AutoMapperJs.IResolutionContext) {
@@ -72,14 +72,14 @@ export class AccessorSupportMapper<T extends Object>
             // Iterates through source properties
             // tslint:disable-next-line: prefer-const
             for (let prop of Object.getOwnPropertyNames(destObj)) {
-                thiz._forAllMembers(destObj, prop, srcObj)
+                thiz.$forAllMembers(destObj, prop, srcObj)
             }
 
             // Iterates through source accessors
             // const accessorNames: string[] = Object
             Object.getOwnPropertyNames(Object.getPrototypeOf(destObj))
                 .map(describeAccessor(destObj))
-                .forEach(desc => thiz._forAllAccessors(destObj, srcObj, desc))
+                .forEach(desc => thiz.$forAllAccessors(destObj, srcObj, desc))
             // tslint:disable-next-line: prefer-const
             // for (let prop of accessorNames) {
             //     thiz._forAllAccessors(destObj, srcObj, {
@@ -96,7 +96,7 @@ export class AccessorSupportMapper<T extends Object>
      * A replacement for native `AutoMapper.forAllMembers`,
      * working well with our custom converter.
      */
-    protected _forAllMembers(destObj: any, destPropName: string, srcObj: any): void {
+    protected $forAllMembers(destObj: any, destPropName: string, srcObj: any): void {
         const setFn = setFunc(destObj, destPropName)
         if (!setFn &&
             (destPropName.startsWith('_') // Private field (by convention)
@@ -112,7 +112,7 @@ export class AccessorSupportMapper<T extends Object>
         }
     }
 
-    protected _forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void {
+    protected $forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void {
         if (desc.isSetter) {
             let srcVal
             if (isGetter(srcObj, desc.name)) {

@@ -1,3 +1,8 @@
+/* istanbul ignore else */
+if (!Reflect || typeof Reflect['hasOwnMetadata'] !== 'function') {
+    require('reflect-metadata')
+}
+
 import constantObj = require('./constants')
 export const constants = constantObj.constants
 
@@ -18,6 +23,7 @@ export * from './models/Exceptions'
 export * from './models/Maybe'
 export * from './models/PagedData'
 export * from './models/Result'
+export * from './models/Translatable'
 export * from './translators/AccessorSupportMapper'
 export * from './translators/IModelAutoMapper'
 export * from './translators/ModelAutoMapper'
@@ -27,4 +33,5 @@ export * from './validators/BusinessInvariantError'
 export * from './validators/JoiExtended'
 export * from './validators/IModelValidator'
 export * from './validators/JoiModelValidator'
+export * from './validators/validate-decorator'
 export * from './validators/ValidationError'

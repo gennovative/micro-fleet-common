@@ -40,7 +40,7 @@ class AccessorSupportMapper extends ModelAutoMapper_1.ModelAutoMapper {
     /**
      * @override
      */
-    _createMap() {
+    $createMap() {
         const mapper = automapper.createMap('any', this.ModelClass);
         const thiz = this;
         mapper.convertUsing(function (resolutionContext) {
@@ -49,13 +49,13 @@ class AccessorSupportMapper extends ModelAutoMapper_1.ModelAutoMapper {
             // Iterates through source properties
             // tslint:disable-next-line: prefer-const
             for (let prop of Object.getOwnPropertyNames(destObj)) {
-                thiz._forAllMembers(destObj, prop, srcObj);
+                thiz.$forAllMembers(destObj, prop, srcObj);
             }
             // Iterates through source accessors
             // const accessorNames: string[] = Object
             Object.getOwnPropertyNames(Object.getPrototypeOf(destObj))
                 .map(describeAccessor(destObj))
-                .forEach(desc => thiz._forAllAccessors(destObj, srcObj, desc));
+                .forEach(desc => thiz.$forAllAccessors(destObj, srcObj, desc));
             // tslint:disable-next-line: prefer-const
             // for (let prop of accessorNames) {
             //     thiz._forAllAccessors(destObj, srcObj, {
@@ -69,7 +69,7 @@ class AccessorSupportMapper extends ModelAutoMapper_1.ModelAutoMapper {
      * A replacement for native `AutoMapper.forAllMembers`,
      * working well with our custom converter.
      */
-    _forAllMembers(destObj, destPropName, srcObj) {
+    $forAllMembers(destObj, destPropName, srcObj) {
         const setFn = setFunc(destObj, destPropName);
         if (!setFn &&
             (destPropName.startsWith('_') // Private field (by convention)
@@ -84,7 +84,7 @@ class AccessorSupportMapper extends ModelAutoMapper_1.ModelAutoMapper {
             destObj[destPropName] = srcObj[destPropName];
         }
     }
-    _forAllAccessors(destObj, srcObj, desc) {
+    $forAllAccessors(destObj, srcObj, desc) {
         if (desc.isSetter) {
             let srcVal;
             if (isGetter(srcObj, desc.name)) {

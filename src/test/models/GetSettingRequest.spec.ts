@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { GetSettingRequest, NotImplementedException } from '../../app'
+import { GetSettingRequest } from '../../app'
 
 
 describe('GetSettingRequest\'s validator', () => {
@@ -16,7 +16,7 @@ describe('GetSettingRequest\'s validator', () => {
             targetTwo.ipAddress = '192.168.10.23'
 
             // Act
-            const validator = GetSettingRequest.validator,
+            const validator = GetSettingRequest.getValidator(),
                 [errorOne, validatedOne] = validator.whole(targetOne),
                 [errorTwo, validatedTwo] = validator.whole(targetTwo)
 
@@ -46,7 +46,7 @@ describe('GetSettingRequest\'s validator', () => {
                 }
 
             // Act
-            const validator = GetSettingRequest.validator,
+            const validator = GetSettingRequest.getValidator(),
                 [errorOne, validatedOne] = validator.whole(targetOne),
                 [errorTwo, validatedTwo] = validator.whole(targetTwo),
                 [errorThree, validatedThree] = validator.whole(targetThree)
@@ -62,22 +62,4 @@ describe('GetSettingRequest\'s validator', () => {
             expect(validatedThree).not.to.exist
         })
     }) // END describe 'whole'
-
-    describe('partial', () => {
-        it('Should throw NotImplementedException', () => {
-            // Act
-            const validator = GetSettingRequest.validator
-            let result, exception
-            try {
-                result = validator.partial({})
-            } catch (err) {
-                exception = err
-            }
-
-            // Assert
-            expect(result).not.to.exist
-            expect(exception).to.exist
-            expect(exception).to.be.instanceOf(NotImplementedException)
-        })
-    }) // END describe 'partial'
 })

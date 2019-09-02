@@ -1,7 +1,3 @@
-/* istanbul ignore else */
-if (!Reflect || typeof Reflect['hasOwnMetadata'] !== 'function') {
-    require('reflect-metadata')
-}
 
 import { injectable, inject, decorate, Container, interfaces,
     unmanaged, optional } from 'inversify'

@@ -1,9 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/* istanbul ignore else */
-if (!Reflect || typeof Reflect['hasOwnMetadata'] !== 'function') {
-    require('reflect-metadata');
-}
 const inversify_1 = require("inversify");
 exports.injectable = inversify_1.injectable;
 exports.inject = inversify_1.inject;
