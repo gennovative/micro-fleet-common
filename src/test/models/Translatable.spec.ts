@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import * as joi from 'joi'
 
-import * as a from '../../app'
+import { Translatable, decorators as d } from '../../app'
 
 
-@a.validateClass({
+@d.validateClass({
     schemaMapModel: {
         name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
         address: joi.string().required(),
@@ -16,7 +16,7 @@ import * as a from '../../app'
         theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required(),
     },
 })
-export class ModelA extends a.Translatable {
+export class ModelA extends Translatable {
     public readonly theID: number = undefined // It's IMPORTANT to initialize property with a value.
     public readonly name: string = undefined
     public readonly address: string = undefined
@@ -25,24 +25,24 @@ export class ModelA extends a.Translatable {
 }
 
 
-export class ModelB extends a.Translatable {
-    @a.id()
-    @a.required()
-    @a.number({ min: 1, max: Number.MAX_SAFE_INTEGER })
+export class ModelB extends Translatable {
+    @d.id()
+    @d.required()
+    @d.number({ min: 1, max: Number.MAX_SAFE_INTEGER })
     public readonly theID: number = undefined
 
-    @a.required()
-    @a.string({ minLength: 3, maxLength: 10, pattern: /^[\d\w -]+$/u })
+    @d.required()
+    @d.string({ minLength: 3, maxLength: 10, pattern: /^[\d\w -]+$/u })
     public readonly name: string = undefined
 
-    @a.required()
-    @a.string()
+    @d.required()
+    @d.string()
     public readonly address: string = undefined
 
-    @a.number({ min: 15, max: 99 })
+    @d.number({ min: 15, max: 99 })
     public readonly age: number = undefined
 
-    @a.only('male', 'female')
+    @d.only('male', 'female')
     public readonly gender: 'male' | 'female' = undefined
 }
 

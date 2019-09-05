@@ -1,6 +1,4 @@
-
-import { injectable, inject, decorate, Container, interfaces,
-    unmanaged, optional } from 'inversify'
+import { Container, interfaces } from 'inversify'
 
 import { Newable } from '../interfaces/misc'
 import { MinorException } from '../models/Exceptions'
@@ -23,7 +21,7 @@ export class BindingScope<T> {
 }
 
 
-export { injectable, inject, decorate, unmanaged, optional }
+// export { injectable, inject, decorate, unmanaged, optional }
 
 export interface IDependencyContainer {
     /**

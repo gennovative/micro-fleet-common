@@ -5,12 +5,7 @@ const Guard_1 = require("../utils/Guard");
 const ValidationError_1 = require("./ValidationError");
 class JoiModelValidator {
     constructor(options) {
-        this._defaultOpts = {
-            abortEarly: false,
-            allowUnknown: true,
-            stripUnknown: true,
-            ...options.joiOptions,
-        };
+        this._defaultOpts = Object.assign({ abortEarly: false, allowUnknown: true, stripUnknown: true }, options.joiOptions);
         this._schemaMapId = options.schemaMapId;
         this._schemaMapModel = options.schemaMapModel;
     }
@@ -59,9 +54,7 @@ class JoiModelValidator {
     _compilePartialSchema() {
         const wholeSchema = this._schemaMapModel;
         // Make all rules optional for partial schema.
-        const partialSchema = {
-            ...this._schemaMapId,
-        };
+        const partialSchema = Object.assign({}, this._schemaMapId);
         for (const key in wholeSchema) {
             const rule = wholeSchema[key];
             /* istanbul ignore else */
@@ -72,10 +65,7 @@ class JoiModelValidator {
         this._compiledPartial = joi.object(partialSchema);
     }
     _validate(schema, target, options = {}) {
-        const opts = {
-            ...this._defaultOpts,
-            ...options,
-        };
+        const opts = Object.assign({}, this._defaultOpts, options);
         const { error, value } = schema.validate(target, opts);
         return (error) ? [ValidationError_1.ValidationError.fromJoi(error.details), null] : [null, value];
     }

@@ -1,8 +1,8 @@
 import * as chai from 'chai'
 import * as spies from 'chai-spies'
 
-import { injectable, IDependencyContainer, DependencyContainer,
-    HandlerContainer, CriticalException, serviceContext } from '../app'
+import { IDependencyContainer, DependencyContainer, HandlerContainer,
+    CriticalException, serviceContext, decorators as d } from '../app'
 
 chai.use(spies)
 const expect = chai.expect
@@ -18,7 +18,7 @@ interface IDummy {
     echoAge(age: number): number
 }
 
-@injectable()
+@d.injectable()
 class Dummy implements IDummy {
 
     public echoName(name: string): string {

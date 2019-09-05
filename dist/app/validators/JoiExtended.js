@@ -19,7 +19,7 @@ const bigintRule = {
                 ? (typeof BigInt(value) === 'bigint')
                 : (typeof value === 'bigint');
         }
-        catch {
+        catch (_a) {
             isBigInt = false;
         }
         return isBigInt
@@ -98,7 +98,7 @@ const joiExtensions = {
             try {
                 return (options.convert ? BigInt(value) : value);
             }
-            catch {
+            catch (_a) {
                 return value;
             }
         }

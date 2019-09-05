@@ -27,6 +27,7 @@ export function validateClass(validatorOptions: JoiModelValidatorConstructorOpti
         v.setClassValidationMetadata(TargetClass, classMeta)
     }
 }
+// export type ValidateClassDecorator = (validatorOptions: JoiModelValidatorConstructorOptions) => ClassDecorator
 
 /**
  * Used to decorate model class' properties to declare complex validation rules.
@@ -67,7 +68,7 @@ export function validateProp(schema?: joi.SchemaLike): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-
+// export type ValidatePropDecorator = (schema?: joi.SchemaLike) => PropertyDecorator
 
 
 export type ArrayDecoratorOptions = {
@@ -125,6 +126,7 @@ export function array(opts: ArrayDecoratorOptions): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type ArrayDecorator = (opts: ArrayDecoratorOptions) => PropertyDecorator
 
 
 export type BooleanDecoratorOptions = {
@@ -146,6 +148,7 @@ export function boolean(opts?: BooleanDecoratorOptions): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type BooleanDecorator = (opts?: BooleanDecoratorOptions) => PropertyDecorator
 
 
 export type BigIntDecoratorOptions = {
@@ -167,6 +170,7 @@ export function bigInt({ convert }: BigIntDecoratorOptions = { convert: false })
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type BigIntDecorator = (opts?: BigIntDecoratorOptions) => PropertyDecorator
 
 
 export type NumberDecoratorOptions = {
@@ -200,6 +204,7 @@ export function number({ min, max, ...opts }: NumberDecoratorOptions = {}): Prop
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type NumberDecorator = (opts?: NumberDecoratorOptions) => PropertyDecorator
 
 
 export type DateTimeDecoratorOptions = {
@@ -259,6 +264,7 @@ export function datetime(opts: DateTimeDecoratorOptions = { convert: false}): Pr
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type DateTimeDecorator = (opts?: DateTimeDecoratorOptions) => PropertyDecorator
 
 /**
  * Used to decorate model class' properties to specify default value.
@@ -272,6 +278,7 @@ export function defaultAs(value: any): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type DefaultAsDecorator = (value: any) => PropertyDecorator
 
 
 /**
@@ -297,6 +304,7 @@ export function only(...values: any[]): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type OnlyDecorator = (...values: any[]) => PropertyDecorator
 
 /**
  * Used to decorate model class' properties to assert it must exist and have non-undefined value.
@@ -311,6 +319,7 @@ export function required(allowNull: boolean = false): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type RequiredDecorator = (allowNull?: boolean) => PropertyDecorator
 
 /**
  * Used to decorate model class' properties to assert it must exist and have non-undefined value.
@@ -324,6 +333,7 @@ export function id(): PropertyDecorator {
         v.setClassValidationMetadata(proto.constructor, classMeta)
     }
 }
+// export type IdDecorator = () => PropertyDecorator
 
 
 export type StringDecoratorOptions = {
@@ -331,6 +341,12 @@ export type StringDecoratorOptions = {
      * Whether or not to allow empty string (''). Default is true.
      */
     allowEmpty?: boolean
+
+    /**
+     * Requires the string value to be a valid email address.
+     * Default is false.
+     */
+    email?: boolean
 
     /**
      * Minimum allowed string length.
@@ -346,10 +362,53 @@ export type StringDecoratorOptions = {
      * Regular expression pattern to match.
      */
     pattern?: RegExp,
+
+    /**
+     * Requires the string value to contain no whitespace before or after.
+     * If the validation convert option is on (enabled by default), the string will be trimmed.
+     *
+     * Default value is false
+     */
+    trim?: boolean,
+
+    /**
+     * Requires the string value to be a valid RFC 3986 URI.
+     *
+     * Value can be `true`, or optionally one or more acceptable Schemes, should only include the scheme name.
+     * Can be an Array or String (strings are automatically escaped for use in a Regular Expression).
+     *
+     * Default is false.
+     */
+    uri?: boolean | string | RegExp | Array<string | RegExp>,
 }
 
 /**
  * Used to decorate model class' properties to assert it must be a string.
+ *
+* ```typescript
+ * class ModelA {
+ *    @string()
+ *    name: string
+ * }
+ *
+ *
+ * class ModelB {
+ *    @string({ minLength: 1, maxLength: 255 })
+ *    name: string
+ * }
+ *
+ *
+ * class ModelC {
+ *    @string({ uri: true })
+ *    url: string
+ * }
+ *
+ *
+ * class ModelD {
+ *    @string({ uri: ['http', 'https', 'ftp'] })
+ *    url: string
+ * }
+ * ```
  */
 export function string(opts: StringDecoratorOptions = { allowEmpty: true }): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
@@ -361,9 +420,18 @@ export function string(opts: StringDecoratorOptions = { allowEmpty: true }): Pro
                 ? schema.allow('')
                 : schema.disallow('')
         }
+        Boolean(opts.email) && propMeta.rules.push(prev => (prev as joi.StringSchema).email());
         (opts.minLength != null) && propMeta.rules.push(prev => (prev as joi.StringSchema).min(opts.minLength));
         (opts.maxLength != null) && propMeta.rules.push(prev => (prev as joi.StringSchema).max(opts.maxLength));
         (opts.pattern != null) && propMeta.rules.push(prev => (prev as joi.StringSchema).regex(opts.pattern))
+        Boolean(opts.trim) && propMeta.rules.push(prev => (prev as joi.StringSchema).trim())
+        Boolean(opts.uri) && propMeta.rules.push(prev => {
+            if (typeof opts.uri !== 'boolean') { // string or RegExp
+                return (prev as joi.StringSchema).uri({ scheme: opts.uri as any })
+            }
+            return (prev as joi.StringSchema).uri()
+        })
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
+// export type StringDecorator = (opts?: StringDecoratorOptions) => PropertyDecorator

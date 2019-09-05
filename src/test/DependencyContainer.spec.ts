@@ -1,7 +1,8 @@
 import { expect } from 'chai'
 import { Container } from 'inversify'
 
-import { injectable, IDependencyContainer, DependencyContainer, MinorException } from '../app'
+import { IDependencyContainer, DependencyContainer, MinorException,
+    decorators as d } from '../app'
 
 const NAME = 'gennova',
     IDENTIFIER = Symbol('abc')
@@ -10,7 +11,7 @@ interface IDummy {
     getName(): string
 }
 
-@injectable()
+@d.injectable()
 class Dummy implements IDummy {
     public getName(): string {
         return NAME

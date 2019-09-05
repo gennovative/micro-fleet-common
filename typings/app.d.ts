@@ -299,43 +299,6 @@ declare module '@micro-fleet/common/dist/app/constants' {
 	export const constants: Constants;
 
 }
-declare module '@micro-fleet/common/dist/app/interfaces/misc' {
-	/**
-	 * A data type representing Javascript primitive types.
-	 */
-	export type PrimitiveType = string | number | boolean;
-	/**
-	 * A data type representing a class.
-	 */
-	export type Newable<T = any> = (new (...args: any[]) => T);
-	/**
-	 * If an object wants to be initialized when microservice proccess starts, it must
-	 * implements this interface to be able to add to add-on list.
-	 */
-	export interface IServiceAddOn {
-	    /**
-	     * Gets add-on name.
-	     */
-	    readonly name: string;
-	    /**
-	     * Initializes this add-on.
-	     * @returns A promise that resolves `true` if success, rejects if otherwise.
-	     */
-	    init(): Promise<void>;
-	    /**
-	     * Invoked before `dispose` is called.
-	     */
-	    deadLetter(): Promise<void>;
-	    /**
-	     * Stops this add-on and cleans all resources.
-	     */
-	    dispose(): Promise<void>;
-	}
-	export interface ISerializable {
-	    toJSON(): object;
-	}
-
-}
 declare module '@micro-fleet/common/dist/app/models/Exceptions' {
 	export class Exception implements Error {
 	    readonly message: string;
@@ -480,15 +443,509 @@ declare module '@micro-fleet/common/dist/app/utils/Guard' {
 	}
 
 }
+declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
+	import * as joi from 'joi';
+	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
+	/**
+	 * Represents a validation error for a property.
+	 * UI Form should use this information to highlight the particular input.
+	 */
+	export type ValidationErrorItem = {
+	    /**
+	     * Error message for this item.
+	     */
+	    message: string;
+	    /**
+	     * Path to the target property in validation schema.
+	     */
+	    path?: string[];
+	    /**
+	     * The invalid property value.
+	     */
+	    value?: any;
+	};
+	/**
+	 * Represents an error when a model does not pass validation.
+	 */
+	export class ValidationError extends MinorException {
+	    readonly details: ValidationErrorItem[];
+	    static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError;
+	    constructor(details: ValidationErrorItem[]);
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/IModelValidator' {
+	import * as joi from 'joi';
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	export interface ValidationOptions extends joi.ValidationOptions {
+	}
+	export type JoiModelValidatorConstructorOptions = {
+	    /**
+	     * Rules to validate model properties.
+	     */
+	    schemaMapModel: joi.SchemaMap;
+	    /**
+	     * Rule to validate model ID.
+	     */
+	    schemaMapId?: joi.SchemaMap;
+	    /**
+	     * Default options which can be override by passing "options" parameter
+	     * to "whole()" and "partial()"
+	     */
+	    joiOptions?: ValidationOptions;
+	};
+	export interface IModelValidator<T> {
+	    readonly schemaMapModel: joi.SchemaMap;
+	    readonly schemaMapId: joi.SchemaMap;
+	    /**
+	     * Validates model ID.
+	     */
+	    id(id: any): [ValidationError, any];
+	    /**
+	     * Validates model for creation operation, which doesn't need `id` property.
+	     */
+	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
+	    /**
+	     * Validates model for modification operation, which requires `id` property.
+	     */
+	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
+	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
+	import * as joi from 'joi';
+	import { IModelValidator, JoiModelValidatorConstructorOptions, ValidationOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
+	export class JoiModelValidator<T> implements IModelValidator<T> {
+	    /**
+	     * Compiled rules for model ID.
+	     */
+	    	    /**
+	     * Compiled rules for model properties.
+	     */
+	    	    /**
+	     * Compiled rules for model properties, but all of them are OPTIONAL.
+	     * Used for patch operation.
+	     */
+	    	    	    	    	    constructor(options: JoiModelValidatorConstructorOptions);
+	    readonly schemaMapModel: joi.SchemaMap;
+	    readonly schemaMapId: joi.SchemaMap;
+	    /**
+	     * @see IModelValidator.id
+	     */
+	    id(id: any): [ValidationError, any];
+	    /**
+	     * @see IModelValidator.whole
+	     */
+	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
+	    /**
+	     * @see IModelValidator.partial
+	     */
+	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
+	    	    	    	    	}
+
+}
+declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
+	import * as joi from 'joi';
+	import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
+	export type PropValidationMetadata = {
+	    type?: () => joi.AnySchema;
+	    rules?: Array<(prev: joi.AnySchema) => joi.AnySchema>;
+	    rawSchema?: joi.SchemaLike;
+	};
+	export type ClassValidationMetadata = JoiModelValidatorConstructorOptions & {
+	    idProps: Set<string | symbol>;
+	    props: {
+	        [key: string]: PropValidationMetadata;
+	    };
+	};
+	export function getClassValidationMetadata(Class: Function): ClassValidationMetadata;
+	export function setClassValidationMetadata(Class: Function, meta: ClassValidationMetadata): void;
+	export function deleteClassValidationMetadata(Class: Function): void;
+	export function getPropValidationMetadata(Class: Function, propName: string | symbol): PropValidationMetadata;
+	export function setPropValidationMetadata(Class: Function, propName: string | symbol, meta: PropValidationMetadata): void;
+	export function createJoiValidator<T>(Class: Function): JoiModelValidator<T>;
+
+}
+declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
+	import * as joi from 'joi';
+	export type JoiDateStringOptions = {
+	    /**
+	     * Whether the input string is in UTC format.
+	     * Default: false.
+	     */
+	    isUTC?: boolean;
+	    /**
+	     * Function to convert input string to desired data type.
+	     * Default function returns native Date object.
+	     */
+	    translator?: any;
+	};
+	export type ExtendedJoi = joi.AnySchema & {
+	    genn: () => {
+	        /**
+	         * Makes sure input is native bigint type.
+	         *
+	         * @example extJoi.genn().bigint().validate('98765443123456');
+	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
+	         */
+	        bigint: () => joi.AnySchema;
+	        /**
+	         * Makes sure input is in W3C Date and Time Formats,
+	         * but must have at least year, month, and day.
+	         *
+	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
+	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
+	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
+	         */
+	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
+	    };
+	};
+	/**
+	 * Joi instance with "genn()" extension enabled, including some custom rules.
+	 */
+	export const extJoi: ExtendedJoi;
+
+}
+declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
+	import * as joi from 'joi';
+	import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	/**
+	 * Used to decorate model class to declare validation rules.
+	 *
+	 * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
+	 * such as @validateProp(), @number(), @defaultAs()...
+	 *
+	 * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+	 *
+	 * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
+	 */
+	export function validateClass(validatorOptions: JoiModelValidatorConstructorOptions): ClassDecorator;
+	/**
+	 * Used to decorate model class' properties to declare complex validation rules.
+	 * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+	 *
+	 * @param {joi.SchemaLike} schema A single schema rule for this property.
+	 *
+	 * ```typescript
+	 * class ModelA {
+	 *   @validateProp(joi.number().positive().precision(2).max(99))
+	 *   age: number
+	 * }
+	 * ```
+	 * Not complex enough? Hold my beer!
+	 *
+	 * ```typescript
+	 * class ModelB {
+	 *   @boolean()
+	 *   hasChildren: boolean
+	 *
+	 *   @validateProp(
+	 *     joi.number().positive()
+	 *       .when('hasChildren', {
+	 *         is: true,
+	 *         then: joi.required(),
+	 *         otherwise: joi.forbidden(),
+	 *       })
+	 *   )
+	 *   childrenIDs: number[]
+	 * }
+	 * ```
+	 */
+	export function validateProp(schema?: joi.SchemaLike): PropertyDecorator;
+	export type ArrayDecoratorOptions = {
+	    /**
+	     * Whether or not to allow specifying a value and
+	     * convert it into array with single item.
+	     * Default is true.
+	     */
+	    allowSingle?: boolean;
+	    /**
+	     * Validation rules for array items.
+	     * Read Joi's docs for more details and examples: https://hapi.dev/family/joi/?v=15.1.1#arrayitemstype
+	     */
+	    items: joi.SchemaLike | joi.SchemaLike[];
+	};
+	/**
+	 * Used to decorate model class' properties to assert it must be a boolean.
+	 *
+	 * ```typescript
+	 *
+	 * import * as joi from 'joi'
+	 *
+	 * const ALLOWED = [ 'id', 'name', 'age' ]
+	 *
+	 * class ModelA {
+	 *   @array({
+	 *     items: joi.string().only(ALLOWED).required()
+	 *   })
+	 *   fields: string[]
+	 * }
+	 *
+	 *
+	 * class ModelB {
+	 *   @array({
+	 *     items: [ joi.string(), joi.number() ]
+	 *   })
+	 *   fields: string[]
+	 * }
+	 * ```
+	 */
+	export function array(opts: ArrayDecoratorOptions): PropertyDecorator;
+	export type BooleanDecoratorOptions = {
+	    /**
+	     * Whether or not to convert value to boolean type.
+	     * Default is true.
+	     */
+	    convert?: boolean;
+	};
+	/**
+	 * Used to decorate model class' properties to assert it must be a boolean.
+	 */
+	export function boolean(opts?: BooleanDecoratorOptions): PropertyDecorator;
+	export type BigIntDecoratorOptions = {
+	    /**
+	     * Whether or not to convert value to bigint type.
+	     * Default is FALSE, which means the value is kept as a string.
+	     */
+	    convert?: boolean;
+	};
+	/**
+	 * Used to decorate model class' properties to assert it must be a Big Int.
+	 */
+	export function bigInt({ convert }?: BigIntDecoratorOptions): PropertyDecorator;
+	export type NumberDecoratorOptions = {
+	    /**
+	     * Minimum allowed number.
+	     */
+	    min?: number;
+	    /**
+	     * Maximum allowed number.
+	     */
+	    max?: number;
+	    /**
+	     * Whether or not to convert value to number type.
+	     * Default is true.
+	     */
+	    convert?: boolean;
+	};
+	/**
+	 * Used to decorate model class' properties to assert it must be a number.
+	 */
+	export function number({ min, max, ...opts }?: NumberDecoratorOptions): PropertyDecorator;
+	export type DateTimeDecoratorOptions = {
+	    /**
+	     * Whether the input string is in UTC format.
+	     * Default: false.
+	     */
+	    isUTC?: boolean;
+	    /**
+	     * Function to convert input string to desired data type.
+	     * Default to convert to native Date object.
+	     */
+	    translator?: any;
+	    /**
+	     * Whether or not to use `translator` to convert or keep as string.
+	     * Default is false, which keeps as string.
+	     */
+	    convert?: boolean;
+	};
+	/**
+	 * Used to decorate model class' properties to assert it must be a number.
+	 *
+	 * ```typescript
+	 * class ModelA {
+	 *    @datetime()
+	 *    birthdate: string
+	 * }
+	 *
+	 *
+	 * class ModelB {
+	 *    @datetime({ convert: true })
+	 *    birthdate: Date
+	 * }
+	 *
+	 *
+	 * import * as moment from 'moment'
+	 *
+	 * class ModelC {
+	 *    @datetime({ isUTC: true, translator: moment, convert: true })
+	 *    birthdate: moment.Moment
+	 * }
+	 * ```
+	 */
+	export function datetime(opts?: DateTimeDecoratorOptions): PropertyDecorator;
+	/**
+	 * Used to decorate model class' properties to specify default value.
+	 * @param {any} value The default value.
+	 */
+	export function defaultAs(value: any): PropertyDecorator;
+	/**
+	 * Used to decorate model class' properties to assert it must be one of the specified.
+	 *
+	 * ```typescript
+	 *
+	 * import * as joi from 'joi'
+	 *
+	 * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
+	 *
+	 * class Model {
+	 *   @only(AccountStatus.ACTIVE, AccountStatus.LOCKED)
+	 *   status: AccountStatus
+	 * }
+	 * ```
+	 */
+	export function only(...values: any[]): PropertyDecorator;
+	/**
+	 * Used to decorate model class' properties to assert it must exist and have non-undefined value.
+	 * @param {boolean} allowNull Whether or not to allow null value. Default is false.
+	 */
+	export function required(allowNull?: boolean): PropertyDecorator;
+	/**
+	 * Used to decorate model class' properties to assert it must exist and have non-undefined value.
+	 */
+	export function id(): PropertyDecorator;
+	export type StringDecoratorOptions = {
+	    /**
+	     * Whether or not to allow empty string (''). Default is true.
+	     */
+	    allowEmpty?: boolean;
+	    /**
+	     * Requires the string value to be a valid email address.
+	     * Default is false.
+	     */
+	    email?: boolean;
+	    /**
+	     * Minimum allowed string length.
+	     */
+	    minLength?: number;
+	    /**
+	     * Maximum allowed string length.
+	     */
+	    maxLength?: number;
+	    /**
+	     * Regular expression pattern to match.
+	     */
+	    pattern?: RegExp;
+	    /**
+	     * Requires the string value to contain no whitespace before or after.
+	     * If the validation convert option is on (enabled by default), the string will be trimmed.
+	     *
+	     * Default value is false
+	     */
+	    trim?: boolean;
+	    /**
+	     * Requires the string value to be a valid RFC 3986 URI.
+	     *
+	     * Value can be `true`, or optionally one or more acceptable Schemes, should only include the scheme name.
+	     * Can be an Array or String (strings are automatically escaped for use in a Regular Expression).
+	     *
+	     * Default is false.
+	     */
+	    uri?: boolean | string | RegExp | Array<string | RegExp>;
+	};
+	/**
+	 * Used to decorate model class' properties to assert it must be a string.
+	 *
+	* ```typescript
+	 * class ModelA {
+	 *    @string()
+	 *    name: string
+	 * }
+	 *
+	 *
+	 * class ModelB {
+	 *    @string({ minLength: 1, maxLength: 255 })
+	 *    name: string
+	 * }
+	 *
+	 *
+	 * class ModelC {
+	 *    @string({ uri: true })
+	 *    url: string
+	 * }
+	 *
+	 *
+	 * class ModelD {
+	 *    @string({ uri: ['http', 'https', 'ftp'] })
+	 *    url: string
+	 * }
+	 * ```
+	 */
+	export function string(opts?: StringDecoratorOptions): PropertyDecorator;
+
+}
+declare module '@micro-fleet/common/dist/app/decorators' {
+	import { injectable, inject, decorate, unmanaged, optional } from 'inversify';
+	import * as v from '@micro-fleet/common/dist/app/validators/validate-decorator';
+	export type Decorators = {
+	    decorate: typeof decorate;
+	    injectable: typeof injectable;
+	    inject: typeof inject;
+	    optional: typeof optional;
+	    unmanaged: typeof unmanaged;
+	    array: typeof v.array;
+	    bigInt: typeof v.bigInt;
+	    boolean: typeof v.boolean;
+	    datetime: typeof v.datetime;
+	    defaultAs: typeof v.defaultAs;
+	    id: typeof v.id;
+	    number: typeof v.number;
+	    only: typeof v.only;
+	    required: typeof v.required;
+	    string: typeof v.string;
+	    validateClass: typeof v.validateClass;
+	    validateProp: typeof v.validateProp;
+	};
+	export const decorators: Decorators;
+
+}
+declare module '@micro-fleet/common/dist/app/interfaces/misc' {
+	/**
+	 * A data type representing Javascript primitive types.
+	 */
+	export type PrimitiveType = string | number | boolean;
+	/**
+	 * A data type representing a class.
+	 */
+	export type Newable<T = any> = (new (...args: any[]) => T);
+	/**
+	 * If an object wants to be initialized when microservice proccess starts, it must
+	 * implements this interface to be able to add to add-on list.
+	 */
+	export interface IServiceAddOn {
+	    /**
+	     * Gets add-on name.
+	     */
+	    readonly name: string;
+	    /**
+	     * Initializes this add-on.
+	     * @returns A promise that resolves `true` if success, rejects if otherwise.
+	     */
+	    init(): Promise<void>;
+	    /**
+	     * Invoked before `dispose` is called.
+	     */
+	    deadLetter(): Promise<void>;
+	    /**
+	     * Stops this add-on and cleans all resources.
+	     */
+	    dispose(): Promise<void>;
+	}
+	export interface ISerializable {
+	    toJSON(): object;
+	}
+
+}
 declare module '@micro-fleet/common/dist/app/di/DependencyContainer' {
-	import { injectable, inject, decorate, interfaces, unmanaged, optional } from 'inversify';
+	import { interfaces } from 'inversify';
 	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
 	export class BindingScope<T> {
 	    	    constructor(_binding: interfaces.BindingInWhenOnSyntax<T>);
 	    asSingleton(): void;
 	    asTransient(): void;
 	}
-	export { injectable, inject, decorate, unmanaged, optional };
 	export interface IDependencyContainer {
 	    /**
 	     * Registers `constructor` as resolvable with key `identifier`.
@@ -892,87 +1349,6 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
 	export {};
 
 }
-declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
-	import * as joi from 'joi';
-	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
-	/**
-	 * Represents a validation error for a property.
-	 * UI Form should use this information to highlight the particular input.
-	 */
-	export type ValidationErrorItem = {
-	    /**
-	     * Error message for this item.
-	     */
-	    message: string;
-	    /**
-	     * Path to the target property in validation schema.
-	     */
-	    path?: string[];
-	    /**
-	     * The invalid property value.
-	     */
-	    value?: any;
-	};
-	/**
-	 * Represents an error when a model does not pass validation.
-	 */
-	export class ValidationError extends MinorException {
-	    readonly details: ValidationErrorItem[];
-	    static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError;
-	    constructor(details: ValidationErrorItem[]);
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/validators/IModelValidator' {
-	import * as joi from 'joi';
-	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
-	export interface ValidationOptions extends joi.ValidationOptions {
-	}
-	export type JoiModelValidatorCreateOptions = {
-	    /**
-	     * Rules to validate model properties.
-	     */
-	    schemaMapModel: joi.SchemaMap;
-	    /**
-	     * Whether the primary key is composite. Default to `false`.
-	     * This param is IGNORED if param `schemaMapPk` has value.
-	     */
-	    isCompositeId?: boolean;
-	    /**
-	     * Whether to validate PK.
-	     * This param is IGNORED if param `schemaMapPk` has value.
-	     * Default to be `false`.
-	     */
-	    requireId?: boolean;
-	    /**
-	     * Rule to validate model PK.
-	     */
-	    schemaMapId?: joi.SchemaMap;
-	};
-	export interface IModelValidator<T> {
-	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapId: joi.SchemaMap;
-	    readonly isCompositeId: boolean;
-	    /**
-	     * Validates model ID.
-	     */
-	    id(id: any): [ValidationError, any];
-	    /**
-	     * Validates model for creation operation, which doesn't need `id` property.
-	     */
-	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
-	    /**
-	     * Validates model for modification operation, which requires `id` property.
-	     */
-	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-	    /**
-	     * Must call this method before using `whole` or `partial`,
-	     * or after `schemaMap` or `schemaMapId` is changed.
-	     */
-	    compile(): void;
-	}
-
-}
 declare module '@micro-fleet/common/dist/app/translators/IModelAutoMapper' {
 	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
 	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
@@ -1064,7 +1440,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	     * @see IModelAutoMapper.enableValidation
 	     */
 	    enableValidation: boolean;
-	    protected _internalMapper: ICreateMapFluentFunctions;
+	    protected $internalMapper: ICreateMapFluentFunctions;
 	    /**
 	     * @param {class} ModelClass The model class
 	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
@@ -1101,116 +1477,39 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 	    /**
 	     * Initializes the model mapping engine.
 	     */
-	    protected _createMap(): ICreateMapFluentFunctions;
+	    protected $createMap(): ICreateMapFluentFunctions;
 	    /**
 	     * Is invoked after source object is validated to map source object to target model.
 	     */
-	    protected _map(source: any): T;
-	    protected _tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
-	    protected _translate(fn: string, source: any, options: MappingOptions): T;
+	    protected $map(source: any): T;
+	    protected $tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
+	    protected $translate(fn: string, source: any, options: MappingOptions): T;
 	}
 
 }
-declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
-	import * as joi from 'joi';
-	export type JoiDateStringOptions = {
-	    /**
-	     * Whether the input string is in UTC format.
-	     * Default: false.
-	     */
-	    isUTC?: boolean;
-	    /**
-	     * Function to convert input string to desired data type.
-	     * Default function returns native Date object.
-	     */
-	    translator?: any;
-	};
-	export type ExtendedJoi = joi.AnySchema & {
-	    genn: () => {
-	        /**
-	         * Makes sure input is native bigint type.
-	         *
-	         * @example extJoi.genn().bigint().validate('98765443123456');
-	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
-	         */
-	        bigint: () => joi.AnySchema;
-	        /**
-	         * Makes sure input is in W3C Date and Time Formats,
-	         * but must have at least year, month, and day.
-	         *
-	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
-	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
-	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
-	         */
-	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
-	    };
-	};
-	/**
-	 * Joi instance with "genn()" extension enabled, including some custom rules.
-	 */
-	export const extJoi: ExtendedJoi;
-
-}
-declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
-	import * as joi from 'joi';
-	import { IModelValidator, JoiModelValidatorCreateOptions, ValidationOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
-	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
-	export class JoiModelValidator<T> implements IModelValidator<T> {
-	    protected _schemaMap: joi.SchemaMap;
-	    protected _isCompositeId: boolean;
-	    protected _schemaMapId?: joi.SchemaMap;
-	    /**
-	     * Builds a new instance of ModelValidatorBase.
-	     */
-	    static create<T>({ schemaMapModel, isCompositeId, requireId, schemaMapId: schemaMapId, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
-	    /**
-	     * Compiled rules for model ID.
-	     */
-	    protected _compiledId: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties.
-	     */
-	    protected _compiledWhole: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties, but all of them are OPTIONAL.
-	     * Used for patch operation.
-	     */
-	    protected _compiledPartial: joi.ObjectSchema;
-	    /**
-	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {boolean} _isCompositeId Whether the primary key is made of multiple properties. Default to `false`
-	     *     This param is IGNORED if param `schemaMapId` has value.
-	     * @param {boolean} requireId Whether to validate ID.
-	     *     This param is IGNORED if param `schemaMapId` has value.
-	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID.
-	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositeId: boolean, requireId: boolean, _schemaMapId?: joi.SchemaMap);
-	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapId: joi.SchemaMap;
-	    readonly isCompositeId: boolean;
-	    /**
-	     * @see IModelValidator.id
-	     */
-	    id(id: any): [ValidationError, any];
-	    /**
-	     * @see IModelValidator.whole
-	     */
-	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
-	    /**
-	     * @see IModelValidator.partial
-	     */
-	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-	    /**
-	     * @see IModelValidator.compile
-	     */
-	    compile(): void;
-	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
+declare module '@micro-fleet/common/dist/app/models/Translatable' {
+	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
+	import { IModelAutoMapper } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
+	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+	export interface ITranslatable<T = any> {
+	    getTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
+	    getValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
+	    from?(source: object): T;
+	    fromMany?(source: object[]): T[];
+	} type TranslatableClass<U> = Newable<U> & typeof Translatable;
+	export abstract class Translatable {
+	    static getTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
+	    static $createTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
+	    static getValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
+	    static $createValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
+	    static from<FT extends Translatable>(this: TranslatableClass<FT>, source: object): FT;
+	    static fromMany<FT extends Translatable>(this: TranslatableClass<FT>, source: object[]): FT[];
 	}
+	export {};
 
 }
 declare module '@micro-fleet/common/dist/app/models/settings/SettingItem' {
-	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
-	import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
+	import { Translatable } from '@micro-fleet/common/dist/app/models/Translatable';
 	export enum SettingItemDataType {
 	    /**
 	     * Text data type, that is rendered as a text box on UI.
@@ -1237,9 +1536,7 @@ declare module '@micro-fleet/common/dist/app/models/settings/SettingItem' {
 	/**
 	 * Represents a setting record.
 	 */
-	export class SettingItem {
-	    static validator: JoiModelValidator<SettingItem>;
-	    static translator: ModelAutoMapper<SettingItem>;
+	export class SettingItem extends Translatable {
 	    /**
 	     * Gets or sets setting name (aka setting key).
 	     * This is also the key in `appconfig.json` and the name of environment variable.
@@ -1353,14 +1650,11 @@ declare module '@micro-fleet/common/dist/app/models/id/TenantId' {
 
 }
 declare module '@micro-fleet/common/dist/app/models/settings/GetSettingRequest' {
-	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
-	import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
+	import { Translatable } from '@micro-fleet/common/dist/app/models/Translatable';
 	/**
 	 * Represents the request contract for GetSetting endpoint.
 	 */
-	export class GetSettingRequest {
-	    static validator: JoiModelValidator<GetSettingRequest>;
-	    static translator: ModelAutoMapper<GetSettingRequest>;
+	export class GetSettingRequest extends Translatable {
 	    /**
 	     * Gets or sets program slug.
 	     */
@@ -1601,13 +1895,13 @@ declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' 
 	    /**
 	     * @override
 	     */
-	    protected _createMap(): ICreateMapFluentFunctions;
+	    protected $createMap(): ICreateMapFluentFunctions;
 	    /**
 	     * A replacement for native `AutoMapper.forAllMembers`,
 	     * working well with our custom converter.
 	     */
-	    protected _forAllMembers(destObj: any, destPropName: string, srcObj: any): void;
-	    protected _forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void;
+	    protected $forAllMembers(destObj: any, destPropName: string, srcObj: any): void;
+	    protected $forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void;
 	}
 
 }
@@ -1643,8 +1937,8 @@ declare module '@micro-fleet/common/dist/app/validators/BusinessInvariantError' 
 
 }
 declare module '@micro-fleet/common' {
-	import constantObj = require('@micro-fleet/common/dist/app/constants');
-	export const constants: constantObj.Constants;
+	export * from '@micro-fleet/common/dist/app/constants';
+	export * from '@micro-fleet/common/dist/app/decorators';
 	export * from '@micro-fleet/common/dist/app/di/DependencyContainer';
 	export * from '@micro-fleet/common/dist/app/di/HandlerContainer';
 	export * from '@micro-fleet/common/dist/app/di/lazyInject';
@@ -1662,6 +1956,7 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/models/Maybe';
 	export * from '@micro-fleet/common/dist/app/models/PagedData';
 	export * from '@micro-fleet/common/dist/app/models/Result';
+	export * from '@micro-fleet/common/dist/app/models/Translatable';
 	export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
 	export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
 	export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
@@ -1672,420 +1967,6 @@ declare module '@micro-fleet/common' {
 	export * from '@micro-fleet/common/dist/app/validators/IModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
 	export * from '@micro-fleet/common/dist/app/validators/ValidationError';
-
-}
-declare module '@micro-fleet/common/dist/app/models/IModelAutoMapper' {
-	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
-	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
-	import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
-	export interface MappingOptions {
-	    /**
-	     * Temporarily turns on or off model validation.
-	     * Can only be turned on if validator is provided to constructor.
-	     */
-	    enableValidation?: boolean;
-	    /**
-	     * If specified, gives validation error to this callback. Otherwise, throw error.
-	     */
-	    errorCallback?: (err: ValidationError) => void;
-	}
-	export interface IModelAutoMapper<T extends Object> {
-	    /**
-	     * Turns on or off model validation before translating.
-	     * Is set to `true` if validator is passed to class constructor.
-	     */
-	    enableValidation: boolean;
-	    /**
-	     * Gets the internal AutoMapper instance for advanced configuration.
-	     */
-	    readonly internalMapper: ICreateMapFluentFunctions;
-	    /**
-	     * Gets the validator.
-	     */
-	    readonly validator: IModelValidator<T>;
-	    /**
-	     * Copies properties from `sources` to dest then optionally validates
-	     * the result (depends on `enableValidation`).
-	     * If `enableValidation` is turned off, it works just like native `Object.assign()` function,
-	     * therefore, use `Object.assign()` for better performance if validation is not needed.
-	     * Note that it uses `partial()` internally, hence `required` validation is IGNORED.
-	     *
-	     * @throws {ValidationError}
-	     */
-	    merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T>;
-	    /**
-	     * Validates then converts an object to type <T>.
-	     * but ONLY properties with value are validated and copied.
-	     * Note that `required` validation is IGNORED.
-	     * @param {object} source The object to be translated.
-	     *
-	     * @throws {ValidationError} If no `errorCallback` is provided.
-	     */
-	    partial(source: object, options?: MappingOptions): Partial<T>;
-	    /**
-	     * Validates then converts a list of objects to type <T>.
-	     * but ONLY properties with value are validated and copied.
-	     * Note that `required` validation is IGNORED.
-	     * @param {object[]} sources A list of objects to be translated.
-	     *
-	     * @throws {ValidationError} If no `errorCallback` is provided.
-	     */
-	    partialMany(sources: object[], options?: MappingOptions): Partial<T>[];
-	    /**
-	     * Validates then converts an object to type <T>.
-	     * ALL properties are validated and copied regardless with or without value.
-	     * @param {object} source The object to be translated.
-	     *
-	     * @throws {ValidationError} If no `errorCallback` is provided.
-	     */
-	    whole(source: object, options?: MappingOptions): T;
-	    /**
-	     * Validates then converts a list of objects to type <T>.
-	     * ALL properties are validated and copied regardless with or without value.
-	     * @param {object[]} sources The list of objects to be translated.
-	     *
-	     * @throws {ValidationError} If no `errorCallback` is provided.
-	     */
-	    wholeMany(sources: object[], options?: MappingOptions): T[];
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/ModelAutoMapper' {
-	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
-	import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
-	import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
-	import { IModelAutoMapper, MappingOptions } from '@micro-fleet/common/dist/app/models/IModelAutoMapper';
-	/**
-	 * Provides functions to auto mapping an arbitrary object to model of specific class type.
-	 */
-	export class ModelAutoMapper<T extends Object> implements IModelAutoMapper<T> {
-	    protected ModelClass: Newable;
-	    protected _validator?: IModelValidator<T>;
-	    /**
-	     * @see IModelAutoMapper.enableValidation
-	     */
-	    enableValidation: boolean;
-	    protected _internalMapper: ICreateMapFluentFunctions;
-	    /**
-	     * @param {class} ModelClass The model class
-	     * @param {JoiModelValidator} _validator The model validator. If specified, turn on `enableValidation`
-	     */
-	    constructor(ModelClass: Newable, _validator?: IModelValidator<T>);
-	    /**
-	     * @see IModelAutoMapper.internalMapper
-	     */
-	    readonly internalMapper: ICreateMapFluentFunctions;
-	    /**
-	     * @see IModelAutoMapper.validator
-	     */
-	    readonly validator: IModelValidator<T>;
-	    /**
-	     * @see IModelAutoMapper.merge
-	     */
-	    merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T>;
-	    /**
-	     * @see IModelAutoMapper.partial
-	     */
-	    partial(source: object, options?: MappingOptions): Partial<T>;
-	    /**
-	     * @see IModelAutoMapper.partialMany
-	     */
-	    partialMany(sources: object[], options?: MappingOptions): Partial<T>[];
-	    /**
-	     * @see IModelAutoMapper.whole
-	     */
-	    whole(source: object, options?: MappingOptions): T;
-	    /**
-	     * @see IModelAutoMapper.wholeMany
-	     */
-	    wholeMany(sources: object[], options?: MappingOptions): T[];
-	    /**
-	     * Initializes the model mapping engine.
-	     */
-	    protected _createMap(): ICreateMapFluentFunctions;
-	    /**
-	     * Is invoked after source object is validated to map source object to target model.
-	     */
-	    protected _map(source: any): T;
-	    protected _tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
-	    protected _translate(fn: string, source: any, options: MappingOptions): T;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/AccessorSupportMapper' {
-	import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
-	import { ModelAutoMapper } from '@micro-fleet/common/dist/app/models/ModelAutoMapper';
-	import { IModelAutoMapper } from '@micro-fleet/common/dist/app/models/IModelAutoMapper';
-	export type AccessorDescription = {
-	    name: string;
-	    isGetter: boolean;
-	    isSetter: boolean;
-	};
-	/**
-	 * A model auto mapper which supports getter and setter.
-	 */
-	export class AccessorSupportMapper<T extends Object> extends ModelAutoMapper<T> implements IModelAutoMapper<T> {
-	    /**
-	     * @override
-	     */
-	    protected _createMap(): ICreateMapFluentFunctions;
-	    /**
-	     * A replacement for native `AutoMapper.forAllMembers`,
-	     * working well with our custom converter.
-	     */
-	    protected _forAllMembers(destObj: any, destPropName: string, srcObj: any): void;
-	    protected _forAllAccessors(destObj: any, srcObj: any, desc: AccessorDescription): void;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/ValidationError' {
-	import * as joi from 'joi';
-	import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
-	/**
-	 * Represents a validation error for a property.
-	 * UI Form should use this information to highlight the particular input.
-	 */
-	export type ValidationErrorItem = {
-	    /**
-	     * Error message for this item.
-	     */
-	    message: string;
-	    /**
-	     * Path to the target property in validation schema.
-	     */
-	    path?: string[];
-	    /**
-	     * The invalid property value.
-	     */
-	    value?: any;
-	};
-	/**
-	 * Represents an error when a model does not pass validation.
-	 */
-	export class ValidationError extends MinorException {
-	    readonly details: ValidationErrorItem[];
-	    static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError;
-	    constructor(details: ValidationErrorItem[]);
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/BusinessInvariantError' {
-	import { ValidationError, ValidationErrorItem } from '@micro-fleet/common/dist/app/models/ValidationError';
-	/**
-	 * Represents a business rule violation.
-	 */
-	export class BusinessInvariantError extends ValidationError {
-	    constructor(details: ValidationErrorItem[]);
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/IModelValidator' {
-	import * as joi from 'joi';
-	import { ValidationError } from '@micro-fleet/common/dist/app/models/ValidationError';
-	export interface ValidationOptions extends joi.ValidationOptions {
-	}
-	export type JoiModelValidatorCreateOptions = {
-	    /**
-	     * Rules to validate model properties.
-	     */
-	    schemaMapModel: joi.SchemaMap;
-	    /**
-	     * Whether the primary key is composite. Default to `false`.
-	     * This param is IGNORED if param `schemaMapPk` has value.
-	     */
-	    isCompositeId?: boolean;
-	    /**
-	     * Whether to validate PK.
-	     * This param is IGNORED if param `schemaMapPk` has value.
-	     * Default to be `false`.
-	     */
-	    requireId?: boolean;
-	    /**
-	     * Rule to validate model PK.
-	     */
-	    schemaMapId?: joi.SchemaMap;
-	};
-	export interface IModelValidator<T> {
-	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapId: joi.SchemaMap;
-	    readonly isCompositeId: boolean;
-	    /**
-	     * Validates model ID.
-	     */
-	    id(id: any): [ValidationError, any];
-	    /**
-	     * Validates model for creation operation, which doesn't need `id` property.
-	     */
-	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
-	    /**
-	     * Validates model for modification operation, which requires `id` property.
-	     */
-	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-	    /**
-	     * Must call this method before using `whole` or `partial`,
-	     * or after `schemaMap` or `schemaMapId` is changed.
-	     */
-	    compile(): void;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/IdBase' {
-	import { ISerializable } from '@micro-fleet/common/dist/app/interfaces/misc';
-	/**
-	 * Base class for ID type.
-	 * Models in DDD (domain-driven design) often have ID as a class instance.
-	 */
-	export abstract class IdBase implements ISerializable {
-	    abstract toArray(): any[];
-	    equals(target: any): boolean;
-	    toJSON(): object;
-	    /**
-	     * @override
-	     */
-	    toString(): string;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/JoiExtended' {
-	import * as joi from 'joi';
-	export type JoiDateStringOptions = {
-	    /**
-	     * Whether the input string is in UTC format.
-	     * Default: false.
-	     */
-	    isUTC?: boolean;
-	    /**
-	     * Function to convert input string to desired data type.
-	     * Default function returns native Date object.
-	     */
-	    translator?: any;
-	};
-	export type ExtendedJoi = joi.AnySchema & {
-	    genn: () => {
-	        /**
-	         * Makes sure input is native bigint type.
-	         *
-	         * @example extJoi.genn().bigint().validate('98765443123456');
-	         * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
-	         */
-	        bigint: () => joi.AnySchema;
-	        /**
-	         * Makes sure input is in W3C Date and Time Formats,
-	         * but must have at least year, month, and day.
-	         *
-	         * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
-	         * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
-	         * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
-	         */
-	        dateString: (options?: JoiDateStringOptions) => joi.AnySchema;
-	    };
-	};
-	/**
-	 * Joi instance with "genn()" extension enabled, including some custom rules.
-	 */
-	export const extJoi: ExtendedJoi;
-
-}
-declare module '@micro-fleet/common/dist/app/models/JoiModelValidator' {
-	import * as joi from 'joi';
-	import { IModelValidator, JoiModelValidatorCreateOptions, ValidationOptions } from '@micro-fleet/common/dist/app/models/IModelValidator';
-	import { ValidationError } from '@micro-fleet/common/dist/app/models/ValidationError';
-	export class JoiModelValidator<T> implements IModelValidator<T> {
-	    protected _schemaMap: joi.SchemaMap;
-	    protected _isCompositeId: boolean;
-	    protected _schemaMapId?: joi.SchemaMap;
-	    /**
-	     * Builds a new instance of ModelValidatorBase.
-	     */
-	    static create<T>({ schemaMapModel, isCompositeId, requireId, schemaMapId: schemaMapId, }: JoiModelValidatorCreateOptions): JoiModelValidator<T>;
-	    /**
-	     * Compiled rules for model ID.
-	     */
-	    protected _compiledId: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties.
-	     */
-	    protected _compiledWhole: joi.ObjectSchema;
-	    /**
-	     * Compiled rules for model properties, but all of them are OPTIONAL.
-	     * Used for patch operation.
-	     */
-	    protected _compiledPartial: joi.ObjectSchema;
-	    /**
-	     * @param {joi.SchemaMap} _schemaMap Rules to validate model properties.
-	     * @param {boolean} _isCompositeId Whether the primary key is made of multiple properties. Default to `false`
-	     *     This param is IGNORED if param `schemaMapId` has value.
-	     * @param {boolean} requireId Whether to validate ID.
-	     *     This param is IGNORED if param `schemaMapId` has value.
-	     * @param {joi.SchemaMap} _schemaMapId Rule to validate model ID.
-	     */
-	    protected constructor(_schemaMap: joi.SchemaMap, _isCompositeId: boolean, requireId: boolean, _schemaMapId?: joi.SchemaMap);
-	    readonly schemaMap: joi.SchemaMap;
-	    readonly schemaMapId: joi.SchemaMap;
-	    readonly isCompositeId: boolean;
-	    /**
-	     * @see IModelValidator.id
-	     */
-	    id(id: any): [ValidationError, any];
-	    /**
-	     * @see IModelValidator.whole
-	     */
-	    whole(target: any, options?: ValidationOptions): [ValidationError, T];
-	    /**
-	     * @see IModelValidator.partial
-	     */
-	    partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-	    /**
-	     * @see IModelValidator.compile
-	     */
-	    compile(): void;
-	    protected validate(schema: joi.ObjectSchema, target: any, options?: ValidationOptions): [ValidationError, T];
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/SingleId' {
-	import { IdBase } from '@micro-fleet/common/dist/app/models/IdBase';
-	export class SingleId extends IdBase {
-	    id: string;
-	    constructor(id: string);
-	    /**
-	     * @override
-	     * Overriding for better performance.
-	     */
-	    equals(target: any): boolean;
-	    /**
-	     * @override
-	     */
-	    toArray(): string[];
-	    /**
-	     * @override
-	     * Overriding for better performance.
-	     */
-	    toString(): string;
-	}
-
-}
-declare module '@micro-fleet/common/dist/app/models/TenantId' {
-	import { IdBase } from '@micro-fleet/common/dist/app/models/IdBase';
-	export class TenantId extends IdBase {
-	    id: string;
-	    tenantId: string;
-	    constructor(id: string, tenantId: string);
-	    /**
-	     * @override
-	     * Overriding for better performance.
-	     */
-	    equals(target: any): boolean;
-	    /**
-	     * @override
-	     */
-	    toArray(): string[];
-	    /**
-	     * @override
-	     * Overriding for better performance.
-	     */
-	    toString(): string;
-	}
 
 }
 declare module '@micro-fleet/common/dist/app/setting-keys/index' {
