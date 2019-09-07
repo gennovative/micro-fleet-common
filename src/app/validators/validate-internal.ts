@@ -1,8 +1,8 @@
 import * as joi from 'joi'
-import isEmpty = require('lodash/isEmpty')
 
 import { JoiModelValidatorConstructorOptions } from './IModelValidator'
 import { JoiModelValidator } from './JoiModelValidator'
+import { isEmpty } from '../utils/ObjectUtil'
 
 
 // This file is for internal use, do not export to (lib)user
@@ -105,3 +105,4 @@ function buildPropSchema(propMeta: PropValidationMetadata): joi.AnySchema {
             propMeta.type()
     )
 }
+

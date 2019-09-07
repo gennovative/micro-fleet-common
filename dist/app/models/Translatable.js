@@ -36,4 +36,20 @@ class Translatable {
     }
 }
 exports.Translatable = Translatable;
+/**
+ * Used to decorate model class to equip same functionalities as extending class `Translatable`.
+ */
+function translatable() {
+    return function (TargetClass) {
+        copyStatic(Translatable, TargetClass, ['getTranslator', '$createTranslator', 'getValidator', '$createValidator', 'from', 'fromMany']);
+    };
+}
+exports.translatable = translatable;
+function copyStatic(SrcClass, DestClass, props = []) {
+    props.forEach(p => {
+        if (!DestClass[p]) {
+            DestClass[p] = SrcClass[p].bind(DestClass);
+        }
+    });
+}
 //# sourceMappingURL=Translatable.js.map

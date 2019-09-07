@@ -1,13 +1,4 @@
 "use strict";
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
-            t[p[i]] = s[p[i]];
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("joi");
 const Guard_1 = require("../utils/Guard");
@@ -25,13 +16,12 @@ const JoiExtended_1 = require("./JoiExtended");
  */
 function validateClass(validatorOptions) {
     return function (TargetClass) {
-        Guard_1.Guard.assertArgDefined('opts', validatorOptions);
+        Guard_1.Guard.assertArgDefined('validatorOptions', validatorOptions);
         const classMeta = Object.assign(v.getClassValidationMetadata(TargetClass), validatorOptions);
         v.setClassValidationMetadata(TargetClass, classMeta);
     };
 }
 exports.validateClass = validateClass;
-// export type ValidateClassDecorator = (validatorOptions: JoiModelValidatorConstructorOptions) => ClassDecorator
 /**
  * Used to decorate model class' properties to declare complex validation rules.
  * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
@@ -66,6 +56,7 @@ exports.validateClass = validateClass;
 function validateProp(schema) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
+        Guard_1.Guard.assertArgDefined('schema', schema);
         const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
         propMeta.rawSchema = schema;
         v.setPropValidationMetadata(proto.constructor, propName, propMeta);
@@ -140,8 +131,7 @@ exports.bigInt = bigInt;
 /**
  * Used to decorate model class' properties to assert it must be a number.
  */
-function number(_a = {}) {
-    var { min, max } = _a, opts = __rest(_a, ["min", "max"]);
+function number({ min, max, ...opts } = {}) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
         const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
@@ -190,7 +180,6 @@ function datetime(opts = { convert: false }) {
     };
 }
 exports.datetime = datetime;
-// export type DateTimeDecorator = (opts?: DateTimeDecoratorOptions) => PropertyDecorator
 /**
  * Used to decorate model class' properties to specify default value.
  * @param {any} value The default value.
@@ -204,7 +193,6 @@ function defaultAs(value) {
     };
 }
 exports.defaultAs = defaultAs;
-// export type DefaultAsDecorator = (value: any) => PropertyDecorator
 /**
  * Used to decorate model class' properties to assert it must be one of the specified.
  *
@@ -229,7 +217,6 @@ function only(...values) {
     };
 }
 exports.only = only;
-// export type OnlyDecorator = (...values: any[]) => PropertyDecorator
 /**
  * Used to decorate model class' properties to assert it must exist and have non-undefined value.
  * @param {boolean} allowNull Whether or not to allow null value. Default is false.
@@ -244,7 +231,6 @@ function required(allowNull = false) {
     };
 }
 exports.required = required;
-// export type RequiredDecorator = (allowNull?: boolean) => PropertyDecorator
 /**
  * Used to decorate model class' properties to assert it must exist and have non-undefined value.
  */
@@ -310,5 +296,4 @@ function string(opts = { allowEmpty: true }) {
     };
 }
 exports.string = string;
-// export type StringDecorator = (opts?: StringDecoratorOptions) => PropertyDecorator
 //# sourceMappingURL=validate-decorator.js.map

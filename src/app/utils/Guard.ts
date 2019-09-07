@@ -1,7 +1,5 @@
-const isEmpty = require('lodash/isEmpty')
-const isFunction = require('lodash/isFunction')
-
 import * as ex from '../models/Exceptions'
+import { isEmpty } from './ObjectUtil'
 
 
 export class Guard {
@@ -42,7 +40,7 @@ export class Guard {
      * @throws {InvalidArgumentException} If assertion fails.
      */
     public static assertArgFunction(name: string, target: any, message?: string): void {
-        if (!isFunction(target)) {
+        if (typeof target !== 'function') {
             throw new ex.InvalidArgumentException(name, message || 'Must be a function!')
         }
     }
@@ -96,7 +94,7 @@ export class Guard {
      * @throws {MinorException} If assertion fails and `isCritical` is false.
      */
     public static assertIsFunction(target: any, message?: string, isCritical: boolean = true): void {
-        Guard.assertIsTruthy(isFunction(target), message, isCritical)
+        Guard.assertIsTruthy(typeof target === 'function', message, isCritical)
     }
 
     /**

@@ -1,6 +1,6 @@
 {
     "name": "@micro-fleet/common",
-    "version": "2.3.0",
+    "version": "2.3.0-rc1",
     "description": "Contains helpers, models and constants used by other packages.",
     "scripts": {
         "build": "npm run compile && npm run test",
@@ -18,7 +18,7 @@
         "automapper-ts": "~1.9",
         "inversify": "~4.11",
         "joi": "~13.0",
-        "lodash": "~4.17",
+        "lodash.isequal": "~4.5",
         "reflect-metadata": "~0.1"
     },
     "devDependencies": {
@@ -26,7 +26,7 @@
         "@types/chai-spies": "~0.0.1",
         "@types/debug": "~0.0.30",
         "@types/joi": "~14.3",
-        "@types/lodash": "~4.14",
+        "@types/lodash.isequal": "~4.5",
         "@types/mocha": "~5.2",
         "@types/node": "~10.14",
         "chai": "~4.1",

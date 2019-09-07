@@ -11,7 +11,6 @@ __export(require("./constants"));
 __export(require("./decorators"));
 __export(require("./di/DependencyContainer"));
 __export(require("./di/HandlerContainer"));
-__export(require("./di/lazyInject"));
 __export(require("./di/ServiceContext"));
 __export(require("./di/Types"));
 __export(require("./models/id/IdBase"));
@@ -31,6 +30,5 @@ __export(require("./utils/Guard"));
 __export(require("./validators/BusinessInvariantError"));
 __export(require("./validators/JoiExtended"));
 __export(require("./validators/JoiModelValidator"));
-// export * from './validators/validate-decorator'
 __export(require("./validators/ValidationError"));
 //# sourceMappingURL=index.js.map

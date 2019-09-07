@@ -10,12 +10,12 @@ const service_1 = require("./setting-keys/service");
 const web_1 = require("./setting-keys/web");
 exports.constants = {
     DbClient: DbClient_1.DbClient,
-    AuthSettingKeys: auth_1.Auth,
-    CacheSettingKeys: cache_1.Cache,
-    DbSettingKeys: database_1.Database,
-    MbSettingKeys: message_broker_1.MessageBroker,
-    RpcSettingKeys: rpc_1.RPC,
-    SvcSettingKeys: service_1.Service,
-    WebSettingKeys: web_1.Web,
+    Auth: auth_1.Auth,
+    Cache: cache_1.Cache,
+    Database: database_1.Database,
+    MessageBroker: message_broker_1.MessageBroker,
+    RPC: rpc_1.RPC,
+    Service: service_1.Service,
+    Web: web_1.Web,
 };
 //# sourceMappingURL=constants.js.map

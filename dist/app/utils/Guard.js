@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const isEmpty = require('lodash/isEmpty');
-const isFunction = require('lodash/isFunction');
 const ex = require("../models/Exceptions");
+const ObjectUtil_1 = require("./ObjectUtil");
 class Guard {
     /**
      * Makes sure the specified `target` is not null or undefined.
@@ -26,7 +25,7 @@ class Guard {
      * @throws {InvalidArgumentException} If assertion fails.
      */
     static assertArgNotEmpty(name, target, message) {
-        if (isEmpty(target)) {
+        if (ObjectUtil_1.isEmpty(target)) {
             throw new ex.InvalidArgumentException(name, message || 'Must not be null, undefined or empty!');
         }
     }
@@ -38,7 +37,7 @@ class Guard {
      * @throws {InvalidArgumentException} If assertion fails.
      */
     static assertArgFunction(name, target, message) {
-        if (!isFunction(target)) {
+        if (typeof target !== 'function') {
             throw new ex.InvalidArgumentException(name, message || 'Must be a function!');
         }
     }
@@ -76,7 +75,7 @@ class Guard {
      * @throws {MinorException} If assertion fails and `isCritical` is false.
      */
     static assertIsNotEmpty(target, message, isCritical = true) {
-        Guard.assertIsFalsey(isEmpty(target), message, isCritical);
+        Guard.assertIsFalsey(ObjectUtil_1.isEmpty(target), message, isCritical);
     }
     /**
      * Makes sure the specified `target` is a function.
@@ -87,7 +86,7 @@ class Guard {
      * @throws {MinorException} If assertion fails and `isCritical` is false.
      */
     static assertIsFunction(target, message, isCritical = true) {
-        Guard.assertIsTruthy(isFunction(target), message, isCritical);
+        Guard.assertIsTruthy(typeof target === 'function', message, isCritical);
     }
     /**
      * Makes sure the specified `target` matches Regular Expression `rule`.

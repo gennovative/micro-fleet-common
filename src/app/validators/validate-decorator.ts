@@ -18,7 +18,7 @@ import { extJoi } from './JoiExtended'
  */
 export function validateClass(validatorOptions: JoiModelValidatorConstructorOptions): ClassDecorator {
     return function (TargetClass: Function): void {
-        Guard.assertArgDefined('opts', validatorOptions)
+        Guard.assertArgDefined('validatorOptions', validatorOptions)
 
         const classMeta = Object.assign(
             v.getClassValidationMetadata(TargetClass),
@@ -27,7 +27,6 @@ export function validateClass(validatorOptions: JoiModelValidatorConstructorOpti
         v.setClassValidationMetadata(TargetClass, classMeta)
     }
 }
-// export type ValidateClassDecorator = (validatorOptions: JoiModelValidatorConstructorOptions) => ClassDecorator
 
 /**
  * Used to decorate model class' properties to declare complex validation rules.
@@ -60,15 +59,15 @@ export function validateClass(validatorOptions: JoiModelValidatorConstructorOpti
  * }
  * ```
  */
-export function validateProp(schema?: joi.SchemaLike): PropertyDecorator {
+export function validateProp(schema: joi.SchemaLike): PropertyDecorator {
     return function (proto: object, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
+        Guard.assertArgDefined('schema', schema)
         const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
         propMeta.rawSchema = schema
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type ValidatePropDecorator = (schema?: joi.SchemaLike) => PropertyDecorator
 
 
 export type ArrayDecoratorOptions = {
@@ -126,7 +125,6 @@ export function array(opts: ArrayDecoratorOptions): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type ArrayDecorator = (opts: ArrayDecoratorOptions) => PropertyDecorator
 
 
 export type BooleanDecoratorOptions = {
@@ -148,7 +146,6 @@ export function boolean(opts?: BooleanDecoratorOptions): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type BooleanDecorator = (opts?: BooleanDecoratorOptions) => PropertyDecorator
 
 
 export type BigIntDecoratorOptions = {
@@ -170,7 +167,6 @@ export function bigInt({ convert }: BigIntDecoratorOptions = { convert: false })
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type BigIntDecorator = (opts?: BigIntDecoratorOptions) => PropertyDecorator
 
 
 export type NumberDecoratorOptions = {
@@ -204,7 +200,6 @@ export function number({ min, max, ...opts }: NumberDecoratorOptions = {}): Prop
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type NumberDecorator = (opts?: NumberDecoratorOptions) => PropertyDecorator
 
 
 export type DateTimeDecoratorOptions = {
@@ -264,7 +259,7 @@ export function datetime(opts: DateTimeDecoratorOptions = { convert: false}): Pr
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type DateTimeDecorator = (opts?: DateTimeDecoratorOptions) => PropertyDecorator
+
 
 /**
  * Used to decorate model class' properties to specify default value.
@@ -278,7 +273,6 @@ export function defaultAs(value: any): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type DefaultAsDecorator = (value: any) => PropertyDecorator
 
 
 /**
@@ -304,7 +298,7 @@ export function only(...values: any[]): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type OnlyDecorator = (...values: any[]) => PropertyDecorator
+
 
 /**
  * Used to decorate model class' properties to assert it must exist and have non-undefined value.
@@ -319,7 +313,7 @@ export function required(allowNull: boolean = false): PropertyDecorator {
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type RequiredDecorator = (allowNull?: boolean) => PropertyDecorator
+
 
 /**
  * Used to decorate model class' properties to assert it must exist and have non-undefined value.
@@ -333,7 +327,6 @@ export function id(): PropertyDecorator {
         v.setClassValidationMetadata(proto.constructor, classMeta)
     }
 }
-// export type IdDecorator = () => PropertyDecorator
 
 
 export type StringDecoratorOptions = {
@@ -434,4 +427,3 @@ export function string(opts: StringDecoratorOptions = { allowEmpty: true }): Pro
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
-// export type StringDecorator = (opts?: StringDecoratorOptions) => PropertyDecorator
