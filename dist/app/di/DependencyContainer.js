@@ -60,7 +60,7 @@ class DependencyContainer {
             return this._container.get(identifier);
         }
         catch (ex) {
-            console.log('Resolve Error: ' + ex);
+            console.log('Resolve Error: ' + String(ex));
             return null;
         }
     }

@@ -70,9 +70,8 @@ export class HandlerContainer {
 
         if (Array.isArray(actions)) {
             return <any>actions.map(act => doRegister(act, dependencyIdentifier))
-        } else {
-            return doRegister(actions, dependencyIdentifier)
         }
+        return doRegister(actions, dependencyIdentifier)
     }
 
     /**

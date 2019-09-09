@@ -1,73 +1,10 @@
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 
+import { Translatable } from '../models/Translatable'
 import { Guard } from '../utils/Guard'
 import { JoiModelValidatorConstructorOptions } from './IModelValidator'
 import * as v from './validate-internal'
 import { extJoi } from './JoiExtended'
-
-
-/**
- * Used to decorate model class to declare validation rules.
- *
- * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
- * such as @validateProp(), @number(), @defaultAs()...
- *
- * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
- *
- * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
- */
-export function validateClass(validatorOptions: JoiModelValidatorConstructorOptions): ClassDecorator {
-    return function (TargetClass: Function): void {
-        Guard.assertArgDefined('validatorOptions', validatorOptions)
-
-        const classMeta = Object.assign(
-            v.getClassValidationMetadata(TargetClass),
-            validatorOptions
-        )
-        v.setClassValidationMetadata(TargetClass, classMeta)
-    }
-}
-
-/**
- * Used to decorate model class' properties to declare complex validation rules.
- * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
- *
- * @param {joi.SchemaLike} schema A single schema rule for this property.
- *
- * ```typescript
- * class ModelA {
- *   @validateProp(joi.number().positive().precision(2).max(99))
- *   age: number
- * }
- * ```
- * Not complex enough? Hold my beer!
- *
- * ```typescript
- * class ModelB {
- *   @boolean()
- *   hasChildren: boolean
- *
- *   @validateProp(
- *     joi.number().positive()
- *       .when('hasChildren', {
- *         is: true,
- *         then: joi.required(),
- *         otherwise: joi.forbidden(),
- *       })
- *   )
- *   childrenIDs: number[]
- * }
- * ```
- */
-export function validateProp(schema: joi.SchemaLike): PropertyDecorator {
-    return function (proto: object, propName: string | symbol): void {
-        Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        Guard.assertArgDefined('schema', schema)
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
-        propMeta.rawSchema = schema
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
-    }
-}
 
 
 export type ArrayDecoratorOptions = {
@@ -82,7 +19,18 @@ export type ArrayDecoratorOptions = {
      * Validation rules for array items.
      * Read Joi's docs for more details and examples: https://hapi.dev/family/joi/?v=15.1.1#arrayitemstype
      */
-    items: joi.SchemaLike | joi.SchemaLike[]
+    items: joi.SchemaLike | joi.SchemaLike[],
+
+    /**
+     * Minimum allowed number of items.
+     */
+    minLength?: number,
+
+    /**
+     * Maximum allowed number of items.
+     */
+    maxLength?: number,
+
 }
 
 /**
@@ -90,7 +38,7 @@ export type ArrayDecoratorOptions = {
  *
  * ```typescript
  *
- * import * as joi from 'joi'
+ * import * as joi from '@hapi/joi'
  *
  * const ALLOWED = [ 'id', 'name', 'age' ]
  *
@@ -116,12 +64,12 @@ export function array(opts: ArrayDecoratorOptions): PropertyDecorator {
         const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
         propMeta.type = () => {
             const itemRules = Array.isArray(opts.items) ? opts.items : [opts.items]
-            const schema = joi.array().items(itemRules)
-            const allowSingle = (opts.allowSingle == null) ? true : opts.allowSingle
-            return allowSingle
-                ? schema.single().options({ convert: true })
-                : schema
+            return joi.array().items(itemRules)
         }
+        (opts.minLength != null) && propMeta.rules.push(prev => (prev as joi.ArraySchema).min(opts.minLength));
+        (opts.maxLength != null) && propMeta.rules.push(prev => (prev as joi.ArraySchema).max(opts.maxLength))
+        const allowSingle = (opts.allowSingle == null) ? true : opts.allowSingle
+        allowSingle && propMeta.rules.push(prev => (prev as joi.ArraySchema).single().options({ convert: true }))
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }
@@ -280,7 +228,7 @@ export function defaultAs(value: any): PropertyDecorator {
  *
  * ```typescript
  *
- * import * as joi from 'joi'
+ * import * as joi from '@hapi/joi'
  *
  * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
  *
@@ -294,6 +242,11 @@ export function only(...values: any[]): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
         const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        // Passing array might be a mistake causing array in array [[value]]
+        // We should correct it back to spreaded list of params
+        if (values.length == 1 && Array.isArray(values[0])) {
+            values = [...values[0]]
+        }
         propMeta.rules.push(prev => prev.only(values))
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
@@ -424,6 +377,88 @@ export function string(opts: StringDecoratorOptions = { allowEmpty: true }): Pro
             }
             return (prev as joi.StringSchema).uri()
         })
+        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+    }
+}
+
+/**
+ * Used to decorate model class to equip same functionalities as extending class `Translatable`.
+ */
+export function translatable(): ClassDecorator {
+    return function (TargetClass: Function): void {
+        copyStatic(Translatable, TargetClass,
+            ['getTranslator', '$createTranslator', 'getValidator', '$createValidator', 'from', 'fromMany'])
+    }
+}
+
+function copyStatic(SrcClass: any, DestClass: any, props: string[] = []): void {
+    props.forEach(p => {
+        if (!DestClass[p]) {
+            DestClass[p] = SrcClass[p].bind(DestClass)
+        }
+    })
+}
+
+
+/**
+ * Used to decorate model class to declare validation rules.
+ *
+ * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
+ * such as @validateProp(), @number(), @defaultAs()...
+ *
+ * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+ *
+ * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
+ */
+export function validateClass(validatorOptions: JoiModelValidatorConstructorOptions): ClassDecorator {
+    return function (TargetClass: Function): void {
+        Guard.assertArgDefined('validatorOptions', validatorOptions)
+
+        const classMeta = Object.assign(
+            v.getClassValidationMetadata(TargetClass),
+            validatorOptions
+        )
+        v.setClassValidationMetadata(TargetClass, classMeta)
+    }
+}
+
+/**
+ * Used to decorate model class' properties to declare complex validation rules.
+ * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+ *
+ * @param {joi.SchemaLike} schema A single schema rule for this property.
+ *
+ * ```typescript
+ * class ModelA {
+ *   @validateProp(joi.number().positive().precision(2).max(99))
+ *   age: number
+ * }
+ * ```
+ * Not complex enough? Hold my beer!
+ *
+ * ```typescript
+ * class ModelB {
+ *   @boolean()
+ *   hasChildren: boolean
+ *
+ *   @validateProp(
+ *     joi.number().positive()
+ *       .when('hasChildren', {
+ *         is: true,
+ *         then: joi.required(),
+ *         otherwise: joi.forbidden(),
+ *       })
+ *   )
+ *   childrenIDs: number[]
+ * }
+ * ```
+ */
+export function validateProp(schema: joi.SchemaLike): PropertyDecorator {
+    return function (proto: object, propName: string | symbol): void {
+        Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
+        Guard.assertArgDefined('schema', schema)
+        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        propMeta.rawSchema = schema
         v.setPropValidationMetadata(proto.constructor, propName, propMeta)
     }
 }

@@ -1,9 +1,11 @@
 import { expect } from 'chai'
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 
 import { JoiModelValidator, extJoi } from '../../app'
 import { SampleModel } from './SampleModel'
 
+
+// tslint:disable: no-magic-numbers
 
 let globalValidator: JoiModelValidator<SampleModel>
 

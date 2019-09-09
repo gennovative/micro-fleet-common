@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const joi = require("joi");
+const joi = require("@hapi/joi");
 const JoiModelValidator_1 = require("./JoiModelValidator");
 const ObjectUtil_1 = require("../utils/ObjectUtil");
 const VALIDATE_META = Symbol();
 function getClassValidationMetadata(Class) {
-    return Reflect.getOwnMetadata(VALIDATE_META, Class) || { schemaMapModel: {}, props: {}, idProps: new Set() };
+    return Reflect.getMetadata(VALIDATE_META, Class) || { schemaMapModel: {}, props: {}, idProps: new Set() };
 }
 exports.getClassValidationMetadata = getClassValidationMetadata;
 function setClassValidationMetadata(Class, meta) {

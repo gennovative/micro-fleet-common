@@ -3,7 +3,7 @@ import { IModelValidator } from '../validators/IModelValidator'
 import { ValidationError } from '../validators/ValidationError'
 
 
-export interface MappingOptions {
+export type MappingOptions = {
     /**
      * Temporarily turns on or off model validation.
      * Can only be turned on if validator is provided to constructor.
@@ -13,7 +13,7 @@ export interface MappingOptions {
     /**
      * If specified, gives validation error to this callback. Otherwise, throw error.
      */
-    errorCallback?: (err: ValidationError) => void
+    errorCallback?(err: ValidationError): void
 }
 
 

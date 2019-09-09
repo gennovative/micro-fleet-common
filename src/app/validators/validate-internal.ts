@@ -1,4 +1,4 @@
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 
 import { JoiModelValidatorConstructorOptions } from './IModelValidator'
 import { JoiModelValidator } from './JoiModelValidator'
@@ -8,7 +8,7 @@ import { isEmpty } from '../utils/ObjectUtil'
 // This file is for internal use, do not export to (lib)user
 
 export type PropValidationMetadata = {
-    type?: () => joi.AnySchema,
+    type?(): joi.AnySchema;
     rules?: Array<(prev: joi.AnySchema) => joi.AnySchema>,
     rawSchema?: joi.SchemaLike,
 }
@@ -23,7 +23,7 @@ export type ClassValidationMetadata = JoiModelValidatorConstructorOptions & {
 const VALIDATE_META = Symbol()
 
 export function getClassValidationMetadata(Class: Function): ClassValidationMetadata {
-    return Reflect.getOwnMetadata(VALIDATE_META, Class) || { schemaMapModel: {}, props: {}, idProps: new Set() }
+    return Reflect.getMetadata(VALIDATE_META, Class) || { schemaMapModel: {}, props: {}, idProps: new Set() }
 }
 
 

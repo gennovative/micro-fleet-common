@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const joi = require("joi");
+const joi = require("@hapi/joi");
 const validate_decorator_1 = require("../../validators/validate-decorator");
 const Translatable_1 = require("../Translatable");
 /**

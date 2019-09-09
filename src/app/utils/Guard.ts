@@ -121,9 +121,8 @@ export class Guard {
         if (!target) {
             if (isCritical) {
                 throw new ex.CriticalException(message)
-            } else {
-                throw new ex.MinorException(message)
             }
+            throw new ex.MinorException(message)
         }
     }
 
@@ -137,9 +136,8 @@ export class Guard {
         if (target) {
             if (isCritical) {
                 throw new ex.CriticalException(message)
-            } else {
-                throw new ex.MinorException(message)
             }
+            throw new ex.MinorException(message)
         }
     }
 

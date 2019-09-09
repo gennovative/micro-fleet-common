@@ -9,10 +9,11 @@ import { createJoiValidator } from '../validators/validate-internal'
 // https://github.com/microsoft/TypeScript/issues/5862
 
 export interface ITranslatable<T = any> {
+    new (...args: any[]): T
     getTranslator(): IModelAutoMapper<T>
     getValidator(): IModelValidator<T>
-    from?(source: object): T
-    fromMany?(source: object[]): T[]
+    from(source: object): T
+    fromMany(source: object[]): T[]
 }
 
 
@@ -58,23 +59,4 @@ export abstract class Translatable {
         return this.getTranslator<FT>().wholeMany(source)
     }
 
-}
-
-
-/**
- * Used to decorate model class to equip same functionalities as extending class `Translatable`.
- */
-export function translatable(): ClassDecorator {
-    return function (TargetClass: Function): void {
-        copyStatic(Translatable, TargetClass,
-            ['getTranslator', '$createTranslator', 'getValidator', '$createValidator', 'from', 'fromMany'])
-    }
-}
-
-function copyStatic(SrcClass: any, DestClass: any, props: string[] = []): void {
-    props.forEach(p => {
-        if (!DestClass[p]) {
-            DestClass[p] = SrcClass[p].bind(DestClass)
-        }
-    })
 }

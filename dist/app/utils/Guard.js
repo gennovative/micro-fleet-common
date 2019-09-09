@@ -112,9 +112,7 @@ class Guard {
             if (isCritical) {
                 throw new ex.CriticalException(message);
             }
-            else {
-                throw new ex.MinorException(message);
-            }
+            throw new ex.MinorException(message);
         }
     }
     /**
@@ -128,9 +126,7 @@ class Guard {
             if (isCritical) {
                 throw new ex.CriticalException(message);
             }
-            else {
-                throw new ex.MinorException(message);
-            }
+            throw new ex.MinorException(message);
         }
     }
 }

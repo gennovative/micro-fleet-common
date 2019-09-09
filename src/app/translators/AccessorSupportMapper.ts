@@ -13,7 +13,7 @@ function isGetter(obj: object, prop: string): boolean {
         Object.getPrototypeOf(obj),
         prop,
     )
-    return Boolean(descriptor) && Boolean(descriptor.get)
+    return Boolean(descriptor) && (typeof descriptor.get === 'function')
 }
 
 function capitalize(source: string) {
@@ -39,8 +39,8 @@ function describeAccessor(obj: object) {
         )
         return {
             name: prop,
-            isGetter: Boolean(descriptor.get),
-            isSetter: Boolean(descriptor.set),
+            isGetter: (typeof descriptor.get === 'function'),
+            isSetter: (typeof descriptor.set === 'function'),
         }
     }
 }

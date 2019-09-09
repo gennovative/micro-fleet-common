@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { Guard, InvalidArgumentException, CriticalException, MinorException } from '../app'
 
+// tslint:disable: no-magic-numbers
 describe('Guard', () => {
 
     describe('assertArgDefined', () => {
@@ -849,3 +850,4 @@ describe('Guard', () => {
     }) // describe 'assertIsFalsey'
 
 })
+// tslint:enable: no-magic-numbers

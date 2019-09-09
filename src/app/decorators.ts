@@ -1,7 +1,6 @@
 import { injectable, inject, decorate, unmanaged, optional } from 'inversify'
 
 import { lazyInject } from './di/lazyInject'
-import { translatable } from './models/Translatable'
 import * as v from './validators/validate-decorator'
 
 export { ArrayDecoratorOptions, BooleanDecoratorOptions, BigIntDecoratorOptions,
@@ -22,7 +21,7 @@ export type Decorators = {
      *
      * ```typescript
      *
-     * import * as joi from 'joi'
+     * import * as joi from '@hapi/joi'
      *
      * const ALLOWED = [ 'id', 'name', 'age' ]
      *
@@ -101,7 +100,7 @@ export type Decorators = {
      *
      * ```typescript
      *
-     * import * as joi from 'joi'
+     * import * as joi from '@hapi/joi'
      *
      * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
      *
@@ -197,7 +196,7 @@ export type Decorators = {
     /**
      * Used to decorate model class to equip same functionalities as extending class `Translatable`.
      */
-    translatable: typeof translatable,
+    translatable: typeof v.translatable,
 }
 
 export const decorators: Decorators = {
@@ -220,5 +219,5 @@ export const decorators: Decorators = {
     string: v.string,
     validateClass: v.validateClass,
     validateProp: v.validateProp,
-    translatable,
+    translatable: v.translatable,
 }

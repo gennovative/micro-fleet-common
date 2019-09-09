@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const inversify_1 = require("inversify");
 const lazyInject_1 = require("./di/lazyInject");
-const Translatable_1 = require("./models/Translatable");
 const v = require("./validators/validate-decorator");
 exports.decorators = {
     decorate: inversify_1.decorate,
@@ -23,6 +22,6 @@ exports.decorators = {
     string: v.string,
     validateClass: v.validateClass,
     validateProp: v.validateProp,
-    translatable: Translatable_1.translatable,
+    translatable: v.translatable,
 };
 //# sourceMappingURL=decorators.js.map

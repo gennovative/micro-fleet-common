@@ -9,7 +9,7 @@ function isGetter(obj, prop) {
     // Object.getOwnPropertyDescriptor cannot find getter/setter of object instance.
     // So we must seek in the instance's prototype.
     const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), prop);
-    return Boolean(descriptor) && Boolean(descriptor.get);
+    return Boolean(descriptor) && (typeof descriptor.get === 'function');
 }
 function capitalize(source) {
     source = source.replace(/[_#]/g, '');
@@ -28,8 +28,8 @@ function describeAccessor(obj) {
         const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), prop);
         return {
             name: prop,
-            isGetter: Boolean(descriptor.get),
-            isSetter: Boolean(descriptor.set),
+            isGetter: (typeof descriptor.get === 'function'),
+            isSetter: (typeof descriptor.set === 'function'),
         };
     };
 }

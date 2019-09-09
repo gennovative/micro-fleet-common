@@ -1,12 +1,13 @@
 /// <reference types="automapper-ts" />
 
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 import { expect } from 'chai'
 
 import { ModelAutoMapper, JoiModelValidator, ValidationError } from '../../app'
 import { SampleModel } from '../validators/SampleModel'
 import { ICreateMapFluentFunctions } from '../../app/interfaces/automapper'
 
+// tslint:disable: no-magic-numbers
 
 const itemValidator = new JoiModelValidator({
     schemaMapModel: {

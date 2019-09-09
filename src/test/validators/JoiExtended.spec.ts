@@ -4,6 +4,8 @@ import * as moment from 'moment'
 import { extJoi } from '../../app'
 
 
+// tslint:disable: no-magic-numbers
+
 describe('JoiExtended', () => {
     describe('bigint', () => {
         it('Should convert then return the value if valid', () => {

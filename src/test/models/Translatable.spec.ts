@@ -1,8 +1,10 @@
 import { expect } from 'chai'
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 
 import { Translatable, decorators as d, StringDecoratorOptions } from '../../app'
 
+
+// tslint:disable: no-magic-numbers
 
 @d.validateClass({
     schemaMapModel: {
@@ -16,7 +18,7 @@ import { Translatable, decorators as d, StringDecoratorOptions } from '../../app
         theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required(),
     },
 })
-export class ModelA extends Translatable {
+class ModelA extends Translatable {
     public readonly theID: number = undefined // It's IMPORTANT to initialize property with a value.
     public readonly name: string = undefined
     public readonly address: string = undefined
@@ -25,7 +27,14 @@ export class ModelA extends Translatable {
 }
 
 
-export class ModelB extends Translatable {
+const HOBBIES = ['soccer', 'football', 'handball']
+class ChildA extends ModelA {
+    @d.only(HOBBIES)
+    public readonly hobbies: string = undefined
+}
+
+
+class ModelB extends Translatable {
     @d.id()
     @d.required()
     @d.number({ min: 1, max: Number.MAX_SAFE_INTEGER })
@@ -47,7 +56,11 @@ export class ModelB extends Translatable {
 }
 
 
-describe('Translatable', () => {
+describe('Translatable', function () {
+    // tslint:disable:no-invalid-this
+    // this.timeout(5000)
+    this.timeout(60000) // For debugging
+
     describe('validateClass', () => {
         it('Should return an object of target type if success', () => {
             // Arrange
@@ -85,6 +98,7 @@ describe('Translatable', () => {
             expect(errorOne).not.to.exist
             expect(convertedOne).to.exist
             expect(convertedOne).is.instanceOf(ModelA)
+            expect(convertedOne.theID).to.equal(sourceOne.theID)
             expect(convertedOne.name).to.equal(sourceOne.name)
             expect(convertedOne.address).to.equal(sourceOne.address)
             expect(convertedOne.age).to.equal(sourceOne.age)
@@ -95,6 +109,7 @@ describe('Translatable', () => {
             expect(errorTwo).not.to.exist
             expect(convertedTwo).to.exist
             expect(convertedTwo).is.instanceOf(ModelA)
+            expect(convertedTwo.theID).to.equal(sourceTwo.theID)
             expect(convertedTwo.name).to.equal(sourceTwo.name)
             expect(convertedTwo.address).to.equal(sourceTwo.address)
             expect(convertedTwo.age).not.to.exist
@@ -166,7 +181,7 @@ describe('Translatable', () => {
             expect(errorThree.details[4].path[0]).to.equal('gender')
             expect(errorThree.details[4].message).to.equal('"gender" must be one of [male, female, null]')
         })
-    })
+    }) // describe 'validateClass'
 
     describe('decorators', () => {
         it('Should return an object of target type if success', () => {
@@ -253,5 +268,59 @@ describe('Translatable', () => {
             expect(errorTwo.details[1].path[0]).to.equal('age')
             expect(errorTwo.details[1].message).to.equal('"age" must be a number')
         })
-    })
+    }) // describe 'decorators'
+
+    describe('inheritance', () => {
+        it.only('Should inherit class validation rules', () => {
+            // Arrange
+            const sourceOne = {
+                    theID: 1,
+                    name: 'Gennova123',
+                    address: 'Unlimited length street name',
+                    age: 18,
+                    gender: 'male',
+                    hobbies: 'handball',
+                },
+                sourceTwo = {
+                    theID: 123,
+                    // name: 'gen-no-va', // Skip required property
+                    address: '^!@',
+                    hobbies: 'gambling',
+                }
+            let errorOne, convertedOne, errorTwo, convertedTwo
+
+            // Act
+            try {
+                convertedOne = ChildA.from(sourceOne)
+            } catch (err) {
+                errorOne = err
+            }
+
+            try {
+                convertedTwo = ChildA.from(sourceTwo)
+            } catch (err) {
+                errorTwo = err
+            }
+
+            // Assert
+            errorOne && console.error(errorOne)
+
+            expect(errorOne).not.to.exist
+            expect(convertedOne).to.exist
+            expect(convertedOne).is.instanceOf(ChildA)
+            expect(convertedOne.name).to.equal(sourceOne.name)
+            expect(convertedOne.address).to.equal(sourceOne.address)
+            expect(convertedOne.age).to.equal(sourceOne.age)
+            expect(convertedOne.gender).to.equal(sourceOne.gender)
+
+            // errorTwo && console.error(errorTwo)
+
+            expect(convertedTwo).not.to.exist
+            expect(errorTwo).to.exist
+            expect(errorTwo.details).to.have.length(1)
+            expect(errorTwo.details[0].path.length).to.equal(1)
+            expect(errorTwo.details[0].path[0]).to.equal('name')
+            expect(errorTwo.details[0].message).to.equal('"name" is required')
+        })
+    }) // describe 'inheritance'
 })

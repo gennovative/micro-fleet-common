@@ -104,6 +104,7 @@ class ModelAutoMapper {
             callback(err);
             return true;
         };
+        // tslint:disable-next-line: no-unbound-method
         if (handleError(error, options.errorCallback)) { // Validation error
             return null;
         }
@@ -111,6 +112,7 @@ class ModelAutoMapper {
             return this.$map(model);
         }
         catch (ex) {
+            // tslint:disable-next-line: no-unbound-method
             handleError(ex, options.errorCallback); // Mapping error
         }
         return null;

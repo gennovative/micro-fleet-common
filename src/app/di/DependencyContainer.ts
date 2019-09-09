@@ -120,7 +120,7 @@ export class DependencyContainer {
         try {
             return this._container.get<T>(identifier)
         } catch (ex) {
-            console.log('Resolve Error: ' + ex)
+            console.log('Resolve Error: ' + String(ex))
             return null
         }
     }

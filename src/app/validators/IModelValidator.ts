@@ -1,8 +1,9 @@
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 
 import { ValidationError } from './ValidationError'
 
 
+// tslint:disable-next-line:interface-name
 export interface ValidationOptions extends joi.ValidationOptions {
     // Re-brand this interface
 }

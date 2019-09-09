@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable-next-line:no-magic-numbers
 Error.stackTraceLimit = 20;
 class Exception {
     /**

@@ -1,8 +1,10 @@
 import { expect } from 'chai'
-import * as joi from 'joi'
+import * as joi from '@hapi/joi'
 
 import { decorators as d } from '../../app'
 
+
+// tslint:disable: no-magic-numbers
 
 @d.translatable()
 export class ModelA {

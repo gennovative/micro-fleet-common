@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ServiceContext_1 = require("./ServiceContext");
 const Guard_1 = require("../utils/Guard");
 class HandlerContainer {
+    constructor() {
+        this._handlers = [];
+    }
     static get instance() {
         if (!this._instance) {
             this._instance = new HandlerContainer();
         }
         return this._instance;
-    }
-    constructor() {
-        this._handlers = [];
     }
     get dependencyContainer() {
         return ServiceContext_1.serviceContext.dependencyContainer;
@@ -50,9 +50,7 @@ class HandlerContainer {
         if (Array.isArray(actions)) {
             return actions.map(act => doRegister(act, dependencyIdentifier));
         }
-        else {
-            return doRegister(actions, dependencyIdentifier);
-        }
+        return doRegister(actions, dependencyIdentifier);
     }
     /**
      * Looks up and returns a function that was registered to bind with `action`.

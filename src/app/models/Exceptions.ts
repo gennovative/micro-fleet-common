@@ -1,3 +1,4 @@
+// tslint:disable-next-line:no-magic-numbers
 Error.stackTraceLimit = 20
 
 export class Exception implements Error {

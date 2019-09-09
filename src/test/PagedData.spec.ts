@@ -2,6 +2,7 @@ import { expect } from 'chai'
 
 import { PagedData } from '../app'
 
+// tslint:disable: no-magic-numbers
 
 describe('PagedData', () => {
     it('Should initialize with one value', () => {
