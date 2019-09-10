@@ -1,6 +1,6 @@
 {
     "name": "@micro-fleet/common",
-    "version": "2.3.0-rc1",
+    "version": "2.3.0-rc3",
     "description": "Contains helpers, models and constants used by other packages.",
     "scripts": {
         "build": "npm run compile && npm run test",
@@ -36,7 +36,6 @@
         "moment": "~2.24",
         "nyc": "~14.1",
         "rimraf": "~3.0",
-        "ts-generator": "0.0",
         "tslint": "~5.19",
         "typescript": "~3.6"
     },

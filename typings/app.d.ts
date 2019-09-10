@@ -156,6 +156,34 @@ declare module '@micro-fleet/common/dist/app/setting-keys/database' {
     }
 
 }
+declare module '@micro-fleet/common/dist/app/setting-keys/id-gen' {
+    export enum IdGenerator {
+        /**
+         * Datacenter identifier. It is used for big int generation and
+         * can have values from 0 to 31 (5 bits).
+         *
+         * Data type: number
+         */
+        ID_DATACENTER = "id_datacenter",
+        /**
+         * Worker identifier. It is used for both big int as well as short id generation and
+         * can have values from 0 to 31 (5 bits).
+         *
+         * Data type: number
+         */
+        ID_WORKER = "id_worker",
+        /**
+         * A Unix timestamp used to generate smaller ids.
+         * This number should neither be bigger than current timestamp
+         * nor smaller than exceed number of milliseconds elapsed
+         * since 1 January 1970 00:00:00 UTC.
+         *
+         * Data type: number
+         */
+        ID_EPOCH = "id_epoch"
+    }
+
+}
 declare module '@micro-fleet/common/dist/app/setting-keys/message-broker' {
     export enum MessageBroker {
         /**
@@ -291,6 +319,7 @@ declare module '@micro-fleet/common/dist/app/constants' {
     import { Auth } from '@micro-fleet/common/dist/app/setting-keys/auth';
     import { Cache } from '@micro-fleet/common/dist/app/setting-keys/cache';
     import { Database } from '@micro-fleet/common/dist/app/setting-keys/database';
+    import { IdGenerator } from '@micro-fleet/common/dist/app/setting-keys/id-gen';
     import { MessageBroker } from '@micro-fleet/common/dist/app/setting-keys/message-broker';
     import { RPC } from '@micro-fleet/common/dist/app/setting-keys/rpc';
     import { Service } from '@micro-fleet/common/dist/app/setting-keys/service';
@@ -300,6 +329,7 @@ declare module '@micro-fleet/common/dist/app/constants' {
         Auth: typeof Auth;
         Cache: typeof Cache;
         Database: typeof Database;
+        IdGenerator: typeof IdGenerator;
         MessageBroker: typeof MessageBroker;
         RPC: typeof RPC;
         Service: typeof Service;
@@ -963,7 +993,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
          * @see IModelValidator.partial
          */
         partial(target: any, options?: ValidationOptions): [ValidationError, Partial<T>];
-                                    }
+                                            }
 
 }
 declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
@@ -2147,34 +2177,6 @@ declare module '@micro-fleet/common' {
     export * from '@micro-fleet/common/dist/app/validators/IModelValidator';
     export * from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
     export * from '@micro-fleet/common/dist/app/validators/ValidationError';
-
-}
-declare module '@micro-fleet/common/dist/app/setting-keys/id-gen' {
-    export enum IdGenerator {
-        /**
-         * Datacenter identifier. It is used for big int generation and
-         * can have values from 0 to 31 (5 bits).
-         *
-         * Data type: number
-         */
-        ID_DATACENTER = "id_datacenter",
-        /**
-         * Worker identifier. It is used for both big int as well as short id generation and
-         * can have values from 0 to 31 (5 bits).
-         *
-         * Data type: number
-         */
-        ID_WORKER = "id_worker",
-        /**
-         * A Unix timestamp used to generate smaller ids.
-         * This number should neither be bigger than current timestamp
-         * nor smaller than exceed number of milliseconds elapsed
-         * since 1 January 1970 00:00:00 UTC.
-         *
-         * Data type: number
-         */
-        ID_EPOCH = "id_epoch"
-    }
 
 }
 declare module '@micro-fleet/common/dist/app/setting-keys/index' {

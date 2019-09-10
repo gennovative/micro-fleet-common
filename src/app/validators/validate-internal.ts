@@ -22,8 +22,17 @@ export type ClassValidationMetadata = JoiModelValidatorConstructorOptions & {
 
 const VALIDATE_META = Symbol()
 
+function createClassValidationMetadata(): ClassValidationMetadata {
+    return {
+        schemaMapId: {},
+        schemaMapModel: {},
+        props: {},
+        idProps: new Set(),
+    }
+}
+
 export function getClassValidationMetadata(Class: Function): ClassValidationMetadata {
-    return Reflect.getMetadata(VALIDATE_META, Class) || { schemaMapModel: {}, props: {}, idProps: new Set() }
+    return Reflect.getMetadata(VALIDATE_META, Class) || createClassValidationMetadata()
 }
 
 
@@ -68,33 +77,19 @@ export function createJoiValidator<T>(Class: Function): JoiModelValidator<T> {
 }
 
 function buildSchemaMapModel(classMeta: ClassValidationMetadata): [joi.SchemaMap, joi.SchemaMap] {
-    const schemaMapId: joi.SchemaMap = {}
-    const schemaMapModel: joi.SchemaMap = {}
-    const hasMapId = !isEmpty(classMeta.schemaMapId)
-    const hasMapModel = !isEmpty(classMeta.schemaMapModel)
-
-    // Decorator @validateClass() overrides all property decorators
-    if (hasMapId && hasMapModel) {
-        return [classMeta.schemaMapId, classMeta.schemaMapModel]
-    }
-
-    // Build schema maps from property decorators
+    // Property decorators can override class schema maps
 
     // tslint:disable-next-line:prefer-const
     for (let [prop, meta] of Object.entries(classMeta.props)) {
         const propSchema = buildPropSchema(meta)
         if (classMeta.idProps.has(prop)) {
-            schemaMapId[prop] = propSchema
+            classMeta.schemaMapId[prop] = propSchema
         }
         else {
-            schemaMapModel[prop] = propSchema
+            classMeta.schemaMapModel[prop] = propSchema
         }
     }
-
-    return [
-        hasMapId ? classMeta.schemaMapId : schemaMapId,
-        hasMapModel ? classMeta.schemaMapModel : schemaMapModel,
-    ]
+    return [classMeta.schemaMapId, classMeta.schemaMapModel]
 }
 
 function buildPropSchema(propMeta: PropValidationMetadata): joi.AnySchema {

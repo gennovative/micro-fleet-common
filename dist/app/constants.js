@@ -4,6 +4,7 @@ const DbClient_1 = require("./setting-keys/DbClient");
 const auth_1 = require("./setting-keys/auth");
 const cache_1 = require("./setting-keys/cache");
 const database_1 = require("./setting-keys/database");
+const id_gen_1 = require("./setting-keys/id-gen");
 const message_broker_1 = require("./setting-keys/message-broker");
 const rpc_1 = require("./setting-keys/rpc");
 const service_1 = require("./setting-keys/service");
@@ -13,6 +14,7 @@ exports.constants = {
     Auth: auth_1.Auth,
     Cache: cache_1.Cache,
     Database: database_1.Database,
+    IdGenerator: id_gen_1.IdGenerator,
     MessageBroker: message_broker_1.MessageBroker,
     RPC: rpc_1.RPC,
     Service: service_1.Service,

@@ -6,62 +6,37 @@ import { Translatable, decorators as d, StringDecoratorOptions } from '../../app
 
 // tslint:disable: no-magic-numbers
 
-@d.validateClass({
-    schemaMapModel: {
-        name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
-        address: joi.string().required(),
-        age: joi.number().min(15).max(99).integer()
-            .allow(null).optional(),
-        gender: joi.only('male', 'female').allow(null).optional(),
-    },
-    schemaMapId: {
-        theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required(),
-    },
-})
-class ModelA extends Translatable {
-    public readonly theID: number = undefined // It's IMPORTANT to initialize property with a value.
-    public readonly name: string = undefined
-    public readonly address: string = undefined
-    public readonly age: number = undefined
-    public readonly gender: 'male' | 'female' = undefined
-}
-
-
-const HOBBIES = ['soccer', 'football', 'handball']
-class ChildA extends ModelA {
-    @d.only(HOBBIES)
-    public readonly hobbies: string = undefined
-}
-
-
-class ModelB extends Translatable {
-    @d.id()
-    @d.required()
-    @d.number({ min: 1, max: Number.MAX_SAFE_INTEGER })
-    public readonly theID: number = undefined
-
-    @d.required()
-    @d.string(<StringDecoratorOptions>{ minLength: 3, maxLength: 10, pattern: /^[\d\w -]+$/u })
-    public readonly name: string = undefined
-
-    @d.required()
-    @d.string()
-    public readonly address: string = undefined
-
-    @d.number({ min: 15, max: 99 })
-    public readonly age: number = undefined
-
-    @d.only('male', 'female')
-    public readonly gender: 'male' | 'female' = undefined
-}
-
+/*
+ * NOTE: Create new class for each test to avoid decorator cache.
+ */
 
 describe('Translatable', function () {
     // tslint:disable:no-invalid-this
-    // this.timeout(5000)
-    this.timeout(60000) // For debugging
+    this.timeout(5000)
+    // this.timeout(60000) // For debugging
 
     describe('validateClass', () => {
+
+        @d.validateClass({
+            schemaMapModel: {
+                name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
+                address: joi.string().required(),
+                age: joi.number().min(15).max(99).integer()
+                    .allow(null).optional(),
+                gender: joi.only('male', 'female').allow(null).optional(),
+            },
+            schemaMapId: {
+                theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required(),
+            },
+        })
+        class ModelA extends Translatable {
+            public readonly theID: number = undefined // It's IMPORTANT to initialize property with a value.
+            public readonly name: string = undefined
+            public readonly address: string = undefined
+            public readonly age: number = undefined
+            public readonly gender: 'male' | 'female' = undefined
+        }
+
         it('Should return an object of target type if success', () => {
             // Arrange
             const sourceOne = {
@@ -79,7 +54,6 @@ describe('Translatable', function () {
             let errorOne, convertedOne, errorTwo, convertedTwo
 
             // Act
-            // const translator = ModelA.getTranslator()
             try {
                 convertedOne = ModelA.from(sourceOne)
             } catch (err) {
@@ -183,7 +157,30 @@ describe('Translatable', function () {
         })
     }) // describe 'validateClass'
 
+
     describe('decorators', () => {
+
+        class ModelB extends Translatable {
+            @d.id()
+            @d.required()
+            @d.number({ min: 1, max: Number.MAX_SAFE_INTEGER })
+            public readonly theID: number = undefined
+
+            @d.required()
+            @d.string(<StringDecoratorOptions>{ minLength: 3, maxLength: 10, pattern: /^[\d\w -]+$/u })
+            public readonly name: string = undefined
+
+            @d.required()
+            @d.string()
+            public readonly address: string = undefined
+
+            @d.number({ min: 15, max: 99 })
+            public readonly age: number = undefined
+
+            @d.only('male', 'female')
+            public readonly gender: 'male' | 'female' = undefined
+        }
+
         it('Should return an object of target type if success', () => {
             // Arrange
             const sourceOne = {
@@ -201,7 +198,6 @@ describe('Translatable', function () {
             let errorOne, convertedOne, errorTwo, convertedTwo
 
             // Act
-            // const translator = ModelB.getTranslator()
             try {
                 convertedOne = ModelB.from(sourceOne)
             } catch (err) {
@@ -220,6 +216,7 @@ describe('Translatable', function () {
             expect(errorOne).not.to.exist
             expect(convertedOne).to.exist
             expect(convertedOne).is.instanceOf(ModelB)
+            expect(convertedOne.theID).to.equal(sourceOne.theID)
             expect(convertedOne.name).to.equal(sourceOne.name)
             expect(convertedOne.address).to.equal(sourceOne.address)
             expect(convertedOne.age).to.equal(sourceOne.age)
@@ -230,6 +227,7 @@ describe('Translatable', function () {
             expect(errorTwo).not.to.exist
             expect(convertedTwo).to.exist
             expect(convertedTwo).is.instanceOf(ModelB)
+            expect(convertedTwo.theID).to.equal(sourceTwo.theID)
             expect(convertedTwo.name).to.equal(sourceTwo.name)
             expect(convertedTwo.address).to.equal(sourceTwo.address)
             expect(convertedTwo.age).not.to.exist
@@ -240,6 +238,7 @@ describe('Translatable', function () {
             // Arrange
             const targetOne = {
                     theID: 1,
+                    age: 20,
                 },
                 targetTwo = {
                     theID: 2,
@@ -255,6 +254,7 @@ describe('Translatable', function () {
             // Assert: `required` validation is ignored.
             errorOne && console.error(errorOne)
             expect(validatedOne).to.exist
+            expect(validatedOne.age).to.equal(targetOne.age)
             expect(errorOne).not.to.exist
 
             // Assert: `required` properties don't allow `null`.
@@ -270,8 +270,36 @@ describe('Translatable', function () {
         })
     }) // describe 'decorators'
 
+
     describe('inheritance', () => {
-        it.only('Should inherit class validation rules', () => {
+        const HOBBIES = ['soccer', 'football', 'handball']
+
+        @d.validateClass({
+            schemaMapModel: {
+                name: joi.string().regex(/^[\d\w -]+$/u).max(10).min(3).required(),
+                address: joi.string().required(),
+                age: joi.number().min(15).max(99).integer()
+                    .allow(null).optional(),
+                gender: joi.only('male', 'female').allow(null).optional(),
+            },
+            schemaMapId: {
+                theID: joi.number().min(1).max(Number.MAX_SAFE_INTEGER).required(),
+            },
+        })
+        class ModelC extends Translatable {
+            public readonly theID: number = undefined // It's IMPORTANT to initialize property with a value.
+            public readonly name: string = undefined
+            public readonly address: string = undefined
+            public readonly age: number = undefined
+            public readonly gender: 'male' | 'female' = undefined
+        }
+
+        class ChildC extends ModelC {
+            @d.only(HOBBIES)
+            public readonly hobbies: string = undefined
+        }
+
+        it('Should inherit class validation rules', () => {
             // Arrange
             const sourceOne = {
                     theID: 1,
@@ -285,19 +313,19 @@ describe('Translatable', function () {
                     theID: 123,
                     // name: 'gen-no-va', // Skip required property
                     address: '^!@',
-                    hobbies: 'gambling',
+                    hobbies: 'gambling', // Not allowed value
                 }
             let errorOne, convertedOne, errorTwo, convertedTwo
 
             // Act
             try {
-                convertedOne = ChildA.from(sourceOne)
+                convertedOne = ChildC.from(sourceOne)
             } catch (err) {
                 errorOne = err
             }
 
             try {
-                convertedTwo = ChildA.from(sourceTwo)
+                convertedTwo = ChildC.from(sourceTwo)
             } catch (err) {
                 errorTwo = err
             }
@@ -307,7 +335,8 @@ describe('Translatable', function () {
 
             expect(errorOne).not.to.exist
             expect(convertedOne).to.exist
-            expect(convertedOne).is.instanceOf(ChildA)
+            expect(convertedOne).is.instanceOf(ChildC)
+            expect(convertedOne.theID).to.equal(sourceOne.theID)
             expect(convertedOne.name).to.equal(sourceOne.name)
             expect(convertedOne.address).to.equal(sourceOne.address)
             expect(convertedOne.age).to.equal(sourceOne.age)
@@ -317,10 +346,97 @@ describe('Translatable', function () {
 
             expect(convertedTwo).not.to.exist
             expect(errorTwo).to.exist
-            expect(errorTwo.details).to.have.length(1)
-            expect(errorTwo.details[0].path.length).to.equal(1)
+            expect(errorTwo.details).to.have.length(2)
             expect(errorTwo.details[0].path[0]).to.equal('name')
             expect(errorTwo.details[0].message).to.equal('"name" is required')
+            expect(errorTwo.details[1].path[0]).to.equal('hobbies')
+            expect(errorTwo.details[1].message).to.equal('"hobbies" must be one of [soccer, football, handball]')
+        })
+
+
+        class ModelD extends Translatable {
+            @d.required()
+            @d.string(<StringDecoratorOptions>{ minLength: 3, maxLength: 10, pattern: /^[\d\w -]+$/u })
+            public readonly name: string = undefined
+
+            @d.required()
+            @d.string()
+            public readonly address: string = undefined
+
+            @d.number({ min: 15, max: 99 })
+            public readonly age: number = undefined
+
+            @d.only('male', 'female')
+            public readonly gender: 'male' | 'female' = undefined
+        }
+
+        @d.validateClass({
+            schemaMapModel: {
+                hobbies: joi.only(HOBBIES),
+            },
+            schemaMapId: {
+                theID: joi.number().min(10).max(Number.MAX_SAFE_INTEGER).required(),
+            },
+        })
+        class ChildD extends ModelD {
+            public readonly theID: number = undefined
+            public readonly hobbies: string = undefined
+        }
+
+        it('Should inherit decorator validation rules', () => {
+            // Arrange
+            const sourceOne = {
+                    theID: 123,
+                    name: 'Gennova123',
+                    address: 'Unlimited length street name',
+                    age: 18,
+                    gender: 'male',
+                    hobbies: 'handball',
+                },
+                sourceTwo = {
+                    theID: 1, // Below minimum value
+                    // name: 'gen-no-va', // Skip required property
+                    address: '^!@',
+                    hobbies: 'gambling', // Not allowed value
+                }
+            let errorOne, convertedOne, errorTwo, convertedTwo
+
+            // Act
+            try {
+                convertedOne = ChildD.from(sourceOne)
+            } catch (err) {
+                errorOne = err
+            }
+
+            try {
+                convertedTwo = ChildD.from(sourceTwo)
+            } catch (err) {
+                errorTwo = err
+            }
+
+            // Assert
+            errorOne && console.error(errorOne)
+
+            expect(errorOne).not.to.exist
+            expect(convertedOne).to.exist
+            expect(convertedOne).is.instanceOf(ChildD)
+            expect(convertedOne.theID).to.equal(sourceOne.theID)
+            expect(convertedOne.name).to.equal(sourceOne.name)
+            expect(convertedOne.address).to.equal(sourceOne.address)
+            expect(convertedOne.age).to.equal(sourceOne.age)
+            expect(convertedOne.gender).to.equal(sourceOne.gender)
+
+            // errorTwo && console.error(errorTwo)
+
+            expect(convertedTwo).not.to.exist
+            expect(errorTwo).to.exist
+            expect(errorTwo.details).to.have.length(3)
+            expect(errorTwo.details[0].path[0]).to.equal('theID')
+            expect(errorTwo.details[0].message).to.equal('"theID" must be larger than or equal to 10')
+            expect(errorTwo.details[1].path[0]).to.equal('hobbies')
+            expect(errorTwo.details[1].message).to.equal('"hobbies" must be one of [soccer, football, handball]')
+            expect(errorTwo.details[2].path[0]).to.equal('name')
+            expect(errorTwo.details[2].message).to.equal('"name" is required')
         })
     }) // describe 'inheritance'
 })

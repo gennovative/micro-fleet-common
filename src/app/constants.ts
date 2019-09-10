@@ -2,6 +2,7 @@ import { DbClient } from './setting-keys/DbClient'
 import { Auth } from './setting-keys/auth'
 import { Cache } from './setting-keys/cache'
 import { Database } from './setting-keys/database'
+import { IdGenerator } from './setting-keys/id-gen'
 import { MessageBroker } from './setting-keys/message-broker'
 import { RPC } from './setting-keys/rpc'
 import { Service } from './setting-keys/service'
@@ -12,6 +13,7 @@ export type Constants = {
     Auth: typeof Auth,
     Cache: typeof Cache,
     Database: typeof Database,
+    IdGenerator: typeof IdGenerator,
     MessageBroker: typeof MessageBroker,
     RPC: typeof RPC,
     Service: typeof Service,
@@ -23,6 +25,7 @@ export const constants: Constants = {
     Auth,
     Cache,
     Database,
+    IdGenerator,
     MessageBroker,
     RPC,
     Service,

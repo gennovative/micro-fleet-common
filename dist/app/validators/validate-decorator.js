@@ -49,7 +49,7 @@ exports.array = array;
 /**
  * Used to decorate model class' properties to assert it must be a boolean.
  */
-function boolean(opts) {
+function boolean(opts = {}) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
         const propMeta = v.getPropValidationMetadata(proto.constructor, propName);

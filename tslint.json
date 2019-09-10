@@ -31,20 +31,11 @@
         "no-empty-interface": false,
         "no-eval": true,
         "no-floating-promises": true,
-        "no-invalid-this": true,
         "no-misused-new": true,
-        "no-promise-as-boolean": true,
         "no-shadowed-variable": true,
         "no-string-throw": true,
         "no-tautology-expression": true,
         "no-trailing-whitespace": true,
-        "no-unbound-method": [
-            true,
-            {
-                "allow-typeof": true,
-                "ignore-static": true
-            }
-        ],
         "no-unsafe-finally": true,
         "no-var-keyword": true,
         "number-literal-format": true,

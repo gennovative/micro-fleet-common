@@ -86,7 +86,7 @@ export type BooleanDecoratorOptions = {
 /**
  * Used to decorate model class' properties to assert it must be a boolean.
  */
-export function boolean(opts?: BooleanDecoratorOptions): PropertyDecorator {
+export function boolean(opts: BooleanDecoratorOptions = {}): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
         const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
