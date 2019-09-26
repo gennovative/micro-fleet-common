@@ -378,17 +378,17 @@ declare module '@micro-fleet/common/dist/app/interfaces/misc' {
 declare module '@micro-fleet/common/dist/app/models/Exceptions' {
     export class Exception implements Error {
         readonly message: string;
+        details?: object | string;
         readonly isCritical: boolean;
-        stack: string;
         name: string;
-        details: any;
+        stack: string;
         /**
          *
          * @param message
          * @param isCritical
          * @param exceptionClass {class} The exception class to exclude from stacktrace.
          */
-        constructor(message?: string, isCritical?: boolean, exceptionClass?: Function);
+        constructor(message?: string, details?: object | string, isCritical?: boolean, exceptionClass?: Function);
         toString(): string;
     }
     /**
@@ -396,14 +396,15 @@ declare module '@micro-fleet/common/dist/app/models/Exceptions' {
      * and need restarting.
      */
     export class CriticalException extends Exception {
-        constructor(message?: string);
+        constructor(message?: string, details?: object | string);
     }
+    export type ExceptionConstructor<T extends Exception = MinorException> = new (message?: string, details?: any) => T;
     /**
      * Represents an acceptable problem that can be handled
      * and the system does not need restarting.
      */
     export class MinorException extends Exception {
-        constructor(message?: string);
+        constructor(message?: string, details?: object | string);
     }
     /**
      * Represents an error where the provided argument of a function or constructor
@@ -422,7 +423,7 @@ declare module '@micro-fleet/common/dist/app/models/Exceptions' {
      * Represents an error whose origin is from another system.
      */
     export class InternalErrorException extends Exception {
-        constructor(message?: string);
+        constructor(message?: string, details?: object | string);
     }
 
 }
@@ -781,8 +782,22 @@ declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
      * Represents an error when a model does not pass validation.
      */
     export class ValidationError extends MinorException {
+        /**
+         * Constructs an instance of MicroFleet's `ValidationError` from
+         * an instance of Joi's `ValidationError`.
+         */
+        static fromJoi(joiError: joi.ValidationError): ValidationError;
+        /**
+         * Constructs an instance of MicroFleet's `ValidationError` from
+         * "details" property of Joi's `ValidationError`.
+         */
+        static fromJoiDetails(joiDetails: joi.ValidationErrorItem[]): ValidationError;
         readonly details: ValidationErrorItem[];
-        static fromJoi(joiDetails: joi.ValidationErrorItem[]): ValidationError;
+        /**
+         * @param {string} message The message to be wrapped in a `ValidationErrorItem`.
+         */
+        constructor(message: string);
+        constructor(detail: ValidationErrorItem);
         constructor(details: ValidationErrorItem[]);
     }
 
@@ -796,11 +811,18 @@ declare module '@micro-fleet/common/dist/app/validators/IModelValidator' {
         /**
          * Rules to validate model properties.
          */
-        schemaMapModel: joi.SchemaMap;
+        schemaMapModel?: joi.SchemaMap;
         /**
          * Rule to validate model ID.
          */
         schemaMapId?: joi.SchemaMap;
+        /**
+         * Raw Joi Schema.
+         *
+         * If specified, `schemaMapModel` and `schemaMapId` options will be ignored,
+         * `partial` methods will behave the same as `whole`.
+         */
+        rawSchema?: joi.AnySchema;
         /**
          * Default options which can be override by passing "options" parameter
          * to "whole()" and "partial()"
@@ -978,7 +1000,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
          * Compiled rules for model properties, but all of them are OPTIONAL.
          * Used for patch operation.
          */
-                                        constructor(options: JoiModelValidatorConstructorOptions);
+                                                constructor(options: JoiModelValidatorConstructorOptions);
         readonly schemaMapModel: joi.SchemaMap;
         readonly schemaMapId: joi.SchemaMap;
         /**
@@ -1596,7 +1618,7 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
      * Represents an error when attempting to get value from a Maybe.Nothing
      */
     export class EmptyMaybeException extends Exception {
-        constructor();
+        constructor(name: string);
     }
     /**
      * Represents an object which may or may not have a value.
@@ -1605,8 +1627,18 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
      * and V8 Maybe: https://v8docs.nodesource.com/node-9.3/d9/d4b/classv8_1_1_maybe.html
      */
     export abstract class Maybe<T = any> {
-        static Nothing(): Maybe;
-        static Just<T>(value: T): Maybe<T>;
+        protected $name: string;
+        /**
+         * Creates an empty Maybe which throws `EmptyMaybeException` if attempting to get value.
+         * @param {string} name The debugging-friendly name to included in error message or `toString()` result.
+         */
+        static Nothing(name?: string): Maybe;
+        /**
+         * Creates a Maybe wrapping a value.
+         * @param {T} value The value to be wrapped, it may be anything even `null` or `undefined`.
+         * @param {string} name The debugging-friendly name to included in error message or `toString()` result.
+         */
+        static Just<T>(value: T, name?: string): Maybe<T>;
         static isJust(target: any): target is Just<any>;
         static isNothing(target: any): target is Nothing;
         static isMaybe(target: any): target is Maybe;
@@ -1655,6 +1687,7 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
          * @param defaultVal Value to return in case there is no contained value.
          */
         abstract tryGetValue(defaultVal: any): T;
+        constructor($name: string);
     } class Just<T> extends Maybe {
                 /**
          * @override
@@ -1668,7 +1701,7 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
          * @override
          */
         readonly value: T;
-        constructor(_value: T);
+        constructor(_value: T, name: string);
         /**
          * @override
          */
@@ -1710,7 +1743,7 @@ declare module '@micro-fleet/common/dist/app/models/Maybe' {
          * @override
          */
         readonly value: any;
-        constructor();
+        constructor(name: string);
         /**
          * @override
          */
@@ -1931,19 +1964,18 @@ declare module '@micro-fleet/common/dist/app/models/PagedData' {
 
 }
 declare module '@micro-fleet/common/dist/app/models/Result' {
-    import { Exception } from '@micro-fleet/common/dist/app/models/Exceptions';
-    import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc'; function returnThis(this: any): any;
+    import { Exception, ExceptionConstructor } from '@micro-fleet/common/dist/app/models/Exceptions'; function returnThis(this: any): any;
     /**
      * Represents an error when attempting to get value from a Result.Failure
      */
     export class NoValueFromFailureResultException extends Exception {
-        constructor();
+        constructor(name: string);
     }
     /**
      * Represents an error when attempting to get error from a Result.Ok
      */
     export class NoErrorFromOkResultException extends Exception {
-        constructor();
+        constructor(name: string);
     }
     /**
      * Represents an object which can be Ok or Failure.
@@ -1951,8 +1983,9 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
      * Source code inspired by: https://github.com/ramda/ramda-fantasy/blob/master/dist/Either.js
      */
     export abstract class Result<TOk = any, TFail = any> {
-        static Failure<TO, TF>(reason: TF): Result<TO, TF>;
-        static Ok<TO>(value: TO): Result<TO>;
+        protected $name: string;
+        static Failure<TO, TF>(reason: TF, name?: string): Result<TO, TF>;
+        static Ok<TO>(value: TO, name?: string): Result<TO>;
         static isOk(target: any): target is Ok<any>;
         static isFailure(target: any): target is Failure;
         static isResult(target: any): target is Result;
@@ -2009,7 +2042,8 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
          * Throws the error if Failure, or does nothing if Ok.
          * @param ExceptionClass The class to wrap error
          */
-        abstract throwError(ExceptionClass?: Newable): void;
+        abstract throwErrorIfAny(ExceptionClass?: ExceptionConstructor, message?: string): void;
+        constructor($name: string);
     } class Ok<T> extends Result<T, any> {
                 /**
          * @override
@@ -2027,7 +2061,7 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
          * @override
          */
         readonly value: T;
-        constructor(_value: T);
+        constructor(_value: T, name: string);
         /**
          * @override
          */
@@ -2055,7 +2089,7 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
         /**
          * @override
          */
-        throwError(ExceptionClass?: Newable): void;
+        throwErrorIfAny(ExceptionClass?: ExceptionConstructor, message?: string): void;
         /**
          * @override
          */
@@ -2077,7 +2111,7 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
          * @override
          */
         readonly value: any;
-        constructor(_reason: T);
+        constructor(_reason: T, name: string);
         /**
          * @override
          */
@@ -2102,7 +2136,7 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
         /**
          * @override
          */
-        throwError(ExceptionClass?: Newable): void;
+        throwErrorIfAny(ExceptionClass?: ExceptionConstructor, message?: string): void;
         /**
          * @override
          */
@@ -2143,6 +2177,11 @@ declare module '@micro-fleet/common/dist/app/validators/BusinessInvariantError' 
      * Represents a business rule violation.
      */
     export class BusinessInvariantError extends ValidationError {
+        /**
+         * @param {string} message The message to be wrapped in a `ValidationErrorItem`.
+         */
+        constructor(message: string);
+        constructor(detail: ValidationErrorItem);
         constructor(details: ValidationErrorItem[]);
     }
 

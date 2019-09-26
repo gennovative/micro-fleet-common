@@ -12,12 +12,20 @@ export type JoiModelValidatorConstructorOptions = {
     /**
      * Rules to validate model properties.
      */
-    schemaMapModel: joi.SchemaMap,
+    schemaMapModel?: joi.SchemaMap,
 
     /**
      * Rule to validate model ID.
      */
     schemaMapId?: joi.SchemaMap,
+
+    /**
+     * Raw Joi Schema.
+     *
+     * If specified, `schemaMapModel` and `schemaMapId` options will be ignored,
+     * `partial` methods will behave the same as `whole`.
+     */
+    rawSchema?: joi.AnySchema,
 
     /**
      * Default options which can be override by passing "options" parameter

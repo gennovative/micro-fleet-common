@@ -67,6 +67,13 @@ export interface IDependencyContainer {
 export class DependencyContainer {
     private _container: Container
 
+    /**
+     * Gets Inversify's container instance
+     */
+    public get container(): Container {
+        return this._container
+    }
+
     constructor() {
         this._container = new Container()
     }

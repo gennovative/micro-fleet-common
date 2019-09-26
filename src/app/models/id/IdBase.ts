@@ -1,4 +1,4 @@
-import isEqual = require('lodash.isEqual')
+import isEqual = require('lodash.isequal')
 
 import { ISerializable } from '../../interfaces/misc'
 

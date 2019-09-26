@@ -18,7 +18,7 @@ describe('Exception', () => {
     it('`toString` should work for critical exception.', () => {
         // Arrange
         const MSG = 'An error occurs'
-        const ex = new app.Exception(MSG, true)
+        const ex = new app.Exception(MSG, {}, true)
 
         // Act
         const myString = ex.toString()
@@ -30,7 +30,7 @@ describe('Exception', () => {
     it('`toString` should work for minor exception.', () => {
         // Arrange
         const MSG = 'An error occurs'
-        const ex = new app.Exception(MSG, false)
+        const ex = new app.Exception(MSG, {}, false)
 
         // Act
         const myString = ex.toString()
