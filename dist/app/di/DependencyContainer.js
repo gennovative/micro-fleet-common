@@ -20,9 +20,15 @@ class DependencyContainer {
         this._container = new inversify_1.Container();
     }
     /**
-     * @see IDependencyContainer.bind
+     * Gets Inversify's container instance
      */
-    bind(identifier, constructor) {
+    get container() {
+        return this._container;
+    }
+    /**
+     * @see IDependencyContainer.bindConstructor
+     */
+    bindConstructor(identifier, constructor) {
         this.assertNotDisposed();
         Guard_1.Guard.assertArgDefined('constructor', constructor);
         let binding, scope;
@@ -30,6 +36,17 @@ class DependencyContainer {
         binding = this._container.bind(identifier).to(constructor);
         scope = new BindingScope(binding);
         return scope;
+    }
+    /**
+     * @see IDependencyContainer.bindFactory
+     */
+    bindFactory(identifier, factoryCreatorFn) {
+        this.assertNotDisposed();
+        Guard_1.Guard.assertArgDefined('constructor', factoryCreatorFn);
+        this.unboundIfDuplicate(identifier);
+        this._container
+            .bind(identifier)
+            .toFactory((context) => factoryCreatorFn(this, context));
     }
     /**
      * @see IDependencyContainer.bindConstant

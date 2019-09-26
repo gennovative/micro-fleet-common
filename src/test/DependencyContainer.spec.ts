@@ -79,7 +79,7 @@ describe('DependencyContainer', () => {
             let resolveInstance: IDummy
 
             // Act
-            container.bind<IDummy>('abc', Dummy) // String identifier
+            container.bindConstructor<IDummy>('abc', Dummy) // String identifier
 
             // Assert
             resolveInstance = internalContainer.get<IDummy>('abc')
@@ -94,7 +94,7 @@ describe('DependencyContainer', () => {
             let resolveInstance: IDummy
 
             // Act
-            container.bind<IDummy>(IDENTIFIER, Dummy) // Symbol identifier
+            container.bindConstructor<IDummy>(IDENTIFIER, Dummy) // Symbol identifier
 
             // Assert
             resolveInstance = internalContainer.get<IDummy>(IDENTIFIER)
@@ -108,7 +108,7 @@ describe('DependencyContainer', () => {
                 internalContainer: Container = container['_container']
 
             // Act
-            container.bind<IDummy>(IDENTIFIER, Dummy).asSingleton()
+            container.bindConstructor<IDummy>(IDENTIFIER, Dummy).asSingleton()
 
             // Assert
             const instance_1st = internalContainer.get<IDummy>(IDENTIFIER),
@@ -134,7 +134,7 @@ describe('DependencyContainer', () => {
                 internalContainer: Container = container['_container']
 
             // Act
-            container.bind<IDummy>(IDENTIFIER, Dummy).asTransient() // Default behavior
+            container.bindConstructor<IDummy>(IDENTIFIER, Dummy).asTransient() // Default behavior
 
             // Assert
             const instance_1st = internalContainer.get<IDummy>(IDENTIFIER),
@@ -159,7 +159,7 @@ describe('DependencyContainer', () => {
         it('Should throw exception if called after disposal', () => {
             // Arrange
             const container: IDependencyContainer = new DependencyContainer()
-            container.bind<IDummy>(IDENTIFIER, Dummy)
+            container.bindConstructor<IDummy>(IDENTIFIER, Dummy)
 
             // Act
             container.dispose()

@@ -541,8 +541,10 @@ declare module '@micro-fleet/common/dist/app/utils/Guard' {
 
 }
 declare module '@micro-fleet/common/dist/app/di/DependencyContainer' {
-    import { interfaces } from 'inversify';
+    import { Container, interfaces } from 'inversify';
     import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
+    export type Factory<T> = (...args: any[]) => (((...args: any[]) => T) | T);
+    export type FactoryCreator<T> = (container: IDependencyContainer, context?: interfaces.Context) => Factory<T>;
     export class BindingScope<T> {
                 constructor(_binding: interfaces.BindingInWhenOnSyntax<T>);
         asSingleton(): void;
@@ -550,13 +552,27 @@ declare module '@micro-fleet/common/dist/app/di/DependencyContainer' {
     }
     export interface IDependencyContainer {
         /**
+         * The underlying Inversify container instance.
+         */
+        readonly container: Container;
+        /**
          * Registers `constructor` as resolvable with key `identifier`.
          * @param {string | symbol} identifier - The key used to resolve this dependency.
-         * @param {INewable<T>} constructor - A class that will be resolved with `identifier`.
+         * @param {INewable<TInterface>} constructor - A class that will be resolved with `identifier`.
          *
          * @return {BindingScope} - A BindingScope instance that allows settings dependency as singleton or transient.
          */
-        bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
+        bindConstructor<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
+        /**
+         * Registers a function `factoryCreatorFn` as resolvable with key `identifier`. The function is then used to create
+         * new instace of `TInterface`.
+         * @param {string | symbol} identifier - The key used to resolve this dependency.
+         * @param {FactoryCreator<TInterface>} factoryCreatorFn - The function for creating
+         * new instace of `TInterface`.
+         *
+         * @return {BindingScope} - A BindingScope instance that allows settings dependency as singleton or transient.
+         */
+        bindFactory<TInterface>(identifier: string | symbol, factoryCreatorFn: FactoryCreator<TInterface>): void;
         /**
          * Registers a constant value with key `identifier`.
          * @param {string | symbol} identifier - The key used to resolve this dependency.
@@ -584,11 +600,19 @@ declare module '@micro-fleet/common/dist/app/di/DependencyContainer' {
         unbind(identifier: string | symbol): void;
     }
     export class DependencyContainer {
-                constructor();
-        /**
-         * @see IDependencyContainer.bind
+                /**
+         * Gets Inversify's container instance
          */
-        bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
+        readonly container: Container;
+        constructor();
+        /**
+         * @see IDependencyContainer.bindConstructor
+         */
+        bindConstructor<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>;
+        /**
+         * @see IDependencyContainer.bindFactory
+         */
+        bindFactory<TInterface>(identifier: string | symbol, factoryCreatorFn: FactoryCreator<TInterface>): void;
         /**
          * @see IDependencyContainer.bindConstant
          */

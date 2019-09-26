@@ -40,7 +40,7 @@ describe('HandlerContainer', () => {
     beforeEach(() => {
         container = new DependencyContainer()
         serviceContext.setDependencyContainer(container)
-        container.bind<IDummy>(IDENTIFIER, Dummy).asSingleton()
+        container.bindConstructor<IDummy>(IDENTIFIER, Dummy).asSingleton()
     })
 
     afterEach(() => {

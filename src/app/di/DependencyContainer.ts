@@ -5,6 +5,10 @@ import { MinorException } from '../models/Exceptions'
 import { Guard } from '../utils/Guard'
 
 
+
+export type Factory<T> = (...args: any[]) => (((...args: any[]) => T) | T)
+export type FactoryCreator<T> = (container: IDependencyContainer, context?: interfaces.Context) => Factory<T>
+
 export class BindingScope<T> {
 
     constructor(private _binding: interfaces.BindingInWhenOnSyntax<T>) {
@@ -20,18 +24,31 @@ export class BindingScope<T> {
     }
 }
 
-
-// export { injectable, inject, decorate, unmanaged, optional }
-
 export interface IDependencyContainer {
+    /**
+     * The underlying Inversify container instance.
+     */
+    readonly container: Container
+
     /**
      * Registers `constructor` as resolvable with key `identifier`.
      * @param {string | symbol} identifier - The key used to resolve this dependency.
-     * @param {INewable<T>} constructor - A class that will be resolved with `identifier`.
+     * @param {INewable<TInterface>} constructor - A class that will be resolved with `identifier`.
      *
      * @return {BindingScope} - A BindingScope instance that allows settings dependency as singleton or transient.
      */
-    bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>
+    bindConstructor<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface>
+
+    /**
+     * Registers a function `factoryCreatorFn` as resolvable with key `identifier`. The function is then used to create
+     * new instace of `TInterface`.
+     * @param {string | symbol} identifier - The key used to resolve this dependency.
+     * @param {FactoryCreator<TInterface>} factoryCreatorFn - The function for creating
+     * new instace of `TInterface`.
+     *
+     * @return {BindingScope} - A BindingScope instance that allows settings dependency as singleton or transient.
+     */
+    bindFactory<TInterface>(identifier: string | symbol, factoryCreatorFn: FactoryCreator<TInterface>): void
 
     /**
      * Registers a constant value with key `identifier`.
@@ -80,9 +97,9 @@ export class DependencyContainer {
 
 
     /**
-     * @see IDependencyContainer.bind
+     * @see IDependencyContainer.bindConstructor
      */
-    public bind<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface> {
+    public bindConstructor<TInterface>(identifier: string | symbol, constructor: Newable<TInterface>): BindingScope<TInterface> {
         this.assertNotDisposed()
         Guard.assertArgDefined('constructor', constructor)
 
@@ -94,6 +111,20 @@ export class DependencyContainer {
         scope = new BindingScope<TInterface>(binding)
 
         return scope
+    }
+
+    /**
+     * @see IDependencyContainer.bindFactory
+     */
+    public bindFactory<TInterface>(identifier: string | symbol, factoryCreatorFn: FactoryCreator<TInterface>): void {
+        this.assertNotDisposed()
+        Guard.assertArgDefined('constructor', factoryCreatorFn)
+
+        this.unboundIfDuplicate(identifier)
+
+        this._container
+            .bind<interfaces.Factory<TInterface>>(identifier)
+            .toFactory<TInterface>((context: interfaces.Context) => factoryCreatorFn(this, context))
     }
 
     /**
