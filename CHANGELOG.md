@@ -3,6 +3,9 @@
 ### 2.3.0
 - Sync version with other packages.
 - Use decorators for validation rules.
+- `DependencyContainer` supports resolving to factory function.
+- `Maybe` and `Result` have name for better logging and debugging.
+- `JoiModelValidator` supports raw Joi schema.
 
 ### 1.4.0
 - [Breaking change] Re-implemented `Maybe`.
