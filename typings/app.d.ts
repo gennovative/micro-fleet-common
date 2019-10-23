@@ -1259,7 +1259,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * }
      * ```
      */
-    export function datetime(opts?: DateTimeDecoratorOptions): PropertyDecorator;
+    export function datetime({ isUTC, translator, ...opts }?: DateTimeDecoratorOptions): PropertyDecorator;
     /**
      * Used to decorate model class' properties to specify default value.
      * @param {any} value The default value.

@@ -108,15 +108,12 @@ exports.number = number;
  * }
  * ```
  */
-function datetime(opts = { convert: false }) {
+function datetime({ isUTC, translator, ...opts } = { convert: false }) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
         const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
         propMeta.type = () => JoiExtended_1.extJoi.genn()
-            .dateString({
-            isUTC: opts.isUTC,
-            translator: opts.translator,
-        })
+            .dateString({ isUTC, translator })
             .options(opts);
         v.setPropValidationMetadata(proto.constructor, propName, propMeta);
     };
