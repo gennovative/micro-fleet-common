@@ -61,7 +61,8 @@ export type ArrayDecoratorOptions = {
 export function array(opts: ArrayDecoratorOptions): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.type = () => {
             const itemRules = Array.isArray(opts.items) ? opts.items : [opts.items]
             return joi.array().items(itemRules)
@@ -70,7 +71,7 @@ export function array(opts: ArrayDecoratorOptions): PropertyDecorator {
         (opts.maxLength != null) && propMeta.rules.push(prev => (prev as joi.ArraySchema).max(opts.maxLength))
         const allowSingle = (opts.allowSingle == null) ? true : opts.allowSingle
         allowSingle && propMeta.rules.push(prev => (prev as joi.ArraySchema).single().options({ convert: true }))
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -89,9 +90,10 @@ export type BooleanDecoratorOptions = {
 export function boolean(opts: BooleanDecoratorOptions = {}): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.type = () => joi.boolean().options(opts)
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -110,9 +112,10 @@ export type BigIntDecoratorOptions = {
 export function bigInt({ convert }: BigIntDecoratorOptions = { convert: false }): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.type = () => extJoi.genn().bigint().options({ convert })
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -141,11 +144,12 @@ export type NumberDecoratorOptions = {
 export function number({ min, max, ...opts }: NumberDecoratorOptions = {}): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.type = () => joi.number().options(opts);
         (min != null) && propMeta.rules.push(prev => (prev as joi.NumberSchema).min(min));
         (max != null) && propMeta.rules.push(prev => (prev as joi.NumberSchema).max(max))
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -194,14 +198,15 @@ export type DateTimeDecoratorOptions = {
  * }
  * ```
  */
-export function datetime({ isUTC, translator, ...opts}: DateTimeDecoratorOptions = { convert: false}): PropertyDecorator {
+export function datetime({ isUTC, translator, convert = false }: DateTimeDecoratorOptions = {}): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.type = () => extJoi.genn()
             .dateString({ isUTC, translator })
-            .options(opts)
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+            .options({ convert })
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -213,9 +218,10 @@ export function datetime({ isUTC, translator, ...opts}: DateTimeDecoratorOptions
 export function defaultAs(value: any): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.rules.push(prev => prev.default(value))
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -238,14 +244,15 @@ export function defaultAs(value: any): PropertyDecorator {
 export function only(...values: any[]): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         // Passing array might be a mistake causing array in array [[value]]
         // We should correct it back to spreaded list of params
         if (values.length == 1 && Array.isArray(values[0])) {
             values = [...values[0]]
         }
         propMeta.rules.push(prev => prev.only(values))
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -257,10 +264,11 @@ export function only(...values: any[]): PropertyDecorator {
 export function required(allowNull: boolean = false): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.rules.push(prev => prev.required())
         allowNull && propMeta.rules.push(prev => prev.allow(null))
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -356,7 +364,8 @@ export type StringDecoratorOptions = {
 export function string(opts: StringDecoratorOptions = { allowEmpty: true }): PropertyDecorator {
     return function (proto: any, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.type = () => {
             const schema = joi.string()
             return opts.allowEmpty
@@ -374,7 +383,7 @@ export function string(opts: StringDecoratorOptions = { allowEmpty: true }): Pro
             }
             return (prev as joi.StringSchema).uri()
         })
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
 
@@ -454,8 +463,9 @@ export function validateProp(schema: joi.SchemaLike): PropertyDecorator {
     return function (proto: object, propName: string | symbol): void {
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
         Guard.assertArgDefined('schema', schema)
-        const propMeta: v.PropValidationMetadata = v.getPropValidationMetadata(proto.constructor, propName)
+        const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
+        const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
         propMeta.rawSchema = schema
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta)
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }

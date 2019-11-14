@@ -1,4 +1,5 @@
 import * as joi from '@hapi/joi'
+import cloneDeep = require('lodash.clonedeep')
 
 import { JoiModelValidatorConstructorOptions } from './IModelValidator'
 import { JoiModelValidator } from './JoiModelValidator'
@@ -32,30 +33,50 @@ function createClassValidationMetadata(): ClassValidationMetadata {
 }
 
 export function getClassValidationMetadata(Class: Function): ClassValidationMetadata {
-    return Reflect.getMetadata(VALIDATE_META, Class) || createClassValidationMetadata()
-}
+    const ownMeta = Reflect.getOwnMetadata(VALIDATE_META, Class)
+    if (ownMeta) {
+        return ownMeta
+    }
 
+    const inheritMeta = Reflect.getMetadata(VALIDATE_META, Class)
+    if (inheritMeta) {
+        return cloneDeep(inheritMeta)
+    }
+    return createClassValidationMetadata()
+}
 
 export function setClassValidationMetadata(Class: Function, meta: ClassValidationMetadata): void {
     Reflect.defineMetadata(VALIDATE_META, meta, Class)
 }
-
 
 export function deleteClassValidationMetadata(Class: Function): void {
     Reflect.deleteMetadata(VALIDATE_META, Class)
 }
 
 
-export function getPropValidationMetadata(Class: Function, propName: string | symbol): PropValidationMetadata {
-    return getClassValidationMetadata(Class).props[propName as string] || {
+// export function getPropValidationMetadata(Class: Function, propName: string | symbol): PropValidationMetadata {
+//     return getClassValidationMetadata(Class).props[propName as string] || {
+//         type: () => joi.string(),
+//         rules: [],
+//     }
+// }
+
+export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol): PropValidationMetadata {
+    return classMeta.props[propName as string] || {
         type: () => joi.string(),
         rules: [],
     }
 }
 
-export function setPropValidationMetadata(Class: Function, propName: string | symbol, meta: PropValidationMetadata): void {
-    const classMeta = getClassValidationMetadata(Class)
-    classMeta.props[propName as string] = meta
+/**
+ * @param classMeta Must be passed to avoid calling costly function `getClassValidationMetadata`
+ */
+export function setPropValidationMetadata(
+    Class: Function, classMeta: ClassValidationMetadata,
+    propName: string | symbol, propMeta: PropValidationMetadata,
+): void {
+    classMeta = classMeta || getClassValidationMetadata(Class)
+    classMeta.props[propName as string] = propMeta
     setClassValidationMetadata(Class, classMeta)
 }
 

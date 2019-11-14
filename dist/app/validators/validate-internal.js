@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("@hapi/joi");
+const cloneDeep = require("lodash.clonedeep");
 const JoiModelValidator_1 = require("./JoiModelValidator");
 const ObjectUtil_1 = require("../utils/ObjectUtil");
 const VALIDATE_META = Symbol();
@@ -13,7 +14,15 @@ function createClassValidationMetadata() {
     };
 }
 function getClassValidationMetadata(Class) {
-    return Reflect.getMetadata(VALIDATE_META, Class) || createClassValidationMetadata();
+    const ownMeta = Reflect.getOwnMetadata(VALIDATE_META, Class);
+    if (ownMeta) {
+        return ownMeta;
+    }
+    const inheritMeta = Reflect.getMetadata(VALIDATE_META, Class);
+    if (inheritMeta) {
+        return cloneDeep(inheritMeta);
+    }
+    return createClassValidationMetadata();
 }
 exports.getClassValidationMetadata = getClassValidationMetadata;
 function setClassValidationMetadata(Class, meta) {
@@ -24,16 +33,25 @@ function deleteClassValidationMetadata(Class) {
     Reflect.deleteMetadata(VALIDATE_META, Class);
 }
 exports.deleteClassValidationMetadata = deleteClassValidationMetadata;
-function getPropValidationMetadata(Class, propName) {
-    return getClassValidationMetadata(Class).props[propName] || {
+// export function getPropValidationMetadata(Class: Function, propName: string | symbol): PropValidationMetadata {
+//     return getClassValidationMetadata(Class).props[propName as string] || {
+//         type: () => joi.string(),
+//         rules: [],
+//     }
+// }
+function extractPropValidationMetadata(classMeta, propName) {
+    return classMeta.props[propName] || {
         type: () => joi.string(),
         rules: [],
     };
 }
-exports.getPropValidationMetadata = getPropValidationMetadata;
-function setPropValidationMetadata(Class, propName, meta) {
-    const classMeta = getClassValidationMetadata(Class);
-    classMeta.props[propName] = meta;
+exports.extractPropValidationMetadata = extractPropValidationMetadata;
+/**
+ * @param classMeta Must be passed to avoid calling costly function `getClassValidationMetadata`
+ */
+function setPropValidationMetadata(Class, classMeta, propName, propMeta) {
+    classMeta = classMeta || getClassValidationMetadata(Class);
+    classMeta.props[propName] = propMeta;
     setClassValidationMetadata(Class, classMeta);
 }
 exports.setPropValidationMetadata = setPropValidationMetadata;

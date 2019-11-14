@@ -1060,8 +1060,11 @@ declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
     export function getClassValidationMetadata(Class: Function): ClassValidationMetadata;
     export function setClassValidationMetadata(Class: Function, meta: ClassValidationMetadata): void;
     export function deleteClassValidationMetadata(Class: Function): void;
-    export function getPropValidationMetadata(Class: Function, propName: string | symbol): PropValidationMetadata;
-    export function setPropValidationMetadata(Class: Function, propName: string | symbol, meta: PropValidationMetadata): void;
+    export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol): PropValidationMetadata;
+    /**
+     * @param classMeta Must be passed to avoid calling costly function `getClassValidationMetadata`
+     */
+    export function setPropValidationMetadata(Class: Function, classMeta: ClassValidationMetadata, propName: string | symbol, propMeta: PropValidationMetadata): void;
     export function createJoiValidator<T>(Class: Function): JoiModelValidator<T>;
 
 }
@@ -1259,7 +1262,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * }
      * ```
      */
-    export function datetime({ isUTC, translator, ...opts }?: DateTimeDecoratorOptions): PropertyDecorator;
+    export function datetime({ isUTC, translator, convert }?: DateTimeDecoratorOptions): PropertyDecorator;
     /**
      * Used to decorate model class' properties to specify default value.
      * @param {any} value The default value.

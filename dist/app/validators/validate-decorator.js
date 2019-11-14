@@ -33,7 +33,8 @@ const JoiExtended_1 = require("./JoiExtended");
 function array(opts) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.type = () => {
             const itemRules = Array.isArray(opts.items) ? opts.items : [opts.items];
             return joi.array().items(itemRules);
@@ -42,7 +43,7 @@ function array(opts) {
         (opts.maxLength != null) && propMeta.rules.push(prev => prev.max(opts.maxLength));
         const allowSingle = (opts.allowSingle == null) ? true : opts.allowSingle;
         allowSingle && propMeta.rules.push(prev => prev.single().options({ convert: true }));
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.array = array;
@@ -52,9 +53,10 @@ exports.array = array;
 function boolean(opts = {}) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.type = () => joi.boolean().options(opts);
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.boolean = boolean;
@@ -64,9 +66,10 @@ exports.boolean = boolean;
 function bigInt({ convert } = { convert: false }) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.type = () => JoiExtended_1.extJoi.genn().bigint().options({ convert });
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.bigInt = bigInt;
@@ -76,11 +79,12 @@ exports.bigInt = bigInt;
 function number({ min, max, ...opts } = {}) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.type = () => joi.number().options(opts);
         (min != null) && propMeta.rules.push(prev => prev.min(min));
         (max != null) && propMeta.rules.push(prev => prev.max(max));
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.number = number;
@@ -108,14 +112,15 @@ exports.number = number;
  * }
  * ```
  */
-function datetime({ isUTC, translator, ...opts } = { convert: false }) {
+function datetime({ isUTC, translator, convert = false } = {}) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.type = () => JoiExtended_1.extJoi.genn()
             .dateString({ isUTC, translator })
-            .options(opts);
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+            .options({ convert });
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.datetime = datetime;
@@ -126,9 +131,10 @@ exports.datetime = datetime;
 function defaultAs(value) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.rules.push(prev => prev.default(value));
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.defaultAs = defaultAs;
@@ -150,14 +156,15 @@ exports.defaultAs = defaultAs;
 function only(...values) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         // Passing array might be a mistake causing array in array [[value]]
         // We should correct it back to spreaded list of params
         if (values.length == 1 && Array.isArray(values[0])) {
             values = [...values[0]];
         }
         propMeta.rules.push(prev => prev.only(values));
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.only = only;
@@ -168,10 +175,11 @@ exports.only = only;
 function required(allowNull = false) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.rules.push(prev => prev.required());
         allowNull && propMeta.rules.push(prev => prev.allow(null));
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.required = required;
@@ -218,7 +226,8 @@ exports.id = id;
 function string(opts = { allowEmpty: true }) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.type = () => {
             const schema = joi.string();
             return opts.allowEmpty
@@ -236,7 +245,7 @@ function string(opts = { allowEmpty: true }) {
             }
             return prev.uri();
         });
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.string = string;
@@ -309,9 +318,10 @@ function validateProp(schema) {
     return function (proto, propName) {
         Guard_1.Guard.assertIsTruthy(propName, 'This decorator is for properties inside class');
         Guard_1.Guard.assertArgDefined('schema', schema);
-        const propMeta = v.getPropValidationMetadata(proto.constructor, propName);
+        const classMeta = v.getClassValidationMetadata(proto.constructor);
+        const propMeta = v.extractPropValidationMetadata(classMeta, propName);
         propMeta.rawSchema = schema;
-        v.setPropValidationMetadata(proto.constructor, propName, propMeta);
+        v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta);
     };
 }
 exports.validateProp = validateProp;
