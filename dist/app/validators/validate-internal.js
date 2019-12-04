@@ -13,6 +13,7 @@ function createClassValidationMetadata() {
         idProps: new Set(),
     };
 }
+exports.createClassValidationMetadata = createClassValidationMetadata;
 function getClassValidationMetadata(Class) {
     const ownMeta = Reflect.getOwnMetadata(VALIDATE_META, Class);
     if (ownMeta) {

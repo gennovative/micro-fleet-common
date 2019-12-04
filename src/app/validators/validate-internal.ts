@@ -23,7 +23,7 @@ export type ClassValidationMetadata = JoiModelValidatorConstructorOptions & {
 
 const VALIDATE_META = Symbol()
 
-function createClassValidationMetadata(): ClassValidationMetadata {
+export function createClassValidationMetadata(): ClassValidationMetadata {
     return {
         schemaMapId: {},
         schemaMapModel: {},

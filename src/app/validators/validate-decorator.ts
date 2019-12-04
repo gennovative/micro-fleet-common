@@ -5,7 +5,7 @@ import { Guard } from '../utils/Guard'
 import { JoiModelValidatorConstructorOptions } from './IModelValidator'
 import * as v from './validate-internal'
 import { extJoi } from './JoiExtended'
-
+``
 
 export type ArrayDecoratorOptions = {
     /**
@@ -44,7 +44,7 @@ export type ArrayDecoratorOptions = {
  *
  * class ModelA {
  *   @array({
- *     items: joi.string().only(ALLOWED).required()
+ *     items: joi.string().valid(ALLOWED).required()
  *   })
  *   fields: string[]
  * }
@@ -114,7 +114,11 @@ export function bigInt({ convert }: BigIntDecoratorOptions = { convert: false })
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
         const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
         const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
-        propMeta.type = () => extJoi.genn().bigint().options({ convert })
+        propMeta.type = () => {
+            const schema = extJoi.bigint()
+            convert && schema.asNative()
+            return schema
+        }
         v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
@@ -203,9 +207,12 @@ export function datetime({ isUTC, translator, convert = false }: DateTimeDecorat
         Guard.assertIsTruthy(propName, 'This decorator is for properties inside class')
         const classMeta: v.ClassValidationMetadata = v.getClassValidationMetadata(proto.constructor)
         const propMeta: v.PropValidationMetadata = v.extractPropValidationMetadata(classMeta, propName)
-        propMeta.type = () => extJoi.genn()
-            .dateString({ isUTC, translator })
-            .options({ convert })
+        propMeta.type = () => {
+            const schema = extJoi.dateString()
+            isUTC && schema.isUTC()
+            convert && schema.translate(translator)
+            return schema
+        }
         v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
@@ -251,7 +258,7 @@ export function only(...values: any[]): PropertyDecorator {
         if (values.length == 1 && Array.isArray(values[0])) {
             values = [...values[0]]
         }
-        propMeta.rules.push(prev => prev.only(values))
+        propMeta.rules.push(prev => prev.valid(...values))
         v.setPropValidationMetadata(proto.constructor, classMeta, propName, propMeta)
     }
 }
@@ -407,12 +414,9 @@ function copyStatic(SrcClass: any, DestClass: any, props: string[] = []): void {
 
 
 /**
- * Used to decorate model class to declare validation rules.
- *
- * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
- * such as @validateProp(), @number(), @defaultAs()...
- *
- * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+ * Used to decorate model class to __exclusively__ declare validation rules,
+ * which means it __removes__ all rules and options from property decorator
+ * as well as parent classes, then applies the specified `validatorOptions`.
  *
  * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
  */
@@ -421,7 +425,7 @@ export function validateClass(validatorOptions: JoiModelValidatorConstructorOpti
         Guard.assertArgDefined('validatorOptions', validatorOptions)
 
         const classMeta = Object.assign(
-            v.getClassValidationMetadata(TargetClass),
+            v.createClassValidationMetadata(),
             validatorOptions
         )
         v.setClassValidationMetadata(TargetClass, classMeta)

@@ -27,7 +27,7 @@ export type Decorators = {
      *
      * class ModelA {
      *   @array({
-     *     items: joi.string().only(ALLOWED).required()
+     *     items: joi.string().valid(ALLOWED).required()
      *   })
      *   fields: string[]
      * }

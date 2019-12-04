@@ -782,6 +782,7 @@ declare module '@micro-fleet/common/dist/app/interfaces/automapper' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
+    /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
     import { MinorException } from '@micro-fleet/common/dist/app/models/Exceptions';
     /**
@@ -827,6 +828,7 @@ declare module '@micro-fleet/common/dist/app/validators/ValidationError' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/IModelValidator' {
+    /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
     import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
     export interface ValidationOptions extends joi.ValidationOptions {
@@ -1010,6 +1012,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
+    /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
     import { IModelValidator, JoiModelValidatorConstructorOptions, ValidationOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     import { ValidationError } from '@micro-fleet/common/dist/app/validators/ValidationError';
@@ -1043,6 +1046,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
+    /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
     import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
@@ -1057,6 +1061,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
             [key: string]: PropValidationMetadata;
         };
     };
+    export function createClassValidationMetadata(): ClassValidationMetadata;
     export function getClassValidationMetadata(Class: Function): ClassValidationMetadata;
     export function setClassValidationMetadata(Class: Function, meta: ClassValidationMetadata): void;
     export function deleteClassValidationMetadata(Class: Function): void;
@@ -1091,38 +1096,56 @@ declare module '@micro-fleet/common/dist/app/models/Translatable' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
+    /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
-    export type JoiDateStringOptions = {
+    export type DateStringJoi = joi.AnySchema & {
         /**
          * Whether the input string is in UTC format.
          * Default: false.
          */
-        isUTC?: boolean;
+        isUTC(): DateStringJoi;
         /**
          * Function to convert input string to desired data type.
          * Default function returns native Date object.
          */
-        translator?: any;
+        translate(fn?: (val: string) => any): DateStringJoi;
     };
     export type ExtendedJoi = joi.AnySchema & {
-        genn(): {
+        /**
+         * Makes sure input is a native BigInt type or a string that is convertible to BigInt type.
+         *
+         * Options prefs.convert is ignored, use "asString" or "asNative" to do conversion.
+         *
+         * @example
+         * extJoi.bigint().validate(98765443123456n);
+         *
+         * @example
+         * extJoi.bigint().asString().validate('98765443123456');
+         * extJoi.bigint().validate('98765443123456', {convert: false});
+         *
+         * @example
+         * extJoi.bigint().asNative().validate('98765443123456');
+         * extJoi.bigint().validate('98765443123456', {convert: true});
+         */
+        bigint(): joi.AnySchema & {
             /**
-             * Makes sure input is native bigint type.
-             *
-             * @example extJoi.genn().bigint().validate('98765443123456');
-             * @example extJoi.genn().bigint().validate(98765443123456n, {convert: false});
+             * Converts input to string.
              */
-            bigint(): joi.AnySchema;
+            asString(): joi.AnySchema;
             /**
-             * Makes sure input is in W3C Date and Time Formats,
-             * but must have at least year, month, and day.
-             *
-             * @example extJoi.genn().dateString().validate('2019-05-15T09:06:02+07:00');
-             * @example extJoi.genn().dateString({ isUTC: true }).validate('2019-05-15T09:06:02Z');
-             * @example extJoi.genn().dateString({ translator: moment }).validate('2019-05-15T09:06:02-07:00');
+             * Converts input to native BigInt.
              */
-            dateString(options?: JoiDateStringOptions): joi.AnySchema;
+            asNative(): joi.AnySchema;
         };
+        /**
+         * Makes sure input is in W3C Date and Time Formats,
+         * but must have at least year, month, and day.
+         *
+         * @example extJoi.dateString().validate('2019-05-15T09:06:02+07:00');
+         * @example extJoi.dateString.isUTC().validate('2019-05-15T09:06:02Z');
+         * @example extJoi.dateString.isUtc().translate(moment).validate('2019-05-15T09:06:02-07:00');
+         */
+        dateString(): DateStringJoi;
     };
     /**
      * Joi instance with "genn()" extension enabled, including some custom rules.
@@ -1131,6 +1154,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
 
 }
 declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
+    /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
     import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     export type ArrayDecoratorOptions = {
@@ -1165,7 +1189,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      *
      * class ModelA {
      *   @array({
-     *     items: joi.string().only(ALLOWED).required()
+     *     items: joi.string().valid(ALLOWED).required()
      *   })
      *   fields: string[]
      * }
@@ -1366,12 +1390,9 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      */
     export function translatable(): ClassDecorator;
     /**
-     * Used to decorate model class to declare validation rules.
-     *
-     * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
-     * such as @validateProp(), @number(), @defaultAs()...
-     *
-     * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+     * Used to decorate model class to __exclusively__ declare validation rules,
+     * which means it __removes__ all rules and options from property decorator
+     * as well as parent classes, then applies the specified `validatorOptions`.
      *
      * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
      */
@@ -1433,7 +1454,7 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          *
          * class ModelA {
          *   @array({
-         *     items: joi.string().only(ALLOWED).required()
+         *     items: joi.string().valid(ALLOWED).required()
          *   })
          *   fields: string[]
          * }
