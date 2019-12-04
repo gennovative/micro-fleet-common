@@ -65,7 +65,7 @@ __decorate([
 ], SettingItem.prototype, "name", void 0);
 __decorate([
     validate_decorator_1.validateProp(joi.string().required()
-        .only(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean)),
+        .valid(SettingItemDataType.String, SettingItemDataType.StringArray, SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean)),
     __metadata("design:type", String)
 ], SettingItem.prototype, "dataType", void 0);
 __decorate([

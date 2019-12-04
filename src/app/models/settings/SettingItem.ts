@@ -50,7 +50,7 @@ export class SettingItem extends Translatable {
      */
     @validateProp(
         joi.string().required()
-            .only(SettingItemDataType.String, SettingItemDataType.StringArray,
+            .valid(SettingItemDataType.String, SettingItemDataType.StringArray,
                 SettingItemDataType.Number, SettingItemDataType.NumberArray, SettingItemDataType.Boolean),
     )
     public readonly dataType: SettingItemDataType = undefined
