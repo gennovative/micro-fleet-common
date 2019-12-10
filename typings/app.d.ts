@@ -85,16 +85,19 @@ declare module '@micro-fleet/common/dist/app/setting-keys/cache' {
     export enum Cache {
         /**
          * Number of cache servers in cluster.
+         *
          * Data type: number
          */
         CACHE_NUM_CONN = "cache_num_conn",
         /**
          * A single string or an array of IP or host name of cache service.
+         *
          * Data type: string | string[]
          */
         CACHE_HOST = "cache_host",
         /**
          * A single value or an array of port number.
+         *
          * Data type: number | number[]
          */
         CACHE_PORT = "cache_port"
@@ -105,51 +108,61 @@ declare module '@micro-fleet/common/dist/app/setting-keys/database' {
     export enum Database {
         /**
          * Name of database engine.
+         *
          * Data type: enum `DbClient`
          */
         DB_ENGINE = "db_engine",
         /**
          * IP or host name of database.
+         *
          * Data type: string
          */
         DB_HOST = "db_host",
         /**
          * Database engine port.
+         *
          * Data type: number
          */
         DB_PORT = "db_port",
         /**
          * Username to log into database.
+         *
          * Data type: string
          */
         DB_USER = "db_user",
         /**
          * Password to log into database.
+         *
          * Data type: string
          */
         DB_PASSWORD = "db_pass",
         /**
          * Database name.
+         *
          * Data type: string
          */
         DB_NAME = "db_name",
         /**
          * Path to database file.
+         *
          * Data type: string
          */
         DB_FILE = "db_file",
         /**
          * Database connection string.
+         *
          * Data type: string
          */
         DB_CONN_STRING = "db_connStr",
         /**
          * Minimum number of connections in pool.
+         *
          * Data type: number
          */
         DB_POOL_MIN = "db_pool_min",
         /**
          * Maximum number of connections in pool.
+         *
          * Data type: number
          */
         DB_POOL_MAX = "db_pool_max"
@@ -188,36 +201,45 @@ declare module '@micro-fleet/common/dist/app/setting-keys/message-broker' {
     export enum MessageBroker {
         /**
          * IP or host name of message broker.
+         *
          * Data type: string
          */
         MSG_BROKER_HOST = "msgBroker_host",
         /**
          * Exchange name on message broker.
+         *
          * Data type: string
          */
         MSG_BROKER_EXCHANGE = "msgBroker_exchange",
         /**
          * Default queue name for RPC handler to connect to.
+         *
          * Data type: string
          */
         MSG_BROKER_HANDLER_QUEUE = "msgBroker_handler_queue",
         /**
          * Number of milliseconds to delay before reconnect to message broker.
+         *
          * Data type: number
          */
         MSG_BROKER_RECONN_TIMEOUT = "msgBroker_reconnectTimeout",
         /**
          * Username to log into message broker.
+         *
          * Data type: string
          */
         MSG_BROKER_USERNAME = "msgBroker_username",
         /**
          * Password to log into message broker.
+         *
          * Data type: string
          */
         MSG_BROKER_PASSWORD = "msgBroker_password",
         /**
-         * Number of milliseconds that messages live in queue.
+         * Number of milliseconds that messages can live.
+         * This is the default value for all created connection, unless overriden by
+         * other settings, such as `RPC_CALLER_MSG_EXPIRE`.
+         *
          * Data type: number
          */
         MSG_BROKER_MSG_EXPIRE = "msgBroker_msg_expr"
@@ -228,11 +250,20 @@ declare module '@micro-fleet/common/dist/app/setting-keys/rpc' {
     export enum RPC {
         /**
          * Number of milliseconds after which RPC caller stops waiting for response.
+         *
          * Data type: number
          */
         RPC_CALLER_TIMEOUT = "rpc_caller_timeout",
         /**
+         * Number of milliseconds that the messages sent by RPC caller can live.
+         * This will override `MSG_BROKER_MSG_EXPIRE` setting.
+         *
+         * Data type: number
+         */
+        RPC_CALLER_MSG_EXPIRE = "rpc_caller_msg_expr",
+        /**
          * Http port to which HTTP RPC handler listens.
+         *
          * Data type: number
          */
         RPC_HANDLER_PORT = "rpc_handler_port"
@@ -243,26 +274,31 @@ declare module '@micro-fleet/common/dist/app/setting-keys/service' {
     export enum Service {
         /**
          * Number of milliseconds to wait before actually disposing addons.
+         *
          * Date type: number
          */
         DEADLETTER_TIMEOUT = "svc_deadletter_timeout",
         /**
          * Number of milliseconds to wait before actually exiting the process.
+         *
          * Date type: number
          */
         STOP_TIMEOUT = "svc_stop_timeout",
         /**
          * Array of addresses to fetch configuration.
+         *
          * Data type: string[]
          */
         CONFIG_SERVICE_ADDRESSES = "svc_config_service_addresses",
         /**
          * Number of milliseconds between refetchings.
+         *
          * Date type: number
          */
         CONFIG_REFETCH_INTERVAL = "svc_config_refetch_interval",
         /**
          * Service URL-safe name.
+         *
          * Data type: string
          */
         SERVICE_SLUG = "svc_slug"
@@ -273,41 +309,49 @@ declare module '@micro-fleet/common/dist/app/setting-keys/web' {
     export enum Web {
         /**
          * Configuration for Cross-Origin Resource Sharing.
+         *
          * Type: string | string[]
          */
         WEB_CORS = "web_cors",
         /**
          * Whether to start HTTPS server.
+         *
          * Type: boolean
          */
         WEB_SSL_ENABLED = "web_ssl_enabled",
         /**
          * Whether to redirect all HTTP request to HTTPS endpoints.
+         *
          * Type: boolean
          */
         WEB_SSL_ONLY = "web_ssl_only",
         /**
          * Path to SSL key file.
+         *
          * Type: string
          */
         WEB_SSL_KEY_FILE = "web_ssl_key_file",
         /**
          * Path to SSL cert file.
+         *
          * Type: string
          */
         WEB_SSL_CERT_FILE = "web_ssl_cert_file",
         /**
          * HTTPS port listened by webserver.
+         *
          * Type: number
          */
         WEB_SSL_PORT = "web_ssl_port",
         /**
          * HTTP port listened by webserver.
+         *
          * Type: number
          */
         WEB_PORT = "web_port",
         /**
          * Prefix to route url.
+         *
          * Type: string
          */
         WEB_URL_PREFIX = "web_url_prefix"
