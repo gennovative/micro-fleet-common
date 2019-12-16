@@ -34,7 +34,7 @@ class ModelAutoMapper {
     /**
      * @see IModelAutoMapper.merge
      */
-    merge(dest, sources, options) {
+    merge(dest, sources, options = {}) {
         if (dest == null || typeof dest !== 'object') {
             return dest;
         }
@@ -44,25 +44,25 @@ class ModelAutoMapper {
     /**
      * @see IModelAutoMapper.partial
      */
-    partial(source, options) {
+    partial(source, options = {}) {
         return this.$tryTranslate('partial', source, options);
     }
     /**
      * @see IModelAutoMapper.partialMany
      */
-    partialMany(sources, options) {
+    partialMany(sources, options = {}) {
         return this.$tryTranslate('partial', sources, options);
     }
     /**
      * @see IModelAutoMapper.whole
      */
-    whole(source, options) {
+    whole(source, options = {}) {
         return this.$tryTranslate('whole', source, options);
     }
     /**
      * @see IModelAutoMapper.wholeMany
      */
-    wholeMany(sources, options) {
+    wholeMany(sources, options = {}) {
         return this.$tryTranslate('whole', sources, options);
     }
     /**
@@ -81,12 +81,19 @@ class ModelAutoMapper {
         if (source == null || typeof source !== 'object') {
             return source;
         }
-        options = Object.assign({
+        options = {
             enableValidation: this.enableValidation,
-        }, options);
-        // Translate an array or single item
+            ...options,
+        };
         if (Array.isArray(source)) {
-            return source.map(s => this.$translate(fn, s, options));
+            return source.reduce((prev, cur) => {
+                const trans = this.$translate(fn, cur, options);
+                // Exclude failed translation (in case options.errorCallback is specified)
+                if (trans != null) {
+                    prev.push(trans);
+                }
+                return prev;
+            }, []);
         }
         return this.$translate(fn, source, options);
     }

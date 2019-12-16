@@ -55,7 +55,7 @@ export class ModelAutoMapper<T extends Object>
     /**
      * @see IModelAutoMapper.merge
      */
-    public merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options?: MappingOptions): Partial<T> {
+    public merge(dest: Partial<T>, sources: Partial<T> | Partial<T>[], options: MappingOptions = {}): Partial<T> {
         if (dest == null || typeof dest !== 'object') { return dest }
         dest = Object.assign.apply(null, Array.isArray(sources) ? [dest, ...sources] : [dest, sources])
         return this.partial(dest, options) as Partial<T>
@@ -64,28 +64,28 @@ export class ModelAutoMapper<T extends Object>
     /**
      * @see IModelAutoMapper.partial
      */
-    public partial(source: object, options?: MappingOptions): Partial<T> {
+    public partial(source: object, options: MappingOptions = {}): Partial<T> {
         return this.$tryTranslate('partial', source, options) as Partial<T>
     }
 
     /**
      * @see IModelAutoMapper.partialMany
      */
-    public partialMany(sources: object[], options?: MappingOptions): Partial<T>[] {
+    public partialMany(sources: object[], options: MappingOptions = {}): Partial<T>[] {
         return this.$tryTranslate('partial', sources, options) as Partial<T>[]
     }
 
     /**
      * @see IModelAutoMapper.whole
      */
-    public whole(source: object, options?: MappingOptions): T {
+    public whole(source: object, options: MappingOptions = {}): T {
         return this.$tryTranslate('whole', source, options) as T
     }
 
     /**
      * @see IModelAutoMapper.wholeMany
      */
-    public wholeMany(sources: object[], options?: MappingOptions): T[] {
+    public wholeMany(sources: object[], options: MappingOptions = {}): T[] {
         return this.$tryTranslate('whole', sources, options) as T[]
     }
 
@@ -105,16 +105,26 @@ export class ModelAutoMapper<T extends Object>
     }
 
 
-    protected $tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[] {
+    protected $tryTranslate(fn: string, source: any | any[], options: MappingOptions): T | T[] {
         if (source == null || typeof source !== 'object') { return source }
 
-        options = Object.assign(<MappingOptions>{
+        options = {
             enableValidation: this.enableValidation,
-        }, options)
+            ...options,
+        }
 
-        // Translate an array or single item
         if (Array.isArray(source)) {
-            return source.map(s => this.$translate(fn, s, options))
+            return source.reduce(
+                (prev, cur) => {
+                    const trans = this.$translate(fn, cur, options)
+                    // Exclude failed translation (in case options.errorCallback is specified)
+                    if (trans != null) {
+                        prev.push(trans)
+                    }
+                    return prev
+                },
+                [],
+            )
         }
         return this.$translate(fn, source, options)
     }

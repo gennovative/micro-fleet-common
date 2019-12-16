@@ -26,10 +26,26 @@ declare module '@micro-fleet/common/dist/app/setting-keys/DbClient' {
 declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
     export enum Auth {
         /**
+         * Signature algorithm. Could be one of these values :
+         * - HS256:    HMAC using SHA-256 hash algorithm (default)
+         * - HS384:    HMAC using SHA-384 hash algorithm
+         * - HS512:    HMAC using SHA-512 hash algorithm
+         * - RS256:    RSASSA using SHA-256 hash algorithm
+         * - RS384:    RSASSA using SHA-384 hash algorithm
+         * - RS512:    RSASSA using SHA-512 hash algorithm
+         * - ES256:    ECDSA using P-256 curve and SHA-256 hash algorithm
+         * - ES384:    ECDSA using P-384 curve and SHA-384 hash algorithm
+         * - ES512:    ECDSA using P-521 curve and SHA-512 hash algorithm
+         * - none:     No digital signature or MAC value included
+         *
+         * Data type: string
+         */
+        AUTH_SIGN_ALGO = "auth_sign_algo",
+        /**
          * Key to verify auth tokens.
          *
-         * If signing algorithm is RS256, this is the PUBLIC key.
-         * Otherwise the key for verify may also be the key for signing.
+         * If signing algorithm is RSxxx, this is the PUBLIC key.
+         * Otherwise this key is used for both signing and verifing.
          *
          * Data type: string
          */
@@ -38,17 +54,16 @@ declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
          * Path to the file containing key to verify auth tokens.
          * The key must be stored as UTF-8 plain text.
          *
-         * If signing algorithm is RS256, this is the PUBLIC key.
-         * Otherwise the key for verify may also be the key for signing.
+         * If signing algorithm is RSxxx, this is the PUBLIC key.
+         * Otherwise this key is used for both signing and verifing.
          *
          * Data type: string
          */
         AUTH_KEY_VERIFY_FILE = "auth_key_verify_file",
         /**
-         * Key to sign auth tokens.
-         *
-         * If signing algorithm is RS256, this is the PRIVATE key.
-         * Otherwise the key for verify may also be the key for signing.
+         * This is the PRIVATE key to sign auth tokens.
+         * It is only used when signing algorithm is RSxxx.
+         * Otherwise `AUTH_KEY_VERIFY` is used for signing.
          *
          * Data type: string
          */
@@ -56,9 +71,8 @@ declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
         /**
          * Path to the file containing key to sign auth tokens.
          * The key must be stored as UTF-8 plain text.
-         *
-         * If signing algorithm is RS256, this is the PRIVATE key.
-         * Otherwise the key for verify may also be the key for signing.
+         * It is only used when signing algorithm is RSxxx.
+         * Otherwise `AUTH_KEY_VERIFY` is used for signing.
          *
          * Data type: string
          */
@@ -1006,7 +1020,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
          * Is invoked after source object is validated to map source object to target model.
          */
         protected $map(source: any): T;
-        protected $tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
+        protected $tryTranslate(fn: string, source: any | any[], options: MappingOptions): T | T[];
         protected $translate(fn: string, source: any, options: MappingOptions): T;
     }
 
@@ -1051,6 +1065,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
     import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
     export type PropValidationMetadata = {
+        ownerClass: any;
         type?(): joi.AnySchema;
         rules?: Array<(prev: joi.AnySchema) => joi.AnySchema>;
         rawSchema?: joi.SchemaLike;
@@ -1065,7 +1080,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
     export function getClassValidationMetadata(Class: Function): ClassValidationMetadata;
     export function setClassValidationMetadata(Class: Function, meta: ClassValidationMetadata): void;
     export function deleteClassValidationMetadata(Class: Function): void;
-    export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol): PropValidationMetadata;
+    export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol, ownerClass: any): PropValidationMetadata;
     /**
      * @param classMeta Must be passed to avoid calling costly function `getClassValidationMetadata`
      */
@@ -1225,7 +1240,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
     /**
      * Used to decorate model class' properties to assert it must be a Big Int.
      */
-    export function bigInt({ convert }?: BigIntDecoratorOptions): PropertyDecorator;
+    export function bigint({ convert }?: BigIntDecoratorOptions): PropertyDecorator;
     export type NumberDecoratorOptions = {
         /**
          * Minimum allowed number.
@@ -1302,12 +1317,12 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
      *
      * class Model {
-     *   @only(AccountStatus.ACTIVE, AccountStatus.LOCKED)
+     *   @valid(AccountStatus.ACTIVE, AccountStatus.LOCKED)
      *   status: AccountStatus
      * }
      * ```
      */
-    export function only(...values: any[]): PropertyDecorator;
+    export function valid(...values: any[]): PropertyDecorator;
     /**
      * Used to decorate model class' properties to assert it must exist and have non-undefined value.
      * @param {boolean} allowNull Whether or not to allow null value. Default is false.
@@ -1399,7 +1414,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
     export function validateClass(validatorOptions: JoiModelValidatorConstructorOptions): ClassDecorator;
     /**
      * Used to decorate model class' properties to declare complex validation rules.
-     * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+     * Note that this decorator overrides other ones such as @defaultAs(), @number(), @valid()...
      *
      * @param {joi.SchemaLike} schema A single schema rule for this property.
      *
@@ -1472,7 +1487,7 @@ declare module '@micro-fleet/common/dist/app/decorators' {
         /**
          * Used to decorate model class' properties to assert it must be a Big Int.
          */
-        bigInt: typeof v.bigInt;
+        bigint: typeof v.bigint;
         /**
          * Used to decorate model class' properties to assert it must be a boolean.
          */
@@ -1525,12 +1540,12 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
          *
          * class Model {
-         *   @only(AccountStatus.ACTIVE, AccountStatus.LOCKED)
+         *   @valid(AccountStatus.ACTIVE, AccountStatus.LOCKED)
          *   status: AccountStatus
          * }
          * ```
          */
-        only: typeof v.only;
+        valid: typeof v.valid;
         /**
          * Used to decorate model class' properties to assert it must exist and have non-undefined value.
          * @param {boolean} allowNull Whether or not to allow null value. Default is false.
@@ -1578,7 +1593,7 @@ declare module '@micro-fleet/common/dist/app/decorators' {
         validateClass: typeof v.validateClass;
         /**
          * Used to decorate model class' properties to declare complex validation rules.
-         * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+         * Note that this decorator overrides other ones such as @defaultAs(), @number(), @valid()...
          *
          * @param {joi.SchemaLike} schema A single schema rule for this property.
          *

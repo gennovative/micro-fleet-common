@@ -6,18 +6,18 @@ const TRANSLATOR = Symbol();
 const VALIDATOR = Symbol();
 class Translatable {
     static getTranslator() {
-        let translator = Reflect.getMetadata(TRANSLATOR, this);
+        let translator = Reflect.getOwnMetadata(TRANSLATOR, this);
         if (!translator) {
             translator = this.$createTranslator();
             Reflect.defineMetadata(TRANSLATOR, translator, this);
         }
-        return Reflect.getMetadata(TRANSLATOR, this);
+        return translator;
     }
     static $createTranslator() {
         return new ModelAutoMapper_1.ModelAutoMapper(this, this.getValidator());
     }
     static getValidator() {
-        let validator = Reflect.getMetadata(VALIDATOR, this);
+        let validator = Reflect.getOwnMetadata(VALIDATOR, this);
         // "validator" may be `null` when class doesn't need validating
         if (validator === undefined) {
             validator = this.$createValidator();

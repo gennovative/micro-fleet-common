@@ -25,12 +25,12 @@ const VALIDATOR = Symbol()
 
 export abstract class Translatable {
     public static getTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT> {
-        let translator = Reflect.getMetadata(TRANSLATOR, this)
+        let translator = Reflect.getOwnMetadata(TRANSLATOR, this)
         if (!translator) {
             translator = this.$createTranslator<TT>()
             Reflect.defineMetadata(TRANSLATOR, translator, this)
         }
-        return Reflect.getMetadata(TRANSLATOR, this)
+        return translator
     }
 
     protected static $createTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT> {
@@ -38,7 +38,7 @@ export abstract class Translatable {
     }
 
     public static getValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT> {
-        let validator = Reflect.getMetadata(VALIDATOR, this)
+        let validator = Reflect.getOwnMetadata(VALIDATOR, this)
         // "validator" may be `null` when class doesn't need validating
         if (validator === undefined) {
             validator = this.$createValidator()
