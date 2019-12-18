@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi = require("@hapi/joi");
-const cloneDeep = require("lodash.clonedeep");
 const JoiModelValidator_1 = require("./JoiModelValidator");
 const ObjectUtil_1 = require("../utils/ObjectUtil");
 const VALIDATE_META = Symbol();
@@ -14,6 +13,14 @@ function createClassValidationMetadata() {
     };
 }
 exports.createClassValidationMetadata = createClassValidationMetadata;
+function cloneMetadata(source) {
+    return {
+        schemaMapId: { ...source.schemaMapId },
+        schemaMapModel: { ...source.schemaMapModel },
+        props: { ...source.props },
+        idProps: new Set(source.idProps),
+    };
+}
 function getClassValidationMetadata(Class) {
     const ownMeta = Reflect.getOwnMetadata(VALIDATE_META, Class);
     if (ownMeta) {
@@ -21,7 +28,7 @@ function getClassValidationMetadata(Class) {
     }
     const inheritMeta = Reflect.getMetadata(VALIDATE_META, Class);
     if (inheritMeta) {
-        return cloneDeep(inheritMeta);
+        return cloneMetadata(inheritMeta);
     }
     return createClassValidationMetadata();
 }
@@ -60,16 +67,17 @@ function setPropValidationMetadata(Class, classMeta, propName, propMeta) {
     setClassValidationMetadata(Class, classMeta);
 }
 exports.setPropValidationMetadata = setPropValidationMetadata;
-function createJoiValidator(Class) {
+function createJoiValidator(Class, joiOptions) {
     const classMeta = getClassValidationMetadata(Class);
     const [schemaMapId, schemaMapModel] = buildSchemaMapModel(classMeta);
     if (ObjectUtil_1.isEmpty(schemaMapId) && ObjectUtil_1.isEmpty(schemaMapModel)) {
+        // Class doesn't need validating
         return null;
     }
     const validator = new JoiModelValidator_1.JoiModelValidator({
         schemaMapModel,
         schemaMapId,
-        joiOptions: classMeta.joiOptions,
+        joiOptions: joiOptions || classMeta.joiOptions,
     });
     // Clean up
     deleteClassValidationMetadata(Class);

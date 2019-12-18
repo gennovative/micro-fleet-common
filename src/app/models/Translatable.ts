@@ -1,7 +1,7 @@
 import { Newable } from '../interfaces/misc'
 import { IModelAutoMapper } from '../translators/IModelAutoMapper'
 import { ModelAutoMapper } from '../translators/ModelAutoMapper'
-import { IModelValidator } from '../validators/IModelValidator'
+import { IModelValidator, ValidationOptions } from '../validators/IModelValidator'
 import { createJoiValidator } from '../validators/validate-internal'
 
 
@@ -47,14 +47,28 @@ export abstract class Translatable {
         return validator
     }
 
-    protected static $createValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT> {
-        return createJoiValidator(this)
+    protected static $createValidator<VT extends Translatable>(
+        this: TranslatableClass<VT>,
+        options?: ValidationOptions,
+    ): IModelValidator<VT> {
+        return createJoiValidator(this, options)
     }
 
+    /**
+     * Converts arbitrary object into instance of this class type.
+     *
+     * If no class property is marked for validation, all properties are copied.
+     *
+     * If just some class properties are marked for validation, they are validated then copied, the rest are ignored.
+     */
     public static from<FT extends Translatable>(this: TranslatableClass<FT>, source: object): FT {
         return this.getTranslator<FT>().whole(source)
     }
 
+    /**
+     * Converts array of arbitrary objects into array of instances of this class type.
+     * Conversion rule is same as `from()` method.
+     */
     public static fromMany<FT extends Translatable>(this: TranslatableClass<FT>, source: object[]): FT[] {
         return this.getTranslator<FT>().wholeMany(source)
     }

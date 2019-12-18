@@ -520,10 +520,9 @@ describe('Translatable', function () {
         it('Should NOT inherit class validation rules with validateClass()', () => {
             // Arrange
             const sourceOne = {
-                    theID: 1,
-                    name: 'Gennova123',
-                    address: 'Unlimited length street name',
-                    age: 18,
+                    theID: -10,
+                    name: '@!#$%',
+                    age: 'Eighty',
                     gender: 'bigender',
                     hobbies: 'gamebooks',
                 },

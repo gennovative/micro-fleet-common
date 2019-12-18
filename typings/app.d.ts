@@ -1062,7 +1062,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
     /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
-    import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+    import { ValidationOptions, JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
     export type PropValidationMetadata = {
         ownerClass: any;
@@ -1085,13 +1085,13 @@ declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
      * @param classMeta Must be passed to avoid calling costly function `getClassValidationMetadata`
      */
     export function setPropValidationMetadata(Class: Function, classMeta: ClassValidationMetadata, propName: string | symbol, propMeta: PropValidationMetadata): void;
-    export function createJoiValidator<T>(Class: Function): JoiModelValidator<T>;
+    export function createJoiValidator<T>(Class: Function, joiOptions?: ValidationOptions): JoiModelValidator<T>;
 
 }
 declare module '@micro-fleet/common/dist/app/models/Translatable' {
     import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
     import { IModelAutoMapper } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
-    import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+    import { IModelValidator, ValidationOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     export interface ITranslatable<T = any> {
         new (...args: any[]): T;
         getTranslator(): IModelAutoMapper<T>;
@@ -1103,8 +1103,19 @@ declare module '@micro-fleet/common/dist/app/models/Translatable' {
         static getTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
         protected static $createTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
         static getValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
-        protected static $createValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
+        protected static $createValidator<VT extends Translatable>(this: TranslatableClass<VT>, options?: ValidationOptions): IModelValidator<VT>;
+        /**
+         * Converts arbitrary object into instance of this class type.
+         *
+         * If no class property is marked for validation, all properties are copied.
+         *
+         * If just some class properties are marked for validation, they are validated then copied, the rest are ignored.
+         */
         static from<FT extends Translatable>(this: TranslatableClass<FT>, source: object): FT;
+        /**
+         * Converts array of arbitrary objects into array of instances of this class type.
+         * Conversion rule is same as `from()` method.
+         */
         static fromMany<FT extends Translatable>(this: TranslatableClass<FT>, source: object[]): FT[];
     }
     export {};
@@ -1113,6 +1124,16 @@ declare module '@micro-fleet/common/dist/app/models/Translatable' {
 declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
     /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
+    export type BigIntJoi = joi.AnySchema & {
+        /**
+         * Converts the validated output to string, regardless of the input type.
+         */
+        asString(): BigIntJoi;
+        /**
+         * Converts the validated output to native bigint, regardless of the input type.
+         */
+        asNative(): BigIntJoi;
+    };
     export type DateStringJoi = joi.AnySchema & {
         /**
          * Whether the input string is in UTC format.
@@ -1142,16 +1163,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
          * extJoi.bigint().asNative().validate('98765443123456');
          * extJoi.bigint().validate('98765443123456', {convert: true});
          */
-        bigint(): joi.AnySchema & {
-            /**
-             * Converts input to string.
-             */
-            asString(): joi.AnySchema;
-            /**
-             * Converts input to native BigInt.
-             */
-            asNative(): joi.AnySchema;
-        };
+        bigint(): BigIntJoi;
         /**
          * Makes sure input is in W3C Date and Time Formats,
          * but must have at least year, month, and day.
@@ -1260,7 +1272,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * Used to decorate model class' properties to assert it must be a number.
      */
     export function number({ min, max, ...opts }?: NumberDecoratorOptions): PropertyDecorator;
-    export type DateTimeDecoratorOptions = {
+    export type DateStringDecoratorOptions = {
         /**
          * Whether the input string is in UTC format.
          * Default: false.
@@ -1282,13 +1294,13 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      *
      * ```typescript
      * class ModelA {
-     *    @datetime()
+     *    @dateString()
      *    birthdate: string
      * }
      *
      *
      * class ModelB {
-     *    @datetime({ convert: true })
+     *    @dateString({ convert: true })
      *    birthdate: Date
      * }
      *
@@ -1296,12 +1308,12 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * import * as moment from 'moment'
      *
      * class ModelC {
-     *    @datetime({ isUTC: true, translator: moment, convert: true })
+     *    @dateString({ isUTC: true, translator: moment, convert: true })
      *    birthdate: moment.Moment
      * }
      * ```
      */
-    export function datetime({ isUTC, translator, convert }?: DateTimeDecoratorOptions): PropertyDecorator;
+    export function dateString({ isUTC, translator, convert }?: DateStringDecoratorOptions): PropertyDecorator;
     /**
      * Used to decorate model class' properties to specify default value.
      * @param {any} value The default value.
@@ -1406,8 +1418,8 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
     export function translatable(): ClassDecorator;
     /**
      * Used to decorate model class to __exclusively__ declare validation rules,
-     * which means it __removes__ all rules and options from property decorator
-     * as well as parent classes, then applies the specified `validatorOptions`.
+     * which means it __replaces__ all rules and options from parent class
+     * as well as property rules in same class.
      *
      * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
      */
@@ -1450,7 +1462,7 @@ declare module '@micro-fleet/common/dist/app/decorators' {
     import { injectable, inject, decorate, unmanaged, optional } from 'inversify';
     import { lazyInject } from '@micro-fleet/common/dist/app/di/lazyInject';
     import * as v from '@micro-fleet/common/dist/app/validators/validate-decorator';
-    export { ArrayDecoratorOptions, BooleanDecoratorOptions, BigIntDecoratorOptions, NumberDecoratorOptions, DateTimeDecoratorOptions, StringDecoratorOptions, } from '@micro-fleet/common/dist/app/validators/validate-decorator';
+    export { ArrayDecoratorOptions, BooleanDecoratorOptions, BigIntDecoratorOptions, NumberDecoratorOptions, DateStringDecoratorOptions, StringDecoratorOptions, } from '@micro-fleet/common/dist/app/validators/validate-decorator';
     export type Decorators = {
         decorate: typeof decorate;
         injectable: typeof injectable;
@@ -1497,13 +1509,13 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          *
          * ```typescript
          * class ModelA {
-         *    @datetime()
+         *    @dateString()
          *    birthdate: string
          * }
          *
          *
          * class ModelB {
-         *    @datetime({ convert: true })
+         *    @dateString({ convert: true })
          *    birthdate: Date
          * }
          *
@@ -1511,12 +1523,12 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          * import * as moment from 'moment'
          *
          * class ModelC {
-         *    @datetime({ isUTC: true, translator: moment, convert: true })
+         *    @dateString({ isUTC: true, translator: moment, convert: true })
          *    birthdate: moment.Moment
          * }
          * ```
          */
-        datetime: typeof v.datetime;
+        dateString: typeof v.dateString;
         /**
          * Used to decorate model class' properties to specify default value.
          * @param {any} value The default value.
@@ -1581,12 +1593,9 @@ declare module '@micro-fleet/common/dist/app/decorators' {
         */
         string: typeof v.string;
         /**
-         * Used to decorate model class to declare validation rules.
-         *
-         * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
-         * such as @validateProp(), @number(), @defaultAs()...
-         *
-         * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+         * Used to decorate model class to __exclusively__ declare validation rules,
+         * which means it __replaces__ all rules and options from parent class
+         * as well as property rules in same class.
          *
          * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
          */
