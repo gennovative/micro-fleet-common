@@ -1,6 +1,7 @@
 export enum Auth {
     /**
-     * Signature algorithm. Could be one of these values :
+     * List of strings with the names of the allowed signature algorithms.
+     * Could be one of these values :
      * - HS256:    HMAC using SHA-256 hash algorithm (default)
      * - HS384:    HMAC using SHA-384 hash algorithm
      * - HS512:    HMAC using SHA-512 hash algorithm
@@ -12,7 +13,7 @@ export enum Auth {
      * - ES512:    ECDSA using P-521 curve and SHA-512 hash algorithm
      * - none:     No digital signature or MAC value included
      *
-     * Data type: string
+     * Data type: string or string[]
      */
     AUTH_SIGN_ALGO = 'auth_sign_algo',
 
@@ -57,19 +58,37 @@ export enum Auth {
     AUTH_KEY_SIGN_FILE = 'auth_key_signfile',
 
     /**
-     * Issuer of auth tokens.
+     * The Authorization Provider that issues tokens.
+     *
      * Data type: string
      */
     AUTH_ISSUER = 'auth_issuer',
 
     /**
+     * The target which token is issued for.
+     *
+     * Data type: string or strings[]
+     */
+    AUTH_AUDIENCES = 'auth_audiences',
+
+    /**
+     * The target which token is issued for.
+     * This setting has higher priority than `AUTH_AUDIENCES`.
+     *
+     * Data type: An regular expression or Array of regular expressions
+     */
+    AUTH_AUDIENCES_REGEX = 'auth_audiences_regex',
+
+    /**
      * Access token expiration duration in seconds.
+     *
      * Data type: number
      */
     AUTH_EXPIRE_ACCESS = 'auth_expire_access',
 
     /**
      * Refresh token expiration duration in seconds.
+     *
      * Data type: number
      */
     AUTH_EXPIRE_REFRESH = 'auth_expire_refresh',

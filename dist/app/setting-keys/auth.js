@@ -55,10 +55,20 @@ var Auth;
      */
     Auth["AUTH_KEY_SIGN_FILE"] = "auth_key_signfile";
     /**
-     * Issuer of auth tokens.
+     * The Authorization Provider that issues tokens.
      * Data type: string
      */
     Auth["AUTH_ISSUER"] = "auth_issuer";
+    /**
+     * The target which token is issued for.
+     * Data type: Array of strings
+     */
+    Auth["AUTH_AUDIENCES"] = "auth_audiences";
+    /**
+     * The target which token is issued for.
+     * Data type: Array of regular expressions
+     */
+    Auth["AUTH_AUDIENCES_REGEX"] = "auth_audiences_regex";
     /**
      * Access token expiration duration in seconds.
      * Data type: number

@@ -78,10 +78,20 @@ declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
          */
         AUTH_KEY_SIGN_FILE = "auth_key_signfile",
         /**
-         * Issuer of auth tokens.
+         * The Authorization Provider that issues tokens.
          * Data type: string
          */
         AUTH_ISSUER = "auth_issuer",
+        /**
+         * The target which token is issued for.
+         * Data type: Array of strings
+         */
+        AUTH_AUDIENCES = "auth_audiences",
+        /**
+         * The target which token is issued for.
+         * Data type: Array of regular expressions
+         */
+        AUTH_AUDIENCES_REGEX = "auth_audiences_regex",
         /**
          * Access token expiration duration in seconds.
          * Data type: number
@@ -2217,6 +2227,15 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
     export {};
 
 }
+declare module '@micro-fleet/common/dist/app/mock-for-test' {
+    import { IConfigurationProvider } from '@micro-fleet/common/dist/app/interfaces/configurations';
+    /**
+     * Creates a mock implementation of IConfigurationProvider, using the specified config data.
+     * @param configs The data to use.
+     */
+    export function createMockConfigProvider(configs: object): IConfigurationProvider;
+
+}
 declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' {
     import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
     import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
@@ -2278,6 +2297,7 @@ declare module '@micro-fleet/common' {
     export * from '@micro-fleet/common/dist/app/models/PagedData';
     export * from '@micro-fleet/common/dist/app/models/Result';
     export * from '@micro-fleet/common/dist/app/models/Translatable';
+    export * from '@micro-fleet/common/dist/app/mock-for-test';
     export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
     export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
     export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
