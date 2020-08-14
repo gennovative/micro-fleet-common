@@ -26,10 +26,26 @@ declare module '@micro-fleet/common/dist/app/setting-keys/DbClient' {
 declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
     export enum Auth {
         /**
+         * Signature algorithm. Could be one of these values :
+         * - HS256:    HMAC using SHA-256 hash algorithm (default)
+         * - HS384:    HMAC using SHA-384 hash algorithm
+         * - HS512:    HMAC using SHA-512 hash algorithm
+         * - RS256:    RSASSA using SHA-256 hash algorithm
+         * - RS384:    RSASSA using SHA-384 hash algorithm
+         * - RS512:    RSASSA using SHA-512 hash algorithm
+         * - ES256:    ECDSA using P-256 curve and SHA-256 hash algorithm
+         * - ES384:    ECDSA using P-384 curve and SHA-384 hash algorithm
+         * - ES512:    ECDSA using P-521 curve and SHA-512 hash algorithm
+         * - none:     No digital signature or MAC value included
+         *
+         * Data type: string
+         */
+        AUTH_SIGN_ALGO = "auth_sign_algo",
+        /**
          * Key to verify auth tokens.
          *
-         * If signing algorithm is RS256, this is the PUBLIC key.
-         * Otherwise the key for verify may also be the key for signing.
+         * If signing algorithm is RSxxx, this is the PUBLIC key.
+         * Otherwise this key is used for both signing and verifing.
          *
          * Data type: string
          */
@@ -38,17 +54,16 @@ declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
          * Path to the file containing key to verify auth tokens.
          * The key must be stored as UTF-8 plain text.
          *
-         * If signing algorithm is RS256, this is the PUBLIC key.
-         * Otherwise the key for verify may also be the key for signing.
+         * If signing algorithm is RSxxx, this is the PUBLIC key.
+         * Otherwise this key is used for both signing and verifing.
          *
          * Data type: string
          */
         AUTH_KEY_VERIFY_FILE = "auth_key_verify_file",
         /**
-         * Key to sign auth tokens.
-         *
-         * If signing algorithm is RS256, this is the PRIVATE key.
-         * Otherwise the key for verify may also be the key for signing.
+         * This is the PRIVATE key to sign auth tokens.
+         * It is only used when signing algorithm is RSxxx.
+         * Otherwise `AUTH_KEY_VERIFY` is used for signing.
          *
          * Data type: string
          */
@@ -56,18 +71,27 @@ declare module '@micro-fleet/common/dist/app/setting-keys/auth' {
         /**
          * Path to the file containing key to sign auth tokens.
          * The key must be stored as UTF-8 plain text.
-         *
-         * If signing algorithm is RS256, this is the PRIVATE key.
-         * Otherwise the key for verify may also be the key for signing.
+         * It is only used when signing algorithm is RSxxx.
+         * Otherwise `AUTH_KEY_VERIFY` is used for signing.
          *
          * Data type: string
          */
         AUTH_KEY_SIGN_FILE = "auth_key_signfile",
         /**
-         * Issuer of auth tokens.
+         * The Authorization Provider that issues tokens.
          * Data type: string
          */
         AUTH_ISSUER = "auth_issuer",
+        /**
+         * The target which token is issued for.
+         * Data type: Array of strings
+         */
+        AUTH_AUDIENCES = "auth_audiences",
+        /**
+         * The target which token is issued for.
+         * Data type: Array of regular expressions
+         */
+        AUTH_AUDIENCES_REGEX = "auth_audiences_regex",
         /**
          * Access token expiration duration in seconds.
          * Data type: number
@@ -1050,7 +1074,7 @@ declare module '@micro-fleet/common/dist/app/translators/ModelAutoMapper' {
          * Is invoked after source object is validated to map source object to target model.
          */
         protected $map(source: any): T;
-        protected $tryTranslate(fn: string, source: any | any[], options?: MappingOptions): T | T[];
+        protected $tryTranslate(fn: string, source: any | any[], options: MappingOptions): T | T[];
         protected $translate(fn: string, source: any, options: MappingOptions): T;
     }
 
@@ -1092,9 +1116,10 @@ declare module '@micro-fleet/common/dist/app/validators/JoiModelValidator' {
 declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
     /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
-    import { JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+    import { ValidationOptions, JoiModelValidatorConstructorOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     import { JoiModelValidator } from '@micro-fleet/common/dist/app/validators/JoiModelValidator';
     export type PropValidationMetadata = {
+        ownerClass: any;
         type?(): joi.AnySchema;
         rules?: Array<(prev: joi.AnySchema) => joi.AnySchema>;
         rawSchema?: joi.SchemaLike;
@@ -1109,18 +1134,18 @@ declare module '@micro-fleet/common/dist/app/validators/validate-internal' {
     export function getClassValidationMetadata(Class: Function): ClassValidationMetadata;
     export function setClassValidationMetadata(Class: Function, meta: ClassValidationMetadata): void;
     export function deleteClassValidationMetadata(Class: Function): void;
-    export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol): PropValidationMetadata;
+    export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol, ownerClass: any): PropValidationMetadata;
     /**
      * @param classMeta Must be passed to avoid calling costly function `getClassValidationMetadata`
      */
     export function setPropValidationMetadata(Class: Function, classMeta: ClassValidationMetadata, propName: string | symbol, propMeta: PropValidationMetadata): void;
-    export function createJoiValidator<T>(Class: Function): JoiModelValidator<T>;
+    export function createJoiValidator<T>(Class: Function, joiOptions?: ValidationOptions): JoiModelValidator<T>;
 
 }
 declare module '@micro-fleet/common/dist/app/models/Translatable' {
     import { Newable } from '@micro-fleet/common/dist/app/interfaces/misc';
     import { IModelAutoMapper } from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
-    import { IModelValidator } from '@micro-fleet/common/dist/app/validators/IModelValidator';
+    import { IModelValidator, ValidationOptions } from '@micro-fleet/common/dist/app/validators/IModelValidator';
     export interface ITranslatable<T = any> {
         new (...args: any[]): T;
         getTranslator(): IModelAutoMapper<T>;
@@ -1132,8 +1157,19 @@ declare module '@micro-fleet/common/dist/app/models/Translatable' {
         static getTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
         protected static $createTranslator<TT extends Translatable>(this: TranslatableClass<TT>): IModelAutoMapper<TT>;
         static getValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
-        protected static $createValidator<VT extends Translatable>(this: TranslatableClass<VT>): IModelValidator<VT>;
+        protected static $createValidator<VT extends Translatable>(this: TranslatableClass<VT>, options?: ValidationOptions): IModelValidator<VT>;
+        /**
+         * Converts arbitrary object into instance of this class type.
+         *
+         * If no class property is marked for validation, all properties are copied.
+         *
+         * If just some class properties are marked for validation, they are validated then copied, the rest are ignored.
+         */
         static from<FT extends Translatable>(this: TranslatableClass<FT>, source: object): FT;
+        /**
+         * Converts array of arbitrary objects into array of instances of this class type.
+         * Conversion rule is same as `from()` method.
+         */
         static fromMany<FT extends Translatable>(this: TranslatableClass<FT>, source: object[]): FT[];
     }
     export {};
@@ -1142,6 +1178,16 @@ declare module '@micro-fleet/common/dist/app/models/Translatable' {
 declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
     /// <reference types="hapi__joi" />
     import * as joi from '@hapi/joi';
+    export type BigIntJoi = joi.AnySchema & {
+        /**
+         * Converts the validated output to string, regardless of the input type.
+         */
+        asString(): BigIntJoi;
+        /**
+         * Converts the validated output to native bigint, regardless of the input type.
+         */
+        asNative(): BigIntJoi;
+    };
     export type DateStringJoi = joi.AnySchema & {
         /**
          * Whether the input string is in UTC format.
@@ -1171,16 +1217,7 @@ declare module '@micro-fleet/common/dist/app/validators/JoiExtended' {
          * extJoi.bigint().asNative().validate('98765443123456');
          * extJoi.bigint().validate('98765443123456', {convert: true});
          */
-        bigint(): joi.AnySchema & {
-            /**
-             * Converts input to string.
-             */
-            asString(): joi.AnySchema;
-            /**
-             * Converts input to native BigInt.
-             */
-            asNative(): joi.AnySchema;
-        };
+        bigint(): BigIntJoi;
         /**
          * Makes sure input is in W3C Date and Time Formats,
          * but must have at least year, month, and day.
@@ -1269,7 +1306,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
     /**
      * Used to decorate model class' properties to assert it must be a Big Int.
      */
-    export function bigInt({ convert }?: BigIntDecoratorOptions): PropertyDecorator;
+    export function bigint({ convert }?: BigIntDecoratorOptions): PropertyDecorator;
     export type NumberDecoratorOptions = {
         /**
          * Minimum allowed number.
@@ -1289,7 +1326,7 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * Used to decorate model class' properties to assert it must be a number.
      */
     export function number({ min, max, ...opts }?: NumberDecoratorOptions): PropertyDecorator;
-    export type DateTimeDecoratorOptions = {
+    export type DateStringDecoratorOptions = {
         /**
          * Whether the input string is in UTC format.
          * Default: false.
@@ -1311,13 +1348,13 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      *
      * ```typescript
      * class ModelA {
-     *    @datetime()
+     *    @dateString()
      *    birthdate: string
      * }
      *
      *
      * class ModelB {
-     *    @datetime({ convert: true })
+     *    @dateString({ convert: true })
      *    birthdate: Date
      * }
      *
@@ -1325,12 +1362,12 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * import * as moment from 'moment'
      *
      * class ModelC {
-     *    @datetime({ isUTC: true, translator: moment, convert: true })
+     *    @dateString({ isUTC: true, translator: moment, convert: true })
      *    birthdate: moment.Moment
      * }
      * ```
      */
-    export function datetime({ isUTC, translator, convert }?: DateTimeDecoratorOptions): PropertyDecorator;
+    export function dateString({ isUTC, translator, convert }?: DateStringDecoratorOptions): PropertyDecorator;
     /**
      * Used to decorate model class' properties to specify default value.
      * @param {any} value The default value.
@@ -1346,12 +1383,12 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
      * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
      *
      * class Model {
-     *   @only(AccountStatus.ACTIVE, AccountStatus.LOCKED)
+     *   @valid(AccountStatus.ACTIVE, AccountStatus.LOCKED)
      *   status: AccountStatus
      * }
      * ```
      */
-    export function only(...values: any[]): PropertyDecorator;
+    export function valid(...values: any[]): PropertyDecorator;
     /**
      * Used to decorate model class' properties to assert it must exist and have non-undefined value.
      * @param {boolean} allowNull Whether or not to allow null value. Default is false.
@@ -1435,15 +1472,15 @@ declare module '@micro-fleet/common/dist/app/validators/validate-decorator' {
     export function translatable(): ClassDecorator;
     /**
      * Used to decorate model class to __exclusively__ declare validation rules,
-     * which means it __removes__ all rules and options from property decorator
-     * as well as parent classes, then applies the specified `validatorOptions`.
+     * which means it __replaces__ all rules and options from parent class
+     * as well as property rules in same class.
      *
      * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
      */
     export function validateClass(validatorOptions: JoiModelValidatorConstructorOptions): ClassDecorator;
     /**
      * Used to decorate model class' properties to declare complex validation rules.
-     * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+     * Note that this decorator overrides other ones such as @defaultAs(), @number(), @valid()...
      *
      * @param {joi.SchemaLike} schema A single schema rule for this property.
      *
@@ -1479,7 +1516,7 @@ declare module '@micro-fleet/common/dist/app/decorators' {
     import { injectable, inject, decorate, unmanaged, optional } from 'inversify';
     import { lazyInject } from '@micro-fleet/common/dist/app/di/lazyInject';
     import * as v from '@micro-fleet/common/dist/app/validators/validate-decorator';
-    export { ArrayDecoratorOptions, BooleanDecoratorOptions, BigIntDecoratorOptions, NumberDecoratorOptions, DateTimeDecoratorOptions, StringDecoratorOptions, } from '@micro-fleet/common/dist/app/validators/validate-decorator';
+    export { ArrayDecoratorOptions, BooleanDecoratorOptions, BigIntDecoratorOptions, NumberDecoratorOptions, DateStringDecoratorOptions, StringDecoratorOptions, } from '@micro-fleet/common/dist/app/validators/validate-decorator';
     export type Decorators = {
         decorate: typeof decorate;
         injectable: typeof injectable;
@@ -1516,7 +1553,7 @@ declare module '@micro-fleet/common/dist/app/decorators' {
         /**
          * Used to decorate model class' properties to assert it must be a Big Int.
          */
-        bigInt: typeof v.bigInt;
+        bigint: typeof v.bigint;
         /**
          * Used to decorate model class' properties to assert it must be a boolean.
          */
@@ -1526,13 +1563,13 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          *
          * ```typescript
          * class ModelA {
-         *    @datetime()
+         *    @dateString()
          *    birthdate: string
          * }
          *
          *
          * class ModelB {
-         *    @datetime({ convert: true })
+         *    @dateString({ convert: true })
          *    birthdate: Date
          * }
          *
@@ -1540,12 +1577,12 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          * import * as moment from 'moment'
          *
          * class ModelC {
-         *    @datetime({ isUTC: true, translator: moment, convert: true })
+         *    @dateString({ isUTC: true, translator: moment, convert: true })
          *    birthdate: moment.Moment
          * }
          * ```
          */
-        datetime: typeof v.datetime;
+        dateString: typeof v.dateString;
         /**
          * Used to decorate model class' properties to specify default value.
          * @param {any} value The default value.
@@ -1569,12 +1606,12 @@ declare module '@micro-fleet/common/dist/app/decorators' {
          * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
          *
          * class Model {
-         *   @only(AccountStatus.ACTIVE, AccountStatus.LOCKED)
+         *   @valid(AccountStatus.ACTIVE, AccountStatus.LOCKED)
          *   status: AccountStatus
          * }
          * ```
          */
-        only: typeof v.only;
+        valid: typeof v.valid;
         /**
          * Used to decorate model class' properties to assert it must exist and have non-undefined value.
          * @param {boolean} allowNull Whether or not to allow null value. Default is false.
@@ -1610,19 +1647,16 @@ declare module '@micro-fleet/common/dist/app/decorators' {
         */
         string: typeof v.string;
         /**
-         * Used to decorate model class to declare validation rules.
-         *
-         * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
-         * such as @validateProp(), @number(), @defaultAs()...
-         *
-         * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+         * Used to decorate model class to __exclusively__ declare validation rules,
+         * which means it __replaces__ all rules and options from parent class
+         * as well as property rules in same class.
          *
          * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
          */
         validateClass: typeof v.validateClass;
         /**
          * Used to decorate model class' properties to declare complex validation rules.
-         * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+         * Note that this decorator overrides other ones such as @defaultAs(), @number(), @valid()...
          *
          * @param {joi.SchemaLike} schema A single schema rule for this property.
          *
@@ -2237,6 +2271,15 @@ declare module '@micro-fleet/common/dist/app/models/Result' {
     export {};
 
 }
+declare module '@micro-fleet/common/dist/app/mock-for-test' {
+    import { IConfigurationProvider } from '@micro-fleet/common/dist/app/interfaces/configurations';
+    /**
+     * Creates a mock implementation of IConfigurationProvider, using the specified config data.
+     * @param configs The data to use.
+     */
+    export function createMockConfigProvider(configs: object): IConfigurationProvider;
+
+}
 declare module '@micro-fleet/common/dist/app/translators/AccessorSupportMapper' {
     import { ICreateMapFluentFunctions } from '@micro-fleet/common/dist/app/interfaces/automapper';
     import { ModelAutoMapper } from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';
@@ -2298,6 +2341,7 @@ declare module '@micro-fleet/common' {
     export * from '@micro-fleet/common/dist/app/models/PagedData';
     export * from '@micro-fleet/common/dist/app/models/Result';
     export * from '@micro-fleet/common/dist/app/models/Translatable';
+    export * from '@micro-fleet/common/dist/app/mock-for-test';
     export * from '@micro-fleet/common/dist/app/translators/AccessorSupportMapper';
     export * from '@micro-fleet/common/dist/app/translators/IModelAutoMapper';
     export * from '@micro-fleet/common/dist/app/translators/ModelAutoMapper';

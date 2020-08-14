@@ -76,7 +76,7 @@ export class ModelD {
     @d.number({ min: 15, max: 99 })
     public readonly age: number = undefined
 
-    @d.only('male', 'female')
+    @d.valid('male', 'female')
     public readonly gender: 'male' | 'female' = undefined
 }
 

@@ -133,6 +133,18 @@ function toDate(dateString: string): Date {
 }
 
 
+export type BigIntJoi = joi.AnySchema & {
+    /**
+     * Converts the validated output to string, regardless of the input type.
+     */
+    asString(): BigIntJoi,
+
+    /**
+     * Converts the validated output to native bigint, regardless of the input type.
+     */
+    asNative(): BigIntJoi,
+}
+
 export type DateStringJoi = joi.AnySchema & {
     /**
      * Whether the input string is in UTC format.
@@ -164,16 +176,7 @@ export type ExtendedJoi = joi.AnySchema & {
      * extJoi.bigint().asNative().validate('98765443123456');
      * extJoi.bigint().validate('98765443123456', {convert: true});
      */
-    bigint(): joi.AnySchema & {
-        /**
-         * Converts input to string.
-         */
-        asString(): joi.AnySchema,
-        /**
-         * Converts input to native BigInt.
-         */
-        asNative(): joi.AnySchema,
-    }
+    bigint(): BigIntJoi
 
     /**
      * Makes sure input is in W3C Date and Time Formats,

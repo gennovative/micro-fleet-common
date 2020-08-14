@@ -1,7 +1,6 @@
 import * as joi from '@hapi/joi'
-import cloneDeep = require('lodash.clonedeep')
 
-import { JoiModelValidatorConstructorOptions } from './IModelValidator'
+import { ValidationOptions, JoiModelValidatorConstructorOptions } from './IModelValidator'
 import { JoiModelValidator } from './JoiModelValidator'
 import { isEmpty } from '../utils/ObjectUtil'
 
@@ -9,6 +8,7 @@ import { isEmpty } from '../utils/ObjectUtil'
 // This file is for internal use, do not export to (lib)user
 
 export type PropValidationMetadata = {
+    ownerClass: any,
     type?(): joi.AnySchema;
     rules?: Array<(prev: joi.AnySchema) => joi.AnySchema>,
     rawSchema?: joi.SchemaLike,
@@ -32,6 +32,15 @@ export function createClassValidationMetadata(): ClassValidationMetadata {
     }
 }
 
+function cloneMetadata(source: ClassValidationMetadata): ClassValidationMetadata {
+    return {
+        schemaMapId: { ...source.schemaMapId },
+        schemaMapModel: { ...source.schemaMapModel },
+        props: { ...source.props },
+        idProps: new Set(source.idProps),
+    }
+}
+
 export function getClassValidationMetadata(Class: Function): ClassValidationMetadata {
     const ownMeta = Reflect.getOwnMetadata(VALIDATE_META, Class)
     if (ownMeta) {
@@ -40,7 +49,7 @@ export function getClassValidationMetadata(Class: Function): ClassValidationMeta
 
     const inheritMeta = Reflect.getMetadata(VALIDATE_META, Class)
     if (inheritMeta) {
-        return cloneDeep(inheritMeta)
+        return cloneMetadata(inheritMeta)
     }
     return createClassValidationMetadata()
 }
@@ -61,11 +70,17 @@ export function deleteClassValidationMetadata(Class: Function): void {
 //     }
 // }
 
-export function extractPropValidationMetadata(classMeta: ClassValidationMetadata, propName: string | symbol): PropValidationMetadata {
-    return classMeta.props[propName as string] || {
-        type: () => joi.string(),
-        rules: [],
-    }
+export function extractPropValidationMetadata(
+    classMeta: ClassValidationMetadata, propName: string | symbol, ownerClass: any,
+): PropValidationMetadata {
+    const found = classMeta.props[propName as string]
+    return (found != null && found.ownerClass === ownerClass)
+        ? found
+        : {
+            type: () => joi.string(),
+            rules: [],
+            ownerClass,
+        }
 }
 
 /**
@@ -81,16 +96,20 @@ export function setPropValidationMetadata(
 }
 
 
-export function createJoiValidator<T>(Class: Function): JoiModelValidator<T> {
+export function createJoiValidator<T>(
+    Class: Function,
+    joiOptions?: ValidationOptions,
+): JoiModelValidator<T> {
     const classMeta = getClassValidationMetadata(Class)
     const [schemaMapId, schemaMapModel] = buildSchemaMapModel(classMeta)
     if (isEmpty(schemaMapId) && isEmpty(schemaMapModel)) {
+        // Class doesn't need validating
         return null
     }
     const validator = new JoiModelValidator<T>({
         schemaMapModel,
         schemaMapId,
-        joiOptions: classMeta.joiOptions,
+        joiOptions: joiOptions || classMeta.joiOptions,
     })
     // Clean up
     deleteClassValidationMetadata(Class)
@@ -99,7 +118,6 @@ export function createJoiValidator<T>(Class: Function): JoiModelValidator<T> {
 
 function buildSchemaMapModel(classMeta: ClassValidationMetadata): [joi.SchemaMap, joi.SchemaMap] {
     // Property decorators can override class schema maps
-
     // tslint:disable-next-line:prefer-const
     for (let [prop, meta] of Object.entries(classMeta.props)) {
         const propSchema = buildPropSchema(meta)

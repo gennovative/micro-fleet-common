@@ -4,7 +4,7 @@ import { lazyInject } from './di/lazyInject'
 import * as v from './validators/validate-decorator'
 
 export { ArrayDecoratorOptions, BooleanDecoratorOptions, BigIntDecoratorOptions,
-    NumberDecoratorOptions, DateTimeDecoratorOptions, StringDecoratorOptions,
+    NumberDecoratorOptions, DateStringDecoratorOptions, StringDecoratorOptions,
 } from './validators/validate-decorator'
 
 
@@ -46,7 +46,7 @@ export type Decorators = {
     /**
      * Used to decorate model class' properties to assert it must be a Big Int.
      */
-    bigInt: typeof v.bigInt,
+    bigint: typeof v.bigint,
 
     /**
      * Used to decorate model class' properties to assert it must be a boolean.
@@ -58,13 +58,13 @@ export type Decorators = {
      *
      * ```typescript
      * class ModelA {
-     *    @datetime()
+     *    @dateString()
      *    birthdate: string
      * }
      *
      *
      * class ModelB {
-     *    @datetime({ convert: true })
+     *    @dateString({ convert: true })
      *    birthdate: Date
      * }
      *
@@ -72,12 +72,12 @@ export type Decorators = {
      * import * as moment from 'moment'
      *
      * class ModelC {
-     *    @datetime({ isUTC: true, translator: moment, convert: true })
+     *    @dateString({ isUTC: true, translator: moment, convert: true })
      *    birthdate: moment.Moment
      * }
      * ```
      */
-    datetime: typeof v.datetime,
+    dateString: typeof v.dateString,
 
     /**
      * Used to decorate model class' properties to specify default value.
@@ -105,12 +105,12 @@ export type Decorators = {
      * enum AccountStatus { ACTIVE = 'active', LOCKED = 'locked' }
      *
      * class Model {
-     *   @only(AccountStatus.ACTIVE, AccountStatus.LOCKED)
+     *   @valid(AccountStatus.ACTIVE, AccountStatus.LOCKED)
      *   status: AccountStatus
      * }
      * ```
      */
-    only: typeof v.only,
+    valid: typeof v.valid,
 
     /**
      * Used to decorate model class' properties to assert it must exist and have non-undefined value.
@@ -149,12 +149,9 @@ export type Decorators = {
     string: typeof v.string,
 
     /**
-     * Used to decorate model class to declare validation rules.
-     *
-     * If `validatorOptions.schemaMapModel` is specified, it overrides all properties' decorators
-     * such as @validateProp(), @number(), @defaultAs()...
-     *
-     * If `validatorOptions.schemaMapId` is specified, it overrides the @id() decorator.
+     * Used to decorate model class to __exclusively__ declare validation rules,
+     * which means it __replaces__ all rules and options from parent class
+     * as well as property rules in same class.
      *
      * @param {JoiModelValidatorConstructorOptions} validatorOptions The options for creating `JoiModelValidator` instance.
      */
@@ -162,7 +159,7 @@ export type Decorators = {
 
     /**
      * Used to decorate model class' properties to declare complex validation rules.
-     * Note that this decorator overrides other ones such as @defaultAs(), @number(), @only()...
+     * Note that this decorator overrides other ones such as @defaultAs(), @number(), @valid()...
      *
      * @param {joi.SchemaLike} schema A single schema rule for this property.
      *
@@ -208,13 +205,13 @@ export const decorators: Decorators = {
     lazyInject,
 
     array: v.array,
-    bigInt: v.bigInt,
+    bigint: v.bigint,
     boolean: v.boolean,
-    datetime: v.datetime,
+    dateString: v.dateString,
     defaultAs: v.defaultAs,
     id: v.id,
     number: v.number,
-    only: v.only,
+    valid: v.valid,
     required: v.required,
     string: v.string,
     validateClass: v.validateClass,

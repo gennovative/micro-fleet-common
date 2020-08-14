@@ -23,6 +23,7 @@ __export(require("./models/Maybe"));
 __export(require("./models/PagedData"));
 __export(require("./models/Result"));
 __export(require("./models/Translatable"));
+__export(require("./mock-for-test"));
 __export(require("./translators/AccessorSupportMapper"));
 __export(require("./translators/ModelAutoMapper"));
 __export(require("./utils/ObjectUtil"));
